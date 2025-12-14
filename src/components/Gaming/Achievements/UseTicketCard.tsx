@@ -1,19 +1,31 @@
 import React, { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { applyTicket } from "../../../store/slices/achievementSlice";
+
+// TODO: Replace with API data
+interface Restaurant {
+  id: string;
+  name: string;
+  ownerPassword: string;
+  logo?: string;
+  location?: string;
+}
 
 interface UseTicketCardProps {
   ticketId: string;
   onCancel: () => void;
+  restaurants?: Restaurant[];
+  onApplyTicket?: (data: {
+    ticketId: string;
+    restaurantId: string;
+    billAmount: number;
+  }) => void;
 }
 
 const UseTicketCard: React.FC<UseTicketCardProps> = ({
   ticketId,
   onCancel,
+  restaurants = [],
+  onApplyTicket,
 }) => {
-  const dispatch = useAppDispatch();
-  const { restaurants } = useAppSelector((state) => state.achievement);
-
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [ownerPassword, setOwnerPassword] = useState("");
   const [billAmount, setBillAmount] = useState("");
@@ -52,14 +64,12 @@ const UseTicketCard: React.FC<UseTicketCardProps> = ({
       return;
     }
 
-    // Use the ticket
-    dispatch(
-      applyTicket({
-        ticketId,
-        restaurantId: selectedRestaurant,
-        billAmount: parseFloat(billAmount),
-      })
-    );
+    // Use the ticket - TODO: Replace with API call
+    onApplyTicket?.({
+      ticketId,
+      restaurantId: selectedRestaurant,
+      billAmount: parseFloat(billAmount),
+    });
 
     setSuccess(true);
 

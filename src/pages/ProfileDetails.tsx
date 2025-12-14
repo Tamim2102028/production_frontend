@@ -8,9 +8,20 @@ import {
   FaUniversity,
   FaBriefcase,
 } from "react-icons/fa";
-import { getUserById, getCurrentUserId } from "../services/userService";
 import PageLoader from "./Fallbacks/PageLoader";
-import type { UserData } from "../data/profile-data/userData";
+
+// TODO: Replace with API types
+type UserData = {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  phone?: string;
+  avatar: string;
+  institution?: string;
+  department?: string;
+  bio?: string;
+};
 
 type UserInfo = UserData | null;
 
@@ -19,19 +30,15 @@ const ProfileDetails: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get current user ID
-  const currentUserId = getCurrentUserId();
+  // TODO: Replace with API calls
+  const currentUserId = "1";
+  const [userData, setUserData] = useState<UserInfo>(null);
 
   // Check if viewing own profile
   const isOwnProfile = !userId || userId === currentUserId;
 
   // Get actual user ID (default to current user ID)
   const actualUserId = userId || currentUserId;
-
-  // Get user data - always fetch from UserData service
-  const userData: UserInfo = isOwnProfile
-    ? getUserById(currentUserId)
-    : getUserById(actualUserId);
 
   useEffect(() => {
     const timer = setTimeout(() => {

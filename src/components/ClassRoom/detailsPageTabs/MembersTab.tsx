@@ -1,44 +1,53 @@
 import React from "react";
 import FriendCard from "../../shared/friends/FriendCard";
-import { type UserData } from "../../../data/profile-data/userData";
 import { showError } from "../../../utils/sweetAlert";
 import { showMemberMenu } from "../../../utils/customModals";
-import { useAppSelector } from "../../../store/hooks";
-import type { RootState } from "../../../store/store";
-import { getCurrentUserId, getUserById } from "../../../services/userService";
+
+// TODO: Replace with API types
+type UserData = {
+  id: string;
+  name: string;
+  avatar?: string;
+};
+
+type RoomMember = {
+  userId: string;
+  roomId: string;
+  role: "creator" | "admin" | "member";
+};
 
 interface Props {
-  roomId: string; // Changed: Now we take roomId instead of members array
+  roomId: string;
   users: UserData[];
+  members: RoomMember[];
+  currentUserId?: string;
   // admin and member management callbacks (optional)
   onRemoveMember?: (id: string) => void;
   onMakeAdmin?: (id: string) => void;
   onRemoveAdmin?: (id: string) => void;
-  // No longer need creatorId and admins props - will get from Redux
 }
 
 const MembersTab: React.FC<Props> = ({
   roomId,
   users,
+  members,
+  currentUserId,
   onRemoveMember,
   onMakeAdmin,
   onRemoveAdmin,
 }) => {
-  const currentUserId = getCurrentUserId();
-  const currentUser = getUserById(currentUserId);
+  const currentUser = users.find((u) => u.id === currentUserId);
 
-  // Get all friendship data from Redux at component level
-  const allFriendships = useAppSelector(
-    (s: RootState) => s.friends.friendships
-  );
-  const allFriendRequests = useAppSelector(
-    (s: RootState) => s.friends.friendRequests
-  );
+  // TODO: Replace with API data
+  const allFriendships: { user1Id: string; user2Id: string }[] = [];
+  const allFriendRequests: {
+    status: string;
+    senderId: string;
+    receiverId: string;
+  }[] = [];
 
-  // Get room members from Redux
-  const roomMembers = useAppSelector((s: RootState) =>
-    s.classRoom.members.filter((m) => m.roomId === roomId)
-  );
+  // Filter room members
+  const roomMembers = members.filter((m) => m.roomId === roomId);
 
   // Extract creator and admins from room members
   const creator = roomMembers.find((m) => m.role === "creator");

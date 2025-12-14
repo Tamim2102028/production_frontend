@@ -8,17 +8,35 @@ import {
   FaArrowLeft,
 } from "react-icons/fa";
 import { showSuccess, showError } from "../../utils/sweetAlert";
-import type { Group } from "../../data/group-data/preGroupData";
-import { addMemberToGroup } from "../../data/group-data/groupMembers";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { createGroup } from "../../store/slices/groupSlice";
+
+// TODO: Replace with API data
+interface Group {
+  id: string;
+  name: string;
+  description: string;
+  groupFor?: "students" | "teachers" | "both";
+  gender?: ("male" | "female")[];
+  type?: "academic" | "hall" | "jobs" | "others";
+  privacy?: "public" | "private" | "closed";
+  educationLevel?: string;
+  coverImage?: string;
+  profileImage?: string;
+  tags?: string[];
+  rules?: string[];
+  university?: Record<string, unknown>;
+  college?: Record<string, unknown>;
+  systemCreated?: boolean;
+  postCount?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  status?: string;
+}
 
 const CreateGroupPage: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
-  // Get current user ID from Redux store
-  const currentUserId = useAppSelector((state) => state.profile?.id);
+  // TODO: Replace with actual user ID from API/context
+  const currentUserId = "current-user-id";
 
   // Form state
   const [formData, setFormData] = useState({
@@ -180,11 +198,11 @@ const CreateGroupPage: React.FC = () => {
       };
     }
 
-    // Add current user as owner in groupMembers
-    addMemberToGroup(currentUserId, newGroupId, "owner", "active");
+    // TODO: Replace with API call to add member to group
+    console.log("Adding owner to group:", currentUserId, newGroupId);
 
-    // Dispatch to Redux store
-    dispatch(createGroup(newGroup as Group));
+    // TODO: Replace with API call to create group
+    console.log("Creating group:", newGroup);
 
     // Show success message
     showSuccess({

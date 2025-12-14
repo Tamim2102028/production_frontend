@@ -7,7 +7,6 @@ import {
   FaFile,
   FaPlus,
 } from "react-icons/fa";
-import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import {
   showSuccess,
   confirmDelete,
@@ -16,19 +15,6 @@ import {
   showUploadSuccess,
 } from "../../../utils/sweetAlert";
 import FileActionButton from "../../shared/FileActionButtons";
-import {
-  selectTheoryCourses,
-  selectSessionalCourses,
-  selectIsViewingFolder,
-  selectBreadcrumbPath,
-  selectCurrentFolderItems,
-  navigateToFolder,
-  navigateToSubFolder,
-  navigateBack,
-  navigateToBreadcrumb,
-  createFolderInArchive,
-  uploadFileToArchive,
-} from "../../../store/slices/communityStudyArchiveSlice";
 import Breadcrumb from "../PersonalFiles/Breadcrumb";
 import UploadModal from "../PersonalFiles/UploadModal";
 import FileActionsMenu from "../../FilesAndArchive/shared/FileActionsMenu";
@@ -50,15 +36,26 @@ type FileItem = {
   views?: number;
 };
 
-const FolderSection: React.FC = () => {
-  const dispatch = useAppDispatch();
+// TODO: Replace with API types
+type Course = {
+  id: string;
+  name: string;
+  code: string;
+  folders: { id: string; name: string; fileCount: number }[];
+};
 
-  // Redux state - get courses based on selected level and term
-  const theoryCourses = useAppSelector(selectTheoryCourses);
-  const sessionalCourses = useAppSelector(selectSessionalCourses);
-  const isViewingFolder = useAppSelector(selectIsViewingFolder);
-  const breadcrumbPath = useAppSelector(selectBreadcrumbPath);
-  const currentFolderItems = useAppSelector(selectCurrentFolderItems);
+type BreadcrumbItem = {
+  id: string;
+  name: string;
+};
+
+const FolderSection: React.FC = () => {
+  // TODO: Replace with API data
+  const [theoryCourses] = useState<Course[]>([]);
+  const [sessionalCourses] = useState<Course[]>([]);
+  const [isViewingFolder, setIsViewingFolder] = useState(false);
+  const [breadcrumbPath, setBreadcrumbPath] = useState<BreadcrumbItem[]>([]);
+  const [currentFolderItems, setCurrentFolderItems] = useState<FileItem[]>([]);
 
   // Get current folder ID to determine what to show
   const currentFolderId =
@@ -95,32 +92,45 @@ const FolderSection: React.FC = () => {
     folderId: string,
     folderName: string
   ) => {
-    dispatch(navigateToFolder({ courseId, courseName, folderId, folderName }));
+    // TODO: Replace with API call
+    setBreadcrumbPath([
+      { id: courseId, name: courseName },
+      { id: folderId, name: folderName },
+    ]);
+    setIsViewingFolder(true);
   };
 
   const handleBackClick = () => {
-    dispatch(navigateBack());
+    // TODO: Replace with proper navigation
+    if (breadcrumbPath.length > 1) {
+      setBreadcrumbPath((prev) => prev.slice(0, -1));
+    } else {
+      setIsViewingFolder(false);
+      setBreadcrumbPath([]);
+    }
   };
 
   const handleBreadcrumbClick = (index: number) => {
-    dispatch(navigateToBreadcrumb(index));
+    // TODO: Replace with proper navigation
+    if (index === 0) {
+      setIsViewingFolder(false);
+      setBreadcrumbPath([]);
+    } else {
+      setBreadcrumbPath((prev) => prev.slice(0, index + 1));
+    }
   };
 
   const handleSubFolderClick = (folderId: string, folderName: string) => {
-    dispatch(navigateToSubFolder({ id: folderId, name: folderName }));
+    // TODO: Replace with API call
+    setBreadcrumbPath((prev) => [...prev, { id: folderId, name: folderName }]);
   };
 
   const handleCreateFolder = async () => {
     const folderName = await inputFolderName();
 
     if (folderName && currentFolderId) {
-      // Dispatch action to create folder in current location
-      dispatch(
-        createFolderInArchive({
-          parentFolderId: currentFolderId,
-          folderName,
-        })
-      );
+      // TODO: Replace with API call
+      console.log("Create folder:", folderName, "in:", currentFolderId);
 
       showSuccess({
         title: "Folder created",
@@ -184,24 +194,19 @@ const FolderSection: React.FC = () => {
   const handleUploadFiles = (files: File[]) => {
     if (!currentFolderId) return;
 
-    // Format files for Redux action
+    // Format files for upload
     const formattedFiles = files.map((file) => ({
       name: file.name,
       size: `${(file.size / 1024).toFixed(1)} KB`,
     }));
 
-    // Dispatch action to upload files to current folder
-    dispatch(
-      uploadFileToArchive({
-        folderId: currentFolderId,
-        files: formattedFiles,
-      })
-    );
+    // TODO: Replace with API call
+    console.log("Upload files:", formattedFiles, "to folder:", currentFolderId);
 
     showUploadSuccess(files.length);
   };
 
-  // Get folders and files from Redux store
+  // Get folders and files from current items
   const folders = currentFolderItems.filter((item) => item.type === "folder");
   const files = currentFolderItems.filter((item) => item.type === "file");
 

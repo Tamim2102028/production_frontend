@@ -1,19 +1,32 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAppDispatch } from "../../../store/hooks";
-import {
-  editPost,
-  deletePost,
-  editReply,
-  deleteReply,
-  togglePinPost,
-} from "../../../store/slices/classRoom/roomPostsSlice";
 import { BsThreeDots } from "react-icons/bs";
 import { formatPostDate, formatPostClock } from "../../../utils/dateUtils";
 import SeparatorDot from "../../shared/SeparatorDot";
-import { type RoomPost } from "../../../data/rooms-data/roomPostData";
-import { type UserData } from "../../../data/profile-data/userData";
 import { showPostMenu } from "../../../utils/customModals";
+
+// TODO: Replace with API types
+type RoomPost = {
+  id: string;
+  roomId: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  pinned?: boolean;
+  replies: {
+    id: string;
+    authorId: string;
+    content: string;
+    createdAt: string;
+  }[];
+  attachments?: { id: string; fileName: string; url: string }[];
+};
+
+type UserData = {
+  id: string;
+  name: string;
+  avatar?: string;
+};
 
 interface Props {
   roomId: string;
@@ -29,6 +42,11 @@ interface Props {
   currentUserId?: string;
   creatorId?: string;
   admins?: string[];
+  onEditPost?: (postId: string, content: string) => void;
+  onDeletePost?: (postId: string) => void;
+  onTogglePin?: (postId: string) => void;
+  onEditReply?: (postId: string, replyId: string, content: string) => void;
+  onDeleteReply?: (postId: string, replyId: string) => void;
 }
 
 const PostsTab: React.FC<Props> = ({
@@ -43,6 +61,11 @@ const PostsTab: React.FC<Props> = ({
   currentUserId,
   creatorId,
   admins,
+  onEditPost,
+  onDeletePost,
+  onTogglePin,
+  onEditReply,
+  onDeleteReply,
 }) => {
   const [postEditingId, setPostEditingId] = useState<string | null>(null);
   const [replyEditing, setReplyEditing] = useState<{
@@ -63,8 +86,6 @@ const PostsTab: React.FC<Props> = ({
   const toggleExpand = (postId: string) =>
     setExpandedPosts((s) => ({ ...s, [postId]: !s[postId] }));
 
-  const dispatch = useAppDispatch();
-
   const handlePostMenu = async (post: RoomPost) => {
     const isCreator = !!currentUserId && currentUserId === creatorId;
     const isAdmin = !!currentUserId && !!admins?.includes(currentUserId);
@@ -84,18 +105,21 @@ const PostsTab: React.FC<Props> = ({
       onPin:
         canPin && !post.pinned
           ? () => {
-              dispatch(togglePinPost(post.id));
+              // TODO: Replace with API call
+              onTogglePin?.(post.id);
             }
           : undefined,
       onUnpin:
         canPin && post.pinned
           ? () => {
-              dispatch(togglePinPost(post.id));
+              // TODO: Replace with API call
+              onTogglePin?.(post.id);
             }
           : undefined,
       onDelete: canDelete
         ? () => {
-            dispatch(deletePost(post.id));
+            // TODO: Replace with API call
+            onDeletePost?.(post.id);
           }
         : undefined,
     });
@@ -188,7 +212,8 @@ const PostsTab: React.FC<Props> = ({
                         onClick={() => {
                           const text = (postEditText[p.id] ?? p.content).trim();
                           if (text)
-                            dispatch(editPost({ postId: p.id, content: text }));
+                            // TODO: Replace with API call
+                            onEditPost?.(p.id, text);
                           setPostEditingId(null);
                         }}
                         className="rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white"
@@ -386,12 +411,8 @@ const PostsTab: React.FC<Props> = ({
                                           {canDeleteReply && (
                                             <button
                                               onClick={() => {
-                                                dispatch(
-                                                  deleteReply({
-                                                    postId: p.id,
-                                                    replyId: r.id,
-                                                  })
-                                                );
+                                                // TODO: Replace with API call
+                                                onDeleteReply?.(p.id, r.id);
                                               }}
                                               className="cursor-pointer text-sm font-medium text-red-600 hover:underline"
                                             >
@@ -425,13 +446,8 @@ const PostsTab: React.FC<Props> = ({
                                             replyEditText[r.id] ?? r.content
                                           ).trim();
                                           if (text)
-                                            dispatch(
-                                              editReply({
-                                                postId: p.id,
-                                                replyId: r.id,
-                                                content: text,
-                                              })
-                                            );
+                                            // TODO: Replace with API call
+                                            onEditReply?.(p.id, r.id, text);
                                           setReplyEditing(null);
                                         }}
                                         className="rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white"

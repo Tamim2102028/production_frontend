@@ -1,14 +1,22 @@
 import React from "react";
-import { useAppSelector } from "../../store/hooks";
-import { selectFilteredPosts } from "../../store/slices/search/searchSlice";
 import HomePostCard from "../Home/HomePostCard";
+
+// TODO: Replace with API data
+interface Post {
+  postId: string;
+  [key: string]: unknown;
+}
 
 interface PostsResultsProps {
   isVisible: boolean;
+  posts?: Post[];
 }
 
-const PostsResults: React.FC<PostsResultsProps> = ({ isVisible }) => {
-  const filteredPosts = useAppSelector(selectFilteredPosts);
+const PostsResults: React.FC<PostsResultsProps> = ({
+  isVisible,
+  posts = [],
+}) => {
+  const filteredPosts = posts;
 
   if (!isVisible) return null;
   if (filteredPosts.length === 0) return null;

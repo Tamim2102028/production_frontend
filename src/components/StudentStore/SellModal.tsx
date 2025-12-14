@@ -30,7 +30,7 @@ const SellModal: React.FC<SellModalProps> = ({
 
   const handleImageAdd = () => {
     // In a real app, this would open file picker
-    const newImage = `https://via.placeholder.com/300x300?text=Image+${images.length + 1}`;
+    const newImage = `https://placehold.co/300x300/e2e8f0/64748b?text=Image+${images.length + 1}`;
     setImages([...images, newImage]);
   };
 

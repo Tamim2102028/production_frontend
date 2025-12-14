@@ -1,7 +1,4 @@
 import React, { useState } from "react";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
-import type { RootState } from "../../store/store";
 import { confirm } from "../../utils/sweetAlert";
 import { FaPoll, FaPlus, FaBullhorn } from "react-icons/fa";
 import dayjs from "dayjs";
@@ -14,27 +11,15 @@ import {
   type Poll,
   type Announcement,
 } from "../../components/CRCorner";
-import {
-  selectAllPolls,
-  selectActivePolls,
-  selectEndedPolls,
-  selectAllAnnouncements,
-  createPoll,
-  updatePoll,
-  deletePoll,
-  endPoll,
-  reopenPoll,
-  votePoll,
-  cancelVote,
-  createAnnouncement,
-  updateAnnouncement,
-  deleteAnnouncement,
-  toggleAnnouncementRead,
-} from "../../store/slices/university/crCornerSlice";
+
+// TODO: Replace with API data
+interface User {
+  id: string;
+  name: string;
+  university?: { isCr?: boolean };
+}
 
 const CRCorner: React.FC = () => {
-  const dispatch = useAppDispatch();
-
   // track selected option per poll: { [pollId]: optionId }
   const [selectedPolls, setSelectedPolls] = useState<
     Record<number, number | null>
@@ -58,23 +43,26 @@ const CRCorner: React.FC = () => {
   const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
   const [editingPollId, setEditingPollId] = useState<number | null>(null);
 
-  // current logged-in user (from profile slice)
-  const currentUser = useAppSelector((s: RootState) =>
-    selectUserById(s, s.profile.id)
-  );
+  // TODO: Replace with actual current user from API/context
+  const currentUser: User | undefined = {
+    id: "current-user-id",
+    name: "Current User",
+    university: { isCr: true },
+  };
 
   const isCurrentUserCr = !!currentUser?.university?.isCr;
 
-  // Get data from Redux store
-  const polls = useAppSelector(selectAllPolls);
-  const announcements = useAppSelector(selectAllAnnouncements);
-  const activePolls = useAppSelector(selectActivePolls);
-  const endedPolls = useAppSelector(selectEndedPolls);
+  // TODO: Replace with API data
+  const polls: Poll[] = [];
+  const announcements: Announcement[] = [];
+  const activePolls: Poll[] = [];
+  const endedPolls: Poll[] = [];
 
   // Toggle read state for a given announcement for the current user
   const toggleRead = (id: number) => {
     if (!currentUser?.id) return;
-    dispatch(toggleAnnouncementRead({ id, userId: currentUser.id }));
+    // TODO: Replace with API call
+    console.log("Toggle read:", { id, userId: currentUser.id });
   };
 
   const handleVote = (pollId: number, optionId: number) => {

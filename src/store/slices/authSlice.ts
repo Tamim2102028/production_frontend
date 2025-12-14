@@ -1,110 +1,69 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import type { User, AuthState } from "../../types/user.types";
 
-interface User {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  avatar: string;
-  bio?: string;
-  location?: string;
-  website?: string;
-  coverPhoto?: string;
-  university?: string; // University name
-  universityId?: string; // University ID for tournament matching
-  followers: number;
-  following: number;
-  postsCount: number;
-  joinedDate: string;
-}
-
-interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  token: string | null;
-  loading: boolean;
-  error: string | null;
-}
+/**
+ * ====================================
+ * AUTH SLICE - Redux State Management
+ * ====================================
+ *
+ * এই slice এ authentication related সব state manage করা হয়।
+ *
+ * State:
+ * - user: Current logged in user এর data
+ * - isAuthenticated: User logged in কিনা
+ * - isLoading: API call চলছে কিনা
+ * - isCheckingAuth: App load এ auth check হচ্ছে কিনা
+ *
+ * Actions:
+ * - setUser: Login/Register success এ user set করে
+ * - clearUser: Logout এ সব clear করে
+ * - setLoading: Loading state toggle
+ * - setCheckingAuth: Initial auth check state
+ * - updateUser: User data partially update
+ */
 
 const initialState: AuthState = {
-  isAuthenticated: false, // Set to false initially
   user: null,
-  token: null,
-  loading: false,
-  error: null,
+  isAuthenticated: false,
+  isLoading: false,
+
+  // ⚠️ IMPORTANT: এটা true থেকে শুরু হয়
+  // কারণ app load এ আমরা /current-user check করি
+  // Check শেষ না হওয়া পর্যন্ত loading দেখাই
+  isCheckingAuth: true,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    loginStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    loginSuccess: (state, action: PayloadAction<User>) => {
-      state.isAuthenticated = true;
+    setUser: (state, action) => {
       state.user = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    login: (state, action: PayloadAction<{ user: User; token: string }>) => {
       state.isAuthenticated = true;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.loading = false;
-      state.error = null;
+      state.isLoading = false;
+      state.isCheckingAuth = false;
     },
-    loginFailure: (state, action: PayloadAction<string>) => {
-      state.isAuthenticated = false;
+    clearUser: (state) => {
       state.user = null;
-      state.loading = false;
-      state.error = action.payload;
-    },
-    logout: (state) => {
       state.isAuthenticated = false;
-      state.user = null;
-      state.token = null;
-      state.loading = false;
-      state.error = null;
+      state.isLoading = false;
+      state.isCheckingAuth = false;
     },
-    updateProfile: (state, action: PayloadAction<Partial<User>>) => {
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
+    setCheckingAuth: (state, action) => {
+      state.isCheckingAuth = action.payload;
+    },
+    updateUser: (state, action) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
       }
     },
-    updateFollowersCount: (state, action: PayloadAction<number>) => {
-      if (state.user) {
-        state.user.followers = action.payload;
-      }
-    },
-    updateFollowingCount: (state, action: PayloadAction<number>) => {
-      if (state.user) {
-        state.user.following = action.payload;
-      }
-    },
-    updatePostsCount: (state, action: PayloadAction<number>) => {
-      if (state.user) {
-        state.user.postsCount = action.payload;
-      }
-    },
-    clearError: (state) => {
-      state.error = null;
-    },
   },
 });
 
-export const {
-  loginStart,
-  loginSuccess,
-  login,
-  loginFailure,
-  logout,
-  updateProfile,
-  updateFollowersCount,
-  updateFollowingCount,
-  updatePostsCount,
-  clearError,
-} = authSlice.actions;
+export const { setUser, clearUser, setLoading, setCheckingAuth, updateUser } =
+  authSlice.actions;
 
 export default authSlice.reducer;

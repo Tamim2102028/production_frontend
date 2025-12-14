@@ -1,39 +1,60 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
-import type { UserData } from "../../data/profile-data/userData";
-import {
-  deleteCommentAndDecrement,
-  toggleLikeComment,
-} from "../../store/slices/commentsSlice";
-import {
-  addReply,
-  selectRepliesByCommentId,
-  deleteReply,
-  toggleLikeReply,
-} from "../../store/slices/repliesSlice";
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "./SeparatorDot";
 import { confirmDelete, showSuccess } from "../../utils/sweetAlert";
-import type { CommentData } from "../../data/profile-data/profilePostCommentsData";
+import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_XS } from "../../constants/images";
+
+// TODO: Replace with API data
+interface UserData {
+  id: string;
+  name: string;
+  avatar?: string;
+}
+
+export interface ReplyData {
+  replyId: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+  likedBy?: string[];
+}
+
+export interface CommentData {
+  commentId: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+  likedBy?: string[];
+  replies?: ReplyData[];
+}
 
 interface CommentItemProps {
   comment: CommentData;
-  postOwnerId: string; // ID of the post owner
+  postOwnerId: string;
+  currentUserId?: string;
+  commentUser?: UserData | null;
+  onLikeComment?: (commentId: string) => void;
+  onDeleteComment?: (commentId: string) => void;
+  onAddReply?: (commentId: string, content: string) => void;
+  onLikeReply?: (replyId: string) => void;
+  onDeleteReply?: (replyId: string) => void;
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
+const CommentItem: React.FC<CommentItemProps> = ({
+  comment,
+  postOwnerId,
+  currentUserId = "",
+  commentUser,
+  onLikeComment,
+  onDeleteComment,
+  onAddReply,
+  onLikeReply,
+  onDeleteReply,
+}) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
-  const currentUserId = useAppSelector((state) => state.auth.user?.id);
-  const commentUser = useAppSelector((state) =>
-    selectUserById(state, comment.userId)
-  );
 
   // Check if current user can delete this comment
-  // (either the comment creator or the post owner)
   const canDelete =
     currentUserId === comment.userId || currentUserId === postOwnerId;
 
@@ -43,7 +64,8 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
     comment.likedBy.includes(currentUserId);
   const likesCount = comment.likedBy ? comment.likedBy.length : 0;
 
-  const currentUser = useAppSelector((state) => state.profile);
+  // TODO: Replace with actual current user from API/context
+  const currentUser = { id: currentUserId, name: "Current User", avatar: "" };
 
   const handleProfileClick = () => {
     navigate(`/profile/${comment.userId}`);
@@ -53,7 +75,8 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
     const result = await confirmDelete("this comment");
 
     if (result) {
-      dispatch(deleteCommentAndDecrement(comment.commentId));
+      // TODO: Replace with API call
+      onDeleteComment?.(comment.commentId);
       await showSuccess({
         title: "Deleted!",
         text: "Comment deleted successfully",
@@ -63,32 +86,19 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
 
   // Reply UI state
   const [showReplyInput, setShowReplyInput] = React.useState(false);
-  // control showing/hiding the replies list (toggle together with reply input)
   const [showReplies, setShowReplies] = React.useState(false);
   const [replyText, setReplyText] = React.useState("");
 
   const replyTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
-  const replies = useAppSelector((state) =>
-    selectRepliesByCommentId(state, comment.commentId)
-  );
-
-  // Replies are hidden by default; clicking Reply toggles both input and the replies list.
-
-  // Map of reply user data by id to avoid calling hooks inside loops
-  const replyUsersMap = useAppSelector((state) => {
-    const map: Record<string, UserData | null> = {};
-    replies.forEach((r) => {
-      map[r.userId] = selectUserById(state, r.userId);
-    });
-    return map;
-  });
+  // Get replies from comment data
+  const replies = comment.replies || [];
 
   const handleSendReply = () => {
     const text = replyText.trim();
     if (!text) return;
-    const userId = currentUserId || "1";
-    dispatch(addReply({ commentId: comment.commentId, userId, content: text }));
+    // TODO: Replace with API call
+    onAddReply?.(comment.commentId, text);
     // Keep the input open after sending; clear text and ensure replies list is visible
     setReplyText("");
     setShowReplies(true);
@@ -99,7 +109,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
   const handleDeleteReply = async (replyId: string) => {
     const result = await confirmDelete("this reply");
     if (result) {
-      dispatch(deleteReply(replyId));
+      onDeleteReply?.(replyId);
       await showSuccess({
         title: "Deleted!",
         text: "Reply deleted successfully",
@@ -122,7 +132,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
       <div className="flex-1">
         <div className="rounded-lg bg-gray-100 px-3 py-2">
           <span
-            className="ing-sition-colors cursor-pointer text-sm font-semibold text-gray-900 hover:text-blue-600 hover:underline"
+            className="cursor-pointer text-sm font-semibold text-gray-900 transition-colors hover:text-blue-600 hover:underline"
             onClick={handleProfileClick}
           >
             {commentUser?.name || "User"}
@@ -139,12 +149,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
           <SeparatorDot />
 
           <button
-            onClick={() => {
-              const userId = currentUserId || "1";
-              dispatch(
-                toggleLikeComment({ commentId: comment.commentId, userId })
-              );
-            }}
+            onClick={() => onLikeComment?.(comment.commentId)}
             className={`cursor-pointer hover:underline ${isLiked ? "font-medium text-green-700" : "text-gray-600"}`}
           >
             Like{likesCount > 0 ? ` · ${likesCount}` : ""}
@@ -159,7 +164,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
             }}
             className="cursor-pointer text-gray-600 hover:underline"
           >
-            {`Reply${replies && replies.length > 0 ? ` · ${replies.length}` : ""}`}
+            {`Reply${replies.length > 0 ? ` · ${replies.length}` : ""}`}
           </button>
 
           {canDelete && (
@@ -180,7 +185,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
           <div className="mt-2 pl-10">
             <div className="flex items-start space-x-3">
               <img
-                src={currentUser.avatar || "https://via.placeholder.com/32"}
+                src={currentUser.avatar || DEFAULT_AVATAR_SM}
                 alt={currentUser.name || "You"}
                 className="h-8 w-8 rounded-full bg-gray-300 object-cover"
               />
@@ -214,10 +219,9 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
         )}
 
         {/* Replies list (after the comment controls) */}
-        {showReplies && replies && replies.length > 0 && (
+        {showReplies && replies.length > 0 && (
           <div className="mt-2 space-y-2 pl-10">
             {replies.map((r) => {
-              const replyUser = replyUsersMap[r.userId];
               const isReplyLiked =
                 !!currentUserId &&
                 !!r.likedBy &&
@@ -231,14 +235,12 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
                   className="flex items-start space-x-2 text-sm"
                 >
                   <img
-                    src={replyUser?.avatar || "https://via.placeholder.com/24"}
-                    alt={replyUser?.name || "User"}
+                    src={DEFAULT_AVATAR_XS}
+                    alt={"User"}
                     className="h-6 w-6 rounded-full bg-gray-200 object-cover"
                   />
                   <div className="rounded-lg bg-gray-50 px-2 py-1">
-                    <div className="font-semibold text-gray-900">
-                      {replyUser?.name || "User"}
-                    </div>
+                    <div className="font-semibold text-gray-900">User</div>
                     <div className="text-gray-700">{r.content}</div>
                     <div className="mt-1 flex items-center space-x-2 text-xs text-gray-400">
                       <span>{formatPostDate(r.createdAt)}</span>
@@ -248,26 +250,22 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postOwnerId }) => {
                       <SeparatorDot />
 
                       <button
-                        onClick={() => {
-                          const userId = currentUserId || "1";
-                          dispatch(
-                            toggleLikeReply({ replyId: r.replyId, userId })
-                          );
-                        }}
+                        onClick={() => onLikeReply?.(r.replyId)}
                         className={`cursor-pointer hover:underline ${isReplyLiked ? "font-medium text-green-700" : "text-gray-600"}`}
                       >
                         Like{replyLikesCount > 0 ? ` · ${replyLikesCount}` : ""}
                       </button>
 
-                      <SeparatorDot />
-
                       {canDeleteReply && (
-                        <button
-                          onClick={() => handleDeleteReply(r.replyId)}
-                          className="cursor-pointer font-medium text-red-600 hover:underline"
-                        >
-                          Delete
-                        </button>
+                        <>
+                          <SeparatorDot />
+                          <button
+                            onClick={() => handleDeleteReply(r.replyId)}
+                            className="cursor-pointer font-medium text-red-600 hover:underline"
+                          >
+                            Delete
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>

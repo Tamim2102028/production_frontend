@@ -1,8 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiX } from "react-icons/fi";
-import { useAppDispatch } from "../../store/hooks";
-import { addPost } from "../../store/slices/classRoom/roomPostsSlice";
-import type { RoomPost } from "../../data/rooms-data/roomPostData";
+
+// TODO: Replace with API types
+type RoomPost = {
+  id: string;
+  roomId: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  replies: unknown[];
+  attachments?: {
+    id: string;
+    fileName: string;
+    url: string;
+    mimeType?: string;
+    sizeKb?: number;
+  }[];
+};
 
 interface Props {
   roomId: string;
@@ -27,7 +41,6 @@ const CreatePostForm: React.FC<Props> = ({
     }[]
   >([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const dispatch = useAppDispatch();
 
   const handleSubmit = () => {
     const content = text.trim();
@@ -52,7 +65,8 @@ const CreatePostForm: React.FC<Props> = ({
       attachments: atts.length ? atts : undefined,
     };
 
-    dispatch(addPost(newPost));
+    // TODO: Replace with API call
+    console.log("Create post:", newPost);
     setText("");
     // keep object URLs intact so the posted attachments remain viewable.
     // we only revoke when the user removes a preview or when the component unmounts.

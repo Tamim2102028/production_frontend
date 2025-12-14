@@ -1,22 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaBell, FaCheck } from "react-icons/fa";
-import { useAppSelector } from "../store/hooks";
-import { NotificationFilters, NotificationItem } from "../components/Notifications";
+import {
+  NotificationFilters,
+  NotificationItem,
+} from "../components/Notifications";
+
+// TODO: Define types when API is connected
+interface Notification {
+  id: string;
+  type: string;
+  user: { name: string; avatar: string };
+  content: string;
+  timestamp: string;
+  isRead: boolean;
+  postContent?: string;
+}
 
 const Notifications: React.FC = () => {
-  const filter = useAppSelector((state) => state.ui.notifications.filter);
-  const notifications = useAppSelector(
-    (state) => state.notifications.notifications
-  );
+  // TODO: Get filter from state management or URL params
+  const [filter, setFilter] = useState<"all" | "unread">("all");
+
+  // TODO: Fetch notifications from API
+  const notifications: Notification[] = [];
 
   const markAsRead = (id: string) => {
-    // TODO: Dispatch action to mark single notification as read
-    console.log("Mark as read:", id);
+    // TODO: Call API to mark single notification as read
+    console.log("TODO: Mark as read via API:", id);
   };
 
   const markAllAsRead = () => {
-    // TODO: Dispatch action to mark all as read
-    console.log("Mark all as read");
+    // TODO: Call API to mark all as read
+    console.log("TODO: Mark all as read via API");
   };
 
   const filteredNotifications =
@@ -34,7 +48,7 @@ const Notifications: React.FC = () => {
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="flex items-center gap-2 font-medium text-blue-600 cursor-pointer"
+            className="flex cursor-pointer items-center gap-2 font-medium text-blue-600"
           >
             <FaCheck className="h-4 w-4" />
             Mark all as read

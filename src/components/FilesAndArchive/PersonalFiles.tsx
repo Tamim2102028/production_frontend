@@ -7,67 +7,70 @@ import FilesList from "./PersonalFiles/FilesList";
 import UploadModal from "./PersonalFiles/UploadModal";
 import { inputFolderName, showSuccess } from "../../utils/sweetAlert";
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  navigateToFolder,
-  navigateBack,
-  navigateToBreadcrumb,
-  createNewFolder as createFolder,
-  uploadFiles as uploadFilesToStore,
-  selectCurrentFiles,
-  selectCurrentPath,
-  selectBreadcrumbPath,
-} from "../../store/slices/filesSlice";
-import type { RootState } from "../../store/store";
-import { selectUserById } from "../../store/slices/profileSlice";
-// Note: This view renders a fixed set of folders (Level/Term grid)
+
+// TODO: Replace with API data
+interface FileItem {
+  id: string;
+  name: string;
+  type: "folder" | "file";
+  size?: string;
+  createdAt: string;
+}
+
+interface BreadcrumbItem {
+  id: string;
+  name: string;
+}
 
 const PersonalFiles: React.FC = () => {
-  // Redux state and actions
-  const dispatch = useAppDispatch();
-  const currentPath = useAppSelector(selectCurrentPath);
-  const breadcrumbPath = useAppSelector(selectBreadcrumbPath);
+  // TODO: Replace with API data
+  const [currentPath, setCurrentPath] = useState<string[]>([]);
+  const [breadcrumbPath, setBreadcrumbPath] = useState<BreadcrumbItem[]>([
+    { id: "root", name: "My Files" },
+  ]);
+  const [currentFiles, setCurrentFiles] = useState<FileItem[]>([]);
 
   // Local UI state (only for modals and search)
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Navigation functions using Redux actions
+  // Navigation functions
   const handleNavigateToFolder = (folderId: string, folderName: string) => {
-    dispatch(navigateToFolder({ id: folderId, name: folderName }));
+    setCurrentPath([...currentPath, folderId]);
+    setBreadcrumbPath([...breadcrumbPath, { id: folderId, name: folderName }]);
   };
 
   const handleNavigateToBreadcrumb = (index: number) => {
-    dispatch(navigateToBreadcrumb(index));
+    setCurrentPath(currentPath.slice(0, index));
+    setBreadcrumbPath(breadcrumbPath.slice(0, index + 1));
   };
 
   const handleNavigateBack = () => {
-    dispatch(navigateBack());
+    if (currentPath.length > 0) {
+      setCurrentPath(currentPath.slice(0, -1));
+      setBreadcrumbPath(breadcrumbPath.slice(0, -1));
+    }
   };
 
-  // File management functions using Redux actions
-
+  // File management functions
   const handleOpenNewFolder = async () => {
     const folderName = await inputFolderName();
 
     if (folderName) {
-      dispatch(createFolder(folderName));
+      // TODO: Replace with API call
+      console.log("Create folder:", folderName);
       showSuccess({ title: "Folder created" });
     }
   };
 
   const handleUploadFiles = (files: File[]) => {
-    dispatch(uploadFilesToStore(files));
+    // TODO: Replace with API call
+    console.log("Upload files:", files);
   };
 
-  // Current folder files (from store)
-  const currentFiles = useAppSelector(selectCurrentFiles);
-  // Get raw user fixture so we can read university.year and semester
-  const rawUser = useAppSelector((s: RootState) =>
-    selectUserById(s, s.profile.id)
-  );
-  const userLevel = rawUser?.university?.year;
-  const userTerm = rawUser?.university?.semester;
+  // TODO: Replace with API data
+  const userLevel = 1;
+  const userTerm = 1;
 
   const getFileIcon = (item: { type: string }) => {
     return item.type === "folder" ? (

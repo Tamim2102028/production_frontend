@@ -1,48 +1,36 @@
 import React from "react";
 import FriendCard from "../shared/friends/FriendCard";
-import { usersData } from "../../data/profile-data/userData";
-import { useAppSelector } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
-import {
-  selectFriendsForUser,
-  selectPendingRequestsForUser,
-  selectSentRequestsByUser,
-} from "../../store/slices/friendsSlice";
-import type { RootState } from "../../store/store";
 
-const FriendSuggestions: React.FC = () => {
-  const currentUser = useAppSelector((s) => selectUserById(s, s.profile.id));
+// TODO: Replace with API data
+interface Suggestion {
+  id: string;
+  name: string;
+  avatar?: string;
+  [key: string]: unknown;
+}
 
-  // Get friend data from Redux friends slice
-  const friendIds = useAppSelector((s: RootState) =>
-    selectFriendsForUser(s, currentUser?.id || "")
-  );
-  const pendingRequestIds = useAppSelector((s: RootState) =>
-    selectPendingRequestsForUser(s, currentUser?.id || "")
-  );
-  const sentRequestIds = useAppSelector((s: RootState) =>
-    selectSentRequestsByUser(s, currentUser?.id || "")
-  );
+interface FriendSuggestionsProps {
+  suggestions?: Suggestion[];
+}
 
-  if (!currentUser) {
-    return <div>User not found</div>;
+const FriendSuggestions: React.FC<FriendSuggestionsProps> = ({
+  suggestions = [],
+}) => {
+  const friendSuggestions = suggestions;
+
+  if (friendSuggestions.length === 0) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900">
+          No suggestions available
+        </h3>
+        <p className="mt-2 text-gray-600">
+          We don't have any friend suggestions for you right now. Check back
+          later!
+        </p>
+      </div>
+    );
   }
-
-  // Get friend suggestions - users who are not current user, not friends, and not in pending requests
-  // friendSuggestions = [{userData}, {userData}, ...]
-  const friendSuggestions = usersData
-    .filter(
-      (user) =>
-        user.id !== currentUser.id && // Not current user
-        !friendIds.includes(user.id) && // Not already a friend
-        !pendingRequestIds.includes(user.id) && // Not in pending requests
-        !sentRequestIds.includes(user.id) // Not in sent requests
-    )
-    .map((user) => {
-      return {
-        ...user,
-      };
-    });
 
   return (
     <div className="space-y-3">

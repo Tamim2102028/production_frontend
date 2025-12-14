@@ -1,10 +1,27 @@
 import React from "react";
 import { FaTint, FaHospital, FaUser, FaPhone } from "react-icons/fa";
-import { useAppSelector } from "../../../store/hooks";
 
-const BloodRequestsTab: React.FC = () => {
-  const { requests } = useAppSelector((state) => state.bloodDonation);
+// TODO: Replace with API data
+interface BloodRequest {
+  id: string;
+  patientName: string;
+  bloodGroup: string;
+  unitsNeeded: number;
+  hospital: string;
+  contactPerson: string;
+  contactPhone: string;
+  urgency: string;
+  status: string;
+  postedDate: string;
+}
 
+interface BloodRequestsTabProps {
+  requests?: BloodRequest[];
+}
+
+const BloodRequestsTab: React.FC<BloodRequestsTabProps> = ({
+  requests = [],
+}) => {
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case "Critical":

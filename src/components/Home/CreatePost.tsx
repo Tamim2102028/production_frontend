@@ -8,30 +8,40 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import {
-  setPostContent,
-  setPostExpanded,
-  clearPostContent,
-} from "../../store/slices/uiSlice";
-import {
-  createPostStart,
-  createPostSuccess,
-} from "../../store/slices/postsSlice";
-import type { PostData } from "../../data/profile-data/profilePostData";
+import { DEFAULT_AVATAR_MD } from "../../constants/images";
+
+// TODO: Define PostData type when API is connected
+interface PostData {
+  postId: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  comments: number;
+  likedBy: string[];
+  sharesBy: string[];
+  images?: string[];
+  status: string;
+  privacy: "public" | "friends" | "private";
+  tags: string[];
+}
 
 const CreatePost: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const postContent = useAppSelector((state) => state.ui.createPost.content);
-  const isExpanded = useAppSelector((state) => state.ui.createPost.isExpanded);
-  const currentUser = useAppSelector((state) => state.profile);
+  // Local state instead of Redux
+  const [postContent, setPostContent] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // TODO: Get current user from auth context/API
+  const currentUser = {
+    id: "",
+    name: "Current User",
+    avatar: DEFAULT_AVATAR_MD,
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (postContent.trim()) {
-      // Local optimistic create (demo mode)
-      dispatch(createPostStart());
-
+      // TODO: Call API to create post
       const now = new Date().toISOString();
       const newPost: PostData = {
         postId: `p${Date.now()}`,
@@ -48,10 +58,12 @@ const CreatePost: React.FC = () => {
         tags: [],
       };
 
-      // Immediately add to store (demo optimistic update)
-      dispatch(createPostSuccess(newPost));
-      dispatch(clearPostContent());
-      // revoke object URLs used for preview now that post uses data URLs (if available)
+      console.log("TODO: Submit post to API", newPost);
+
+      // Clear form after submission
+      setPostContent("");
+      setIsExpanded(false);
+      // revoke object URLs used for preview
       selectedImages.forEach((s) => {
         try {
           URL.revokeObjectURL(s.url);
@@ -82,15 +94,15 @@ const CreatePost: React.FC = () => {
         {/* User Avatar and Input */}
         <div className="flex space-x-3">
           <img
-            src={currentUser.avatar || "https://via.placeholder.com/40"}
+            src={currentUser.avatar || DEFAULT_AVATAR_MD}
             alt={currentUser.name || "Your avatar"}
             className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
           />
           <div className="flex-1">
             <textarea
               value={postContent}
-              onChange={(e) => dispatch(setPostContent(e.target.value))}
-              onFocus={() => dispatch(setPostExpanded(true))}
+              onChange={(e) => setPostContent(e.target.value)}
+              onFocus={() => setIsExpanded(true)}
               placeholder="What's on your mind?"
               className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
               rows={isExpanded ? 4 : 1}
@@ -214,7 +226,8 @@ const CreatePost: React.FC = () => {
                 type="button"
                 onClick={() => {
                   // clear content and any selected images
-                  dispatch(clearPostContent());
+                  setPostContent("");
+                  setIsExpanded(false);
                   selectedImages.forEach((s) => URL.revokeObjectURL(s.url));
                   setSelectedImages([]);
                 }}

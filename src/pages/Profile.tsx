@@ -1,83 +1,94 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaFolder, FaFileAlt, FaBookmark, FaUserFriends } from "react-icons/fa";
-// Use posts from Redux store as single source-of-truth
-import { getUserById, getCurrentUserId } from "../services/userService";
-import { getPublicFoldersByUserId } from "../data/publicFilesData";
 import {
   ProfileHeader,
   ProfilePosts,
   PublicFiles,
 } from "../components/Profile";
 import PageLoader from "./Fallbacks/PageLoader";
+import { DEFAULT_AVATAR_MD } from "../constants/images";
+import { PROFILE_RELATION_STATUS } from "../constants";
 import { useAppSelector } from "../store/hooks";
-import { selectRelationshipStatus } from "../store/slices/friendsSlice";
+import { useProfile } from "../hooks/useProfile";
+import type { FriendshipStatus } from "../types/profile.types";
+
+// TODO: Define proper types when Posts API is connected
+interface Post {
+  postId: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  comments: number;
+  likedBy: string[];
+  sharesBy: string[];
+  images?: string[];
+  status: string;
+  privacy: string;
+  tags?: string[];
+}
+
+interface PublicFileItem {
+  fileId: string;
+  name: string;
+  type: string;
+  size: string;
+  uploadDate: string;
+  downloads: number;
+  views: number;
+}
 
 const Profile: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"posts" | "files">("posts");
-  const [isLoading, setIsLoading] = useState(true);
-  const profileData = useAppSelector((state) => state.profile);
 
-  // Get current user ID
-  const currentUserId = getCurrentUserId();
+  // Get current user from Redux
+  const { user: currentUser } = useAppSelector((state) => state.auth);
+
+  // Determine which username to fetch
+  // If no param, use current user's username (own profile)
+  const profileUsername = username || currentUser?.userName;
 
   // Check if viewing own profile
-  const isOwnProfile = !userId || userId === currentUserId;
+  const isOwnProfile = !username || username === currentUser?.userName;
 
-  // Get actual user ID (default to current user ID)
-  const actualUserId = userId || currentUserId;
+  // Fetch profile data using TanStack Query
+  const { data: profileData, isLoading, error } = useProfile(profileUsername);
 
-  // Get user data - use Redux state for own profile, userData for others
-  const userData = isOwnProfile ? profileData : getUserById(actualUserId);
+  // profileData IS the user with friendshipStatus (flat structure from Backend)
+  const userData = profileData;
+  const friendshipStatus: FriendshipStatus =
+    (profileData?.friendshipStatus as FriendshipStatus) ||
+    PROFILE_RELATION_STATUS.NONE;
 
-  // Determine relationship status between current user and the profile being viewed
-  const relationship = useAppSelector((state) =>
-    selectRelationshipStatus(state, currentUserId, actualUserId)
-  );
+  // TODO: Fetch user's posts from API
+  const userPosts: Post[] = [];
 
-  // Get user's posts from Redux (so newly created posts appear)
-  const allPosts = useAppSelector((state) => state.posts.posts);
-  const userPosts = allPosts.filter((p) => p.userId === actualUserId);
+  // TODO: Fetch user's public folders from API
+  const userPublicFolders: PublicFileItem[] = [];
 
-  // Get user's public folders
-  const userPublicFolders = getPublicFoldersByUserId(actualUserId);
+  // Loading state
+  if (isLoading) {
+    return <PageLoader />;
+  }
 
-  useEffect(() => {
-    // Set loading to false after component mounts
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [
-    userData,
-    userId,
-    actualUserId,
-    isOwnProfile,
-    currentUserId,
-    userPosts.length,
-    userPublicFolders.length,
-  ]);
-
-  // If user not found, show error
-  if (!userData) {
+  // Error or user not found
+  if (error || !userData) {
     return (
-      <>
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h2 className="text-2xl font-bold text-gray-900">User Not Found</h2>
-          <p className="mt-2 text-gray-600">
-            The user you're looking for doesn't exist.
-          </p>
-          <button
-            onClick={() => navigate("/")}
-            className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          >
-            Go Home
-          </button>
-        </div>
-      </>
+      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900">User Not Found</h2>
+        <p className="mt-2 text-gray-600">
+          The user you're looking for doesn't exist.
+        </p>
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+        >
+          Go Home
+        </button>
+      </div>
     );
   }
 
@@ -89,21 +100,16 @@ const Profile: React.FC = () => {
     if (isOwnProfile) {
       navigate("/profile/details");
     } else {
-      navigate(`/profile/${actualUserId}/details`);
+      navigate(`/profile/${userData.userName}/details`);
     }
   };
-
-  if (isLoading) {
-    return <PageLoader />;
-  }
 
   return (
     <>
       <ProfileHeader
         userData={userData}
         isOwnProfile={isOwnProfile}
-        actualUserId={actualUserId}
-        relationship={relationship}
+        friendshipStatus={friendshipStatus}
         onEditProfile={handleEditProfile}
         onViewDetails={handleViewDetails}
       />
@@ -170,9 +176,9 @@ const Profile: React.FC = () => {
               posts={userPosts}
               isOwnProfile={isOwnProfile}
               userData={{
-                name: userData?.name || "User",
-                username: userData?.username || "username",
-                avatar: userData?.avatar || "https://via.placeholder.com/40",
+                name: userData.fullName,
+                username: userData.userName,
+                avatar: userData.avatar || DEFAULT_AVATAR_MD,
               }}
             />
           </div>
@@ -182,7 +188,7 @@ const Profile: React.FC = () => {
           <div className="space-y-3">
             <PublicFiles
               publicFolders={userPublicFolders}
-              userName={userData.name}
+              userName={userData.fullName}
             />
           </div>
         )}

@@ -1,26 +1,33 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { FaTint, FaUniversity, FaUsers, FaFilter } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  setSelectedBloodGroup,
-  setSelectedUniversity,
-} from "../../../store/slices/mainMore/bloodDonationSlice";
 import { bloodGroups } from "../data/bloodDonationData";
 
 const universities = ["All", "BUET", "RUET", "KUET", "CUET", "HSC"];
 
-const DonorListTab: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { donors, selectedBloodGroup, selectedUniversity } = useAppSelector(
-    (state) => state.bloodDonation
-  );
+// TODO: Replace with API data
+interface Donor {
+  id: string;
+  name: string;
+  bloodGroup: string;
+  university: string;
+  totalDonations: number;
+  [key: string]: unknown;
+}
+
+interface DonorListTabProps {
+  donors?: Donor[];
+}
+
+const DonorListTab: React.FC<DonorListTabProps> = ({ donors = [] }) => {
+  const [selectedBloodGroup, setSelectedBloodGroup] = useState("All");
+  const [selectedUniversity, setSelectedUniversity] = useState("All");
 
   const handleBloodGroupChange = (bloodGroup: string) => {
-    dispatch(setSelectedBloodGroup(bloodGroup));
+    setSelectedBloodGroup(bloodGroup);
   };
 
   const handleUniversityChange = (university: string) => {
-    dispatch(setSelectedUniversity(university));
+    setSelectedUniversity(university);
   };
 
   // Filter and sort donors

@@ -2,39 +2,44 @@ import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { FaUsers, FaImage, FaInfoCircle, FaThumbtack } from "react-icons/fa";
 import { BsPostcard } from "react-icons/bs";
-import sampleRooms, { type Room } from "../../data/rooms-data/roomsData";
-import { usersData } from "../../data/profile-data/userData";
-import { roomPosts } from "../../data/rooms-data/roomPostData";
 import CreatePostForm from "../../components/ClassRoom/CreatePostForm";
 import PostsTab from "../../components/ClassRoom/detailsPageTabs/PostsTab";
 import PinnedTab from "../../components/ClassRoom/detailsPageTabs/PinnedTab";
 import MembersTab from "../../components/ClassRoom/detailsPageTabs/MembersTab";
 import MediaTab from "../../components/ClassRoom/detailsPageTabs/MediaTab";
 import AboutTab from "../../components/ClassRoom/detailsPageTabs/AboutTab";
-import { addReply } from "../../store/slices/classRoom/roomPostsSlice";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
 import confirm from "../../utils/sweetAlert";
-import {
-  updateRoom,
-  makeAdmin,
-  removeAdmin,
-  removeMember,
-  selectRoomCreator,
-  selectMemberCount,
-  selectAllAdmins,
-  selectIsAdminOrCreator,
-} from "../../store/slices/classRoom/classRoomSlice";
+
+// TODO: Replace with API data
+interface Room {
+  id: string;
+  name: string;
+  coverImage?: string;
+  description?: string;
+  privacy?: string;
+  createdAt?: string;
+}
+
+interface User {
+  id: string;
+  name: string;
+  avatar?: string;
+}
 
 const RoomDetails: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
+  const navigate = useNavigate();
 
-  // Get room from Redux state first, fallback to sample data
-  const roomFromRedux = useAppSelector((s) =>
-    s.classRoom.rooms.find((r) => r.id === roomId)
-  );
-  const roomFromSample = sampleRooms.find((r) => r.id === roomId);
-  const room: Room | undefined = roomFromRedux || roomFromSample;
+  // TODO: Replace with API call to get room data
+  const room: Room | undefined = roomId
+    ? {
+        id: roomId,
+        name: "Sample Room",
+        coverImage: undefined,
+        description: "Sample room description",
+        privacy: "public",
+      }
+    : undefined;
 
   // keep a local editable copy so we can remove members / promote admins in-memory
   const [roomState, setRoomState] = useState<Room | undefined>(
@@ -57,29 +62,19 @@ const RoomDetails: React.FC = () => {
     { id: "about", label: "About", icon: FaInfoCircle },
   ];
 
-  const dispatch = useAppDispatch();
-  const currentUser = useAppSelector((s) => selectUserById(s, s.profile.id));
-  const navigate = useNavigate();
+  // TODO: Replace with actual current user from API/context
+  const currentUser: User | undefined = {
+    id: "current-user-id",
+    name: "Current User",
+  };
 
-  // Use Redux selectors (like helper functions)
-  const creatorId = useAppSelector((s) =>
-    room ? selectRoomCreator(s, room.id) : undefined
-  );
-  const memberCount = useAppSelector((s) =>
-    room ? selectMemberCount(s, room.id) : 0
-  );
-  const allAdmins = useAppSelector((s) =>
-    room ? selectAllAdmins(s, room.id) : []
-  );
-  const isCurrentUserAdminOrCreator = useAppSelector((s) =>
-    room && currentUser
-      ? selectIsAdminOrCreator(s, currentUser.id, room.id)
-      : false
-  );
+  // TODO: Replace with API data
+  const creatorId = "creator-id";
+  const memberCount = 0;
+  const allAdmins: string[] = [];
+  const isCurrentUserAdminOrCreator = true;
 
-  const creator = creatorId
-    ? usersData.find((u) => u.id === creatorId)
-    : undefined;
+  const creator: User | undefined = { id: creatorId, name: "Room Creator" };
 
   // Update roomState when room changes
   React.useEffect(() => {
@@ -91,7 +86,8 @@ const RoomDetails: React.FC = () => {
   const [showReplyFor, setShowReplyFor] = useState<Record<string, boolean>>({});
   const [replyText, setReplyText] = useState<Record<string, string>>({});
   const [showCreatePost, setShowCreatePost] = useState(false);
-  const postsFromStore = useAppSelector((s) => s.roomPosts?.posts || roomPosts);
+  // TODO: Replace with API data
+  const postsFromStore: unknown[] = [];
 
   const toggleReply = (postId: string) =>
     setShowReplyFor((s) => ({ ...s, [postId]: !s[postId] }));
@@ -106,7 +102,8 @@ const RoomDetails: React.FC = () => {
       content: text,
       createdAt: new Date().toISOString(),
     };
-    dispatch(addReply({ postId, reply: newReply }));
+    // TODO: Replace with API call
+    console.log("Add reply:", { postId, reply: newReply });
     setReplyText((r) => ({ ...r, [postId]: "" }));
     setShowReplyFor((s) => ({ ...s, [postId]: false }));
   };

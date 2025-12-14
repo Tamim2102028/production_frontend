@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import FindTutor from "../components/Tuition/FindTutor";
 import BecomeTutor from "../components/Tuition/BecomeTutor";
-import { useAppSelector } from "../store/hooks";
 
 const Tuition: React.FC = () => {
-  // Redux state for loading/error (keeping Redux integration)
-  const { loading, error } = useAppSelector((state) => state.tuition);
+  // TODO: Get loading/error state from API
+  const loading = false;
+  const error: string | null = null;
 
   // Local UI state for role switching
   const [activeRole, setActiveRole] = useState<"student" | "tutor">("tutor");

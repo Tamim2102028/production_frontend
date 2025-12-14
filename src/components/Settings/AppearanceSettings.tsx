@@ -1,20 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaPalette } from "react-icons/fa";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { setAppTheme, setAppLanguage } from "../../store/slices/uiSlice";
 import SettingsItem from "./SettingsItem";
 
 const AppearanceSettings: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const appTheme = useAppSelector((state) => state.ui.settings.appTheme);
-  const appLanguage = useAppSelector((state) => state.ui.settings.appLanguage);
+  // TODO: Replace with API data
+  const [appTheme, setAppTheme] = useState<"light" | "dark">("light");
+  const [appLanguage, setAppLanguage] = useState("en");
 
   const handleThemeChange = (value: string) => {
-    dispatch(setAppTheme(value as "light" | "dark"));
+    setAppTheme(value as "light" | "dark");
   };
 
   const handleLanguageChange = (value: string) => {
-    dispatch(setAppLanguage(value));
+    setAppLanguage(value);
   };
 
   return (

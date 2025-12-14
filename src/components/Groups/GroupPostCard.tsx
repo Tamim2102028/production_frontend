@@ -13,44 +13,56 @@ import {
   FaEdit,
   FaTrash,
 } from "react-icons/fa";
-import type { GroupPost } from "../../data/group-data/groupPostsData";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
-import {
-  addComment,
-  selectCommentsByPostId,
-} from "../../store/slices/commentsSlice";
-import { incrementCommentCount } from "../../store/slices/postsSlice";
-import CommentItem from "../shared/CommentItem";
+import CommentItem, { type CommentData } from "../shared/CommentItem";
+import { DEFAULT_AVATAR_SM } from "../../constants/images";
+
+// TODO: Replace with API data
+interface GroupPost {
+  postId: string;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+  likedBy?: string[];
+  sharesBy?: string[];
+  comments?: number;
+  tags?: string[];
+  images?: string[];
+  isPinned?: boolean;
+}
+
+interface Author {
+  id: string;
+  name: string;
+  avatar?: string;
+}
 
 type Props = {
   post: GroupPost;
+  author?: Author;
 };
 
-const GroupPostCardSimple: React.FC<Props> = ({ post }) => {
+const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const author = useAppSelector((s) => selectUserById(s, post.createdBy));
-  const currentUser = useAppSelector((state) => state.profile);
+  // TODO: Replace with actual current user data
+  const currentUser = {
+    id: "current-user-id",
+    name: "Current User",
+    avatar: "",
+  };
   const isOwnPost = post.createdBy === currentUser.id;
-  const postComments = useAppSelector((state) =>
-    selectCommentsByPostId(state, post.postId)
-  );
+  // TODO: Replace with API data for comments
+  const postComments: CommentData[] = [];
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likedBy?.length || 0);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15); // Initially show 15 comments
+  const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15);
 
-  // Get actual post from Redux store for comment count
-  const reduxPost = useAppSelector((state) =>
-    state.posts.posts.find((p) => p.postId === post.postId)
-  );
-  const commentsCount = reduxPost?.comments || postComments.length;
+  const commentsCount = post.comments || postComments.length;
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -288,7 +300,7 @@ const GroupPostCardSimple: React.FC<Props> = ({ post }) => {
           <div className="border-t border-gray-100 px-4 pb-4">
             <div className="mt-3 flex items-center space-x-3">
               <img
-                src={currentUser.avatar || "https://via.placeholder.com/32"}
+                src={currentUser.avatar || DEFAULT_AVATAR_SM}
                 alt="Your avatar"
                 className="h-8 w-8 rounded-full bg-gray-300 object-cover"
               />
@@ -300,14 +312,8 @@ const GroupPostCardSimple: React.FC<Props> = ({ post }) => {
                 className="flex-1 rounded-full border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 onKeyPress={(e) => {
                   if (e.key === "Enter" && commentText.trim()) {
-                    dispatch(
-                      addComment({
-                        postId: post.postId,
-                        userId: currentUser.id,
-                        content: commentText.trim(),
-                      })
-                    );
-                    dispatch(incrementCommentCount(post.postId));
+                    // TODO: Call API to add comment
+                    console.log("Add comment:", commentText.trim());
                     setCommentText("");
                   }
                 }}
@@ -315,14 +321,8 @@ const GroupPostCardSimple: React.FC<Props> = ({ post }) => {
               <button
                 onClick={() => {
                   if (commentText.trim()) {
-                    dispatch(
-                      addComment({
-                        postId: post.postId,
-                        userId: currentUser.id,
-                        content: commentText.trim(),
-                      })
-                    );
-                    dispatch(incrementCommentCount(post.postId));
+                    // TODO: Call API to add comment
+                    console.log("Add comment:", commentText.trim());
                     setCommentText("");
                   }
                 }}

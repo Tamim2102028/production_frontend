@@ -1,34 +1,19 @@
 import React from "react";
 import FriendCard from "../shared/friends/FriendCard";
-import { getUserById } from "../../services/userService";
-import { useAppSelector } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
-import { selectFriendsForUser } from "../../store/slices/friendsSlice";
-import type { RootState } from "../../store/store";
 
-const FriendsList: React.FC = () => {
-  const currentUser = useAppSelector((s) => selectUserById(s, s.profile.id));
+// TODO: Replace with API data
+interface Friend {
+  id: string;
+  name: string;
+  avatar?: string;
+  [key: string]: unknown;
+}
 
-  // Get friends from Redux friends slice
-  const friendIds = useAppSelector((s: RootState) =>
-    selectFriendsForUser(s, currentUser?.id || "")
-  );
+interface FriendsListProps {
+  friends?: Friend[];
+}
 
-  if (!currentUser) {
-    return <div>User not found</div>;
-  }
-
-  // friends = [{userData}, {userData}, ...]
-  const friends = friendIds
-    .map((friendId) => {
-      const friend = getUserById(friendId);
-      if (!friend) return null;
-      return {
-        ...friend,
-      };
-    })
-    .filter((friend) => friend !== null);
-
+const FriendsList: React.FC<FriendsListProps> = ({ friends = [] }) => {
   if (friends.length === 0) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">

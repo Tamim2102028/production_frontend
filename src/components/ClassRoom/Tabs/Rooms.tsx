@@ -1,42 +1,27 @@
 import React, { useEffect, useState } from "react";
 import RoomForm, { type RoomFormValues } from "../RoomForm";
 import RoomCard from "../RoomCard";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import type { RootState } from "../../../store/store";
-import {
-  toggleRoomStatus,
-  selectOpenRooms,
-  selectVisibleRoomIds,
-  selectHiddenRoomIds,
-} from "../../../store/slices/classRoom/classRoomSlice";
-import { selectUserById } from "../../../store/slices/profileSlice";
+
+// TODO: Replace with API types
+type Room = {
+  id: string;
+  name: string;
+  coverImage?: string;
+  creatorId?: string;
+  creatorName?: string;
+};
 
 const Rooms: React.FC<{
   showCreateForm?: boolean;
   onCreate?: (data: RoomFormValues) => void;
   onCancelCreate?: () => void;
 }> = ({ showCreateForm = false, onCreate, onCancelCreate }) => {
-  const dispatch = useAppDispatch();
+  // TODO: Replace with API call
+  const [allRooms] = useState<Room[]>([]);
+  const [hiddenRoomIds, setHiddenRoomIds] = useState<string[]>([]);
 
-  // Get current user ID
-  const currentUser = useAppSelector((s: RootState) =>
-    selectUserById(s, s.profile.id)
-  );
-  const currentUserId = currentUser?.id || "";
-
-  // Get all non-deleted rooms from Redux
-  const allRooms = useAppSelector((s: RootState) => selectOpenRooms(s));
-
-  // Get visible and hidden room IDs from Redux (automatically updates!)
-  const visibleRoomIds = useAppSelector((s: RootState) =>
-    selectVisibleRoomIds(s, currentUserId)
-  );
-  const hiddenRoomIds = useAppSelector((s: RootState) =>
-    selectHiddenRoomIds(s, currentUserId)
-  );
-
-  // Filter rooms based on membership status
-  const userOpenRooms = allRooms.filter((r) => visibleRoomIds.includes(r.id));
+  // Filter rooms based on visibility
+  const userOpenRooms = allRooms.filter((r) => !hiddenRoomIds.includes(r.id));
   const userHiddenRooms = allRooms.filter((r) => hiddenRoomIds.includes(r.id));
 
   // keep menu state locally
@@ -60,10 +45,10 @@ const Rooms: React.FC<{
   };
 
   const toggleRoomStatusLocal = (id: string) => {
-    if (!currentUserId) return;
-
-    // Just dispatch the Redux action - selectors will automatically update!
-    dispatch(toggleRoomStatus({ userId: currentUserId, roomId: id }));
+    // TODO: Replace with API call
+    setHiddenRoomIds((prev) =>
+      prev.includes(id) ? prev.filter((rid) => rid !== id) : [...prev, id]
+    );
     setMenuOpenFor(null);
   };
 
@@ -118,6 +103,7 @@ const Rooms: React.FC<{
                 menuOpenFor={menuOpenFor}
                 toggleMenu={toggleMenu}
                 onToggleStatus={toggleRoomStatusLocal}
+                isHidden={true}
               />
             ))}
           </div>

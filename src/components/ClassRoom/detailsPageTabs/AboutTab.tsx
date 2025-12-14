@@ -1,8 +1,30 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import confirm from "../../../utils/sweetAlert";
-import type { Room } from "../../../data/rooms-data/roomsData";
-import type { UserData } from "../../../data/profile-data/userData";
+import { DEFAULT_AVATAR_ML } from "../../../constants/images";
+
+// TODO: Replace with API types
+type Room = {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  privacy: "public" | "private";
+  university?: string;
+  department?: string;
+  year?: string;
+  semester?: string;
+  section?: string;
+  subsection?: string;
+  lastActivityAt?: string;
+};
+
+type UserData = {
+  id: string;
+  name: string;
+  username: string;
+  avatar?: string;
+};
 
 interface Props {
   room: Room;
@@ -53,7 +75,7 @@ const AboutTab: React.FC<Props> = ({
           <h3 className="mb-3 font-bold text-gray-900">Creator</h3>
           <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
             <img
-              src={creator.avatar || "https://via.placeholder.com/48"}
+              src={creator.avatar || DEFAULT_AVATAR_ML}
               alt={creator.name}
               className="h-12 w-12 rounded-full object-cover"
             />

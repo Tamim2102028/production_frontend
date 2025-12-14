@@ -1,12 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  toggleLikePost,
-  toggleBookmarkPost,
-  incrementCommentCount,
-} from "../../store/slices/postsSlice";
-import { togglePostMenu } from "../../store/slices/uiSlice";
 import { showSuccess, showError } from "../../utils/sweetAlert";
 import {
   FaHeart,
@@ -21,51 +14,82 @@ import {
   FaTrash,
 } from "react-icons/fa";
 
-import type { PostData } from "../../data/profile-data/profilePostData";
-import { selectUserById } from "../../store/slices/profileSlice";
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
-import {
-  addComment,
-  selectCommentsByPostId,
-} from "../../store/slices/commentsSlice";
 import CommentItem from "../shared/CommentItem";
+import { DEFAULT_AVATAR_MD, DEFAULT_AVATAR_SM } from "../../constants/images";
+
+// TODO: Import Post type from shared types when API is connected
+interface PostData {
+  postId: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  comments: number;
+  likedBy: string[];
+  sharesBy: string[];
+  images?: string[];
+  status: string;
+  privacy: string;
+  tags?: string[];
+}
+
+// TODO: Import Comment type from shared types when API is connected
+interface Comment {
+  commentId: string;
+  postId: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+}
 
 interface HomePostCardProps {
   post: PostData;
 }
 
 const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [imageError, setImageError] = useState(false);
   const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15); // Initially show 15 comments
-  const showMenu = useAppSelector(
-    (state) => state.ui.menus.postMenus[post.postId] || false
-  );
+  const [showMenu, setShowMenu] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
-  // Get user data for the post author via selector
-  const userData = useAppSelector((state) =>
-    selectUserById(state, post.userId)
-  );
-  const currentUser = useAppSelector((state) => state.profile);
-  const postComments = useAppSelector((state) =>
-    selectCommentsByPostId(state, post.postId)
-  );
-  const isLiked = post.likedBy.includes("1"); // Current user ID
+  // TODO: Fetch user data from API based on post.userId
+  const userData = {
+    name: "User",
+    avatar: DEFAULT_AVATAR_MD,
+  };
+
+  // TODO: Get current user from auth context/API
+  const currentUser = {
+    id: "",
+    name: "Current User",
+    avatar: DEFAULT_AVATAR_SM,
+  };
+
+  // TODO: Fetch comments from API
+  const postComments: Comment[] = [];
 
   const handleLike = () => {
-    dispatch(toggleLikePost(post.postId));
+    // TODO: Call API to toggle like
+    console.log("TODO: Toggle like for post", post.postId);
+    setIsLiked(!isLiked);
   };
 
   const handleBookmark = () => {
-    dispatch(toggleBookmarkPost(post.postId));
+    // TODO: Call API to toggle bookmark
+    console.log("TODO: Toggle bookmark for post", post.postId);
   };
 
   const handleProfileClick = () => {
     navigate(`/profile/${post.userId}`);
+  };
+
+  const handleToggleMenu = () => {
+    setShowMenu(!showMenu);
   };
 
   return (
@@ -76,8 +100,8 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
           <img
             src={
               imageError
-                ? "https://via.placeholder.com/40"
-                : userData?.avatar || "https://via.placeholder.com/40"
+                ? DEFAULT_AVATAR_MD
+                : userData?.avatar || DEFAULT_AVATAR_MD
             }
             alt={userData?.name || "User"}
             className="h-10 w-10 cursor-pointer rounded-full bg-gray-300 transition-all hover:ring-2 hover:ring-blue-300"
@@ -101,7 +125,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
 
         <div className="relative">
           <button
-            onClick={() => dispatch(togglePostMenu(post.postId))}
+            onClick={handleToggleMenu}
             className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-200"
             title="More actions"
           >
@@ -127,7 +151,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                         title: "Copied!",
                         text: "Post link copied to clipboard",
                       });
-                      dispatch(togglePostMenu(post.postId));
+                      setShowMenu(false);
                     } catch {
                       showError({
                         title: "Copy failed",
@@ -145,9 +169,9 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                   <>
                     <button
                       onClick={() => {
-                        dispatch(togglePostMenu(post.postId));
-                        // TODO: wire up edit action
-                        console.log("Edit post", post.postId);
+                        setShowMenu(false);
+                        // TODO: Implement edit action with API
+                        console.log("TODO: Edit post", post.postId);
                       }}
                       className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
                     >
@@ -156,9 +180,9 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                     </button>
                     <button
                       onClick={() => {
-                        dispatch(togglePostMenu(post.postId));
-                        // TODO: wire up delete action
-                        console.log("Delete post", post.postId);
+                        setShowMenu(false);
+                        // TODO: Implement delete action with API
+                        console.log("TODO: Delete post", post.postId);
                       }}
                       className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
                     >
@@ -319,7 +343,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
           <div className="border-t border-gray-100 px-4 pb-4">
             <div className="mt-3 flex items-center space-x-3">
               <img
-                src={currentUser.avatar || "https://via.placeholder.com/32"}
+                src={currentUser.avatar || DEFAULT_AVATAR_SM}
                 alt="Your avatar"
                 className="h-8 w-8 rounded-full bg-gray-300 object-cover"
               />
@@ -331,14 +355,12 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                 className="flex-1 rounded-full border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 onKeyPress={(e) => {
                   if (e.key === "Enter" && commentText.trim()) {
-                    dispatch(
-                      addComment({
-                        postId: post.postId,
-                        userId: currentUser.id,
-                        content: commentText.trim(),
-                      })
+                    // TODO: Call API to add comment
+                    console.log(
+                      "TODO: Add comment to post",
+                      post.postId,
+                      commentText.trim()
                     );
-                    dispatch(incrementCommentCount(post.postId));
                     setCommentText("");
                   }
                 }}
@@ -346,14 +368,12 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
               <button
                 onClick={() => {
                   if (commentText.trim()) {
-                    dispatch(
-                      addComment({
-                        postId: post.postId,
-                        userId: currentUser.id,
-                        content: commentText.trim(),
-                      })
+                    // TODO: Call API to add comment
+                    console.log(
+                      "TODO: Add comment to post",
+                      post.postId,
+                      commentText.trim()
                     );
-                    dispatch(incrementCommentCount(post.postId));
                     setCommentText("");
                   }
                 }}

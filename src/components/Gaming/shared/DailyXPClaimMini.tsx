@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { FaGift, FaTrophy } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { claimDailyXP } from "../../../store/slices/tournamentSlice.ts";
 
-const DailyXPClaimMini: React.FC = () => {
-  const dispatch = useAppDispatch();
+interface DailyXPClaimMiniProps {
+  userXP?: number;
+  lastClaimDate?: string | null;
+  onClaim?: () => void;
+}
+
+const DailyXPClaimMini: React.FC<DailyXPClaimMiniProps> = ({
+  userXP = 0,
+  lastClaimDate = null,
+  onClaim,
+}) => {
   const navigate = useNavigate();
-  const { userXP, lastClaimDate } = useAppSelector((state) => state.tournament);
 
   const [canClaim, setCanClaim] = useState(false);
 
@@ -30,8 +36,8 @@ const DailyXPClaimMini: React.FC = () => {
   }, [lastClaimDate]);
 
   const handleClaim = () => {
-    // Wait for animation to finish (2 seconds), then dispatch claim
-    dispatch(claimDailyXP());
+    // TODO: Replace with API call
+    onClaim?.();
   };
 
   // Don't show if already claimed

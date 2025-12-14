@@ -2,13 +2,19 @@ import React, { useState, useEffect } from "react";
 import { FaGift, FaClock, FaTrophy, FaCoins } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { claimDailyXP } from "../../../store/slices/tournamentSlice.ts";
 
-const DailyXPClaim: React.FC = () => {
-  const dispatch = useAppDispatch();
+interface DailyXPClaimProps {
+  userXP?: number;
+  lastClaimDate?: string | null;
+  onClaim?: () => void;
+}
+
+const DailyXPClaim: React.FC<DailyXPClaimProps> = ({
+  userXP = 0,
+  lastClaimDate = null,
+  onClaim,
+}) => {
   const navigate = useNavigate();
-  const { userXP, lastClaimDate } = useAppSelector((state) => state.tournament);
 
   const [canClaim, setCanClaim] = useState(false);
   const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
@@ -51,7 +57,8 @@ const DailyXPClaim: React.FC = () => {
   }, []);
 
   const handleClaim = () => {
-    dispatch(claimDailyXP());
+    // TODO: Replace with API call
+    onClaim?.();
   };
 
   const rewards = [

@@ -1,22 +1,22 @@
 import React from "react";
 import FriendCard from "../../shared/friends/FriendCard";
-import { type UserData } from "../../../data/profile-data/userData";
 import { showError } from "../../../utils/sweetAlert";
 import { showMemberMenu } from "../../../utils/customModals";
-import { useAppSelector } from "../../../store/hooks";
-import type { RootState } from "../../../store/store";
-import {
-  getMembersForGroup,
-  getGroupOwner,
-  getGroupAdmins,
-  isOwner as checkIsOwner,
-  isAdmin as checkIsAdmin,
-  getMemberCount,
-} from "../../../data/group-data/groupMembers";
+
+// TODO: Replace with API data
+interface UserData {
+  id: string;
+  name: string;
+  avatar?: string;
+  [key: string]: unknown;
+}
 
 interface Props {
   groupId: string;
   users: UserData[];
+  members?: string[];
+  owner?: string;
+  admins?: string[];
   currentUserId?: string;
   currentUser?: { id: string } | null;
   // admin and member management callbacks (optional)
@@ -28,24 +28,23 @@ interface Props {
 const GroupMembersTab: React.FC<Props> = ({
   groupId,
   users,
+  members = [],
+  owner = "",
+  admins = [],
   currentUser,
   onRemoveMember,
   onMakeAdmin,
   onRemoveAdmin,
 }) => {
-  // Get all friendship data from Redux at component level
-  const allFriendships = useAppSelector(
-    (s: RootState) => s.friends.friendships
-  );
-  const allFriendRequests = useAppSelector(
-    (s: RootState) => s.friends.friendRequests
-  );
+  // TODO: Replace with API data for friendships
+  const allFriendships: { user1Id: string; user2Id: string }[] = [];
+  const allFriendRequests: {
+    senderId: string;
+    receiverId: string;
+    status: string;
+  }[] = [];
 
-  // Use the new groupMembers data for membership information
-  const members = getMembersForGroup(groupId);
-  const owner = getGroupOwner(groupId);
-  const admins = getGroupAdmins(groupId);
-  const memberCount = getMemberCount(groupId);
+  const memberCount = members.length;
 
   const handleMemberMenu = async (
     userId: string,
@@ -144,9 +143,9 @@ const GroupMembersTab: React.FC<Props> = ({
               else if (hasSent) type = "sent";
               else type = "suggestion";
 
-              // Use helper functions to check roles
-              const isAdmin = checkIsAdmin(user.id, groupId);
-              const isOwner = checkIsOwner(user.id, groupId);
+              // Check if user is admin or owner
+              const isAdmin = admins.includes(user.id);
+              const isOwner = user.id === owner;
 
               const isCurrentUserOwner =
                 !!currentUser && !!owner && currentUser.id === owner;

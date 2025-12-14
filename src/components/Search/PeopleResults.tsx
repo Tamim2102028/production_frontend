@@ -1,14 +1,24 @@
 import React from "react";
-import { useAppSelector } from "../../store/hooks";
-import { selectFilteredPeople } from "../../store/slices/search/searchSlice";
 import FriendCard from "../shared/friends/FriendCard";
+
+// TODO: Replace with API data
+interface Person {
+  id: string;
+  name: string;
+  profileImage?: string;
+  relationStatus?: "friend" | "request" | "suggestion" | "sent";
+}
 
 interface PeopleResultsProps {
   isVisible: boolean;
+  people?: Person[];
 }
 
-const PeopleResults: React.FC<PeopleResultsProps> = ({ isVisible }) => {
-  const filteredPeople = useAppSelector(selectFilteredPeople);
+const PeopleResults: React.FC<PeopleResultsProps> = ({
+  isVisible,
+  people = [],
+}) => {
+  const filteredPeople = people;
 
   if (!isVisible) return null;
   if (filteredPeople.length === 0) return null;

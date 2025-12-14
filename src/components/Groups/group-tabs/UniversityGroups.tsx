@@ -1,29 +1,20 @@
 import GroupCard from "../utils/GroupCard";
-import { useAppSelector } from "../../../store/hooks";
-import { resolveGroupsByIds } from "../../../data/group-data/groupResolver";
-import { getMemberCount } from "../../../data/group-data/groupMembers";
 
-const UniversityGroups = () => {
-  const user = useAppSelector((s) => s.profile);
+// TODO: Replace with API data
+interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  coverImage?: string;
+  memberCount?: number;
+  privacy?: string;
+}
 
-  // Use the user's preJoinedGroup array to show only those groups in the University tab.
-  // Support both pre-created ids (pg...) and normal group ids (g...)
-  const preJoinedIds: string[] = user?.preJoinedGroup || [];
+interface UniversityGroupsProps {
+  groups?: Group[];
+}
 
-  // Use the resolver to translate ids => groups. When the backend uses a
-  // single collection with uniform ids you only need to update
-  // `groupResolver.findGroupById` to look into that collection.
-  const preJoinedGroups = resolveGroupsByIds(preJoinedIds);
-
-  const groups = preJoinedGroups.map((g) => ({
-    id: g.id,
-    name: g.name,
-    description: g.description,
-    coverImage: g.coverImage,
-    memberCount: getMemberCount(g.id),
-    privacy: g.privacy,
-  }));
-
+const UniversityGroups: React.FC<UniversityGroupsProps> = ({ groups = [] }) => {
   return (
     <div>
       <h2 className="mb-3 text-xl font-semibold text-gray-900">

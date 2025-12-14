@@ -2,15 +2,19 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import sampleRooms from "../../data/rooms-data/roomsData";
-import { 
-  getRoomCreator, 
-  isAdminOrCreator,
-  getMembersForRoom 
-} from "../../data/rooms-data/roomMembers";
-import { usersData } from "../../data/profile-data/userData";
-import { useAppSelector } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
+
+// TODO: Replace with API data
+interface Room {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+interface User {
+  id: string;
+  name: string;
+  avatar?: string;
+}
 
 type ChatMessage = {
   id: string;
@@ -21,28 +25,30 @@ type ChatMessage = {
 
 const RoomLive: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  const room = sampleRooms.find((r) => r.id === roomId);
-  const currentUser = useAppSelector((s) => selectUserById(s, s.profile.id));
+  // TODO: Replace with API call to get room data
+  const room: Room | undefined = roomId
+    ? { id: roomId, name: "Sample Room" }
+    : undefined;
+  // TODO: Replace with actual current user from API/context
+  const currentUser: User | undefined = {
+    id: "current-user-id",
+    name: "Current User",
+  };
 
-  const creatorId = room ? getRoomCreator(room.id) : undefined;
-  const creator = useMemo(() => {
-    if (!creatorId) return undefined;
-    return usersData.find((u) => u.id === creatorId);
-  }, [creatorId]);
+  // TODO: Replace with API call to get room creator
+  const creatorId = "creator-id";
+  const creator: User | undefined = { id: creatorId, name: "Room Creator" };
 
   // Local in-memory state for demo live features
   const [isLive, setIsLive] = useState<boolean>(false);
-  const [participants, setParticipants] = useState<string[]>(() =>
-    room ? getMembersForRoom(room.id) : []
-  );
+  const [participants, setParticipants] = useState<string[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
 
   useEffect(() => {
-    // ensure all members are listed
+    // TODO: Get members from API
     if (!room) return;
-    const members = getMembersForRoom(room.id);
-    setParticipants(members);
+    setParticipants([]);
   }, [room]);
 
   // initialize dayjs relativeTime plugin (for human-friendly timestamps)
@@ -64,9 +70,9 @@ const RoomLive: React.FC = () => {
     );
   }
 
-  // Only admins (including creator) can access live
-  const hasAccess = currentUser?.id && isAdminOrCreator(currentUser.id, room.id);
-  
+  // TODO: Replace with API call to check if user is admin
+  const hasAccess = true;
+
   if (!hasAccess) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">

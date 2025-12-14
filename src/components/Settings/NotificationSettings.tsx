@@ -1,17 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaBell } from "react-icons/fa";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { updateNotificationSettings } from "../../store/slices/uiSlice";
 import SettingsItem from "./SettingsItem";
 
 const NotificationSettings: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const notifications = useAppSelector(
-    (state) => state.ui.settings.notifications
-  );
+  // TODO: Replace with API data
+  const [notifications, setNotifications] = useState({
+    push: true,
+    email: true,
+    sms: false,
+    likes: true,
+    comments: true,
+    follows: true,
+    messages: true,
+    inApp: true,
+  });
 
   const handleNotificationToggle = (key: keyof typeof notifications) => {
-    dispatch(updateNotificationSettings({ [key]: !notifications[key] }));
+    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (

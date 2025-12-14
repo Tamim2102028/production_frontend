@@ -1,29 +1,28 @@
 import React from "react";
-import { useAppSelector } from "../../store/hooks";
-import { selectFilteredGroups } from "../../store/slices/search/searchSlice";
-import { getMemberCount } from "../../data/group-data/groupMembers";
 import GroupCard from "../Groups/utils/GroupCard";
+
+// TODO: Replace with API data
+interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  coverImage?: string;
+  profileImage?: string;
+  memberCount?: number;
+  privacy?: string;
+}
 
 interface GroupsResultsProps {
   isVisible: boolean;
+  groups?: Group[];
 }
 
-const GroupsResults: React.FC<GroupsResultsProps> = ({ isVisible }) => {
-  const filteredGroups = useAppSelector(selectFilteredGroups);
-
+const GroupsResults: React.FC<GroupsResultsProps> = ({
+  isVisible,
+  groups = [],
+}) => {
   if (!isVisible) return null;
-  if (filteredGroups.length === 0) return null;
-
-  // Map groups to GroupCard format
-  const groups = filteredGroups.map((group) => ({
-    id: group.id,
-    name: group.name,
-    description: group.description,
-    coverImage: group.coverImage,
-    profileImage: group.profileImage,
-    memberCount: getMemberCount(group.id),
-    privacy: group.privacy,
-  }));
+  if (groups.length === 0) return null;
 
   return (
     <div>

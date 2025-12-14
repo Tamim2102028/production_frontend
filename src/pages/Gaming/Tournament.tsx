@@ -1,5 +1,4 @@
 import React from "react";
-import { useAppSelector } from "../../store/hooks";
 import TournamentBracket from "../../components/Gaming/Tournament/TournamentBracket";
 import TournamentHistory from "../../components/Gaming/Tournament/TournamentHistory";
 import {
@@ -11,7 +10,15 @@ import {
 } from "react-icons/fa";
 
 const Tournament: React.FC = () => {
-  const { currentTournament } = useAppSelector((state) => state.tournament);
+  // TODO: Replace with API data
+  const currentTournament = {
+    id: "1",
+    name: "Math Championship",
+    status: "open",
+    startDate: new Date().toISOString(),
+    registeredPlayers: [] as { id: string; name: string }[],
+    currentRound: "round-1",
+  };
 
   const formattedDate = new Date(
     currentTournament.startDate

@@ -8,11 +8,6 @@ import {
   FaUniversity,
   FaGlobe,
 } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  setSelectedConversation,
-  setSearchQuery,
-} from "../../store/slices/messagesSlice";
 import {
   mockConversations,
   directMessages,
@@ -23,13 +18,27 @@ import {
 
 type FilterType = "all" | "direct" | "group" | "university" | "global";
 
-const ConversationList: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { selectedConversation, searchQuery } = useAppSelector(
-    (state) => state.messages
+interface ConversationListProps {
+  selectedConversation?: string;
+  onSelectConversation?: (id: string) => void;
+}
+
+const ConversationList: React.FC<ConversationListProps> = ({
+  selectedConversation: propSelectedConversation,
+  onSelectConversation,
+}) => {
+  // TODO: Replace with local state or API data
+  const [selectedConversation, setSelectedConversation] = useState(
+    propSelectedConversation || ""
   );
+  const [searchQuery, setSearchQuery] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+
+  const handleSelectConversation = (id: string) => {
+    setSelectedConversation(id);
+    onSelectConversation?.(id);
+  };
 
   // Filter conversations based on active filter and search
   const getFilteredConversations = () => {

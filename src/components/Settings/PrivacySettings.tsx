@@ -1,24 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaLock } from "react-icons/fa";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { updatePrivacySettings } from "../../store/slices/uiSlice";
 import SettingsItem from "./SettingsItem";
 
 const PrivacySettings: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const privacy = useAppSelector((state) => state.ui.settings.privacy);
+  // TODO: Replace with API data
+  const [privacy, setPrivacy] = useState({
+    profileVisibility: "public" as "public" | "friends" | "private",
+    showEmail: false,
+    showPhone: false,
+    allowMessagesFromStranger: true,
+  });
 
   const handlePrivacyToggle = (key: keyof typeof privacy) => {
     if (key === "profileVisibility") return;
-    dispatch(updatePrivacySettings({ [key]: !privacy[key] }));
+    setPrivacy((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleProfileVisibilityChange = (value: string) => {
-    dispatch(
-      updatePrivacySettings({
-        profileVisibility: value as "public" | "friends" | "private",
-      })
-    );
+    setPrivacy((prev) => ({
+      ...prev,
+      profileVisibility: value as "public" | "friends" | "private",
+    }));
   };
 
   return (

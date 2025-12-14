@@ -1,15 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEdit, FaUniversity, FaInfoCircle } from "react-icons/fa";
-import { useAppDispatch } from "../../store/hooks";
 import {
-  sendFriendRequest,
-  cancelFriendRequest,
-  acceptFriendRequest,
-  rejectFriendRequest,
-  removeFriendship,
-} from "../../store/slices/friendsSlice";
-import { setSelectedConversation } from "../../store/slices/messagesSlice";
+  FaEdit,
+  FaUniversity,
+  FaInfoCircle,
+  FaGraduationCap,
+} from "react-icons/fa";
 import {
   MessageButton,
   UnfriendButton,
@@ -18,15 +14,15 @@ import {
   AddFriendButton,
   CancelRequestButton,
 } from "../shared/friends/FriendActions";
-import type { UserData } from "../../data/profile-data/userData";
-import { getCurrentUserId } from "../../services/userService";
 import confirm from "../../utils/sweetAlert";
+import { PROFILE_RELATION_STATUS, USER_TYPES } from "../../constants";
+import type { User, Institution, Department } from "../../types/user.types";
+import type { FriendshipStatus } from "../../types/profile.types";
 
 type Props = {
-  userData: UserData;
+  userData: User;
   isOwnProfile: boolean;
-  actualUserId: string;
-  relationship: string;
+  friendshipStatus: FriendshipStatus;
   onEditProfile: () => void;
   onViewDetails: () => void;
 };
@@ -34,41 +30,49 @@ type Props = {
 const ProfileHeader: React.FC<Props> = ({
   userData,
   isOwnProfile,
-  actualUserId,
-  relationship,
+  friendshipStatus,
   onEditProfile,
   onViewDetails,
 }) => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentUserId = getCurrentUserId();
 
-  const handleMessage = (actualUserId: string) => {
-    dispatch(setSelectedConversation(actualUserId));
+  // Helper to get institution name
+  const getInstitutionName = (): string => {
+    if (!userData.institution) return "";
+    if (typeof userData.institution === "string") return "";
+    return (userData.institution as Institution).name || "";
+  };
+
+  // Helper to get department name
+  const getDepartmentName = (): string => {
+    if (!userData.academicInfo?.department) return "";
+    if (typeof userData.academicInfo.department === "string") return "";
+    return (userData.academicInfo.department as Department).name || "";
+  };
+
+  const handleMessage = (userId: string) => {
+    // TODO: Replace with API call to set selected conversation
+    console.log("Message user:", userId);
     navigate("/messages");
   };
 
-  // Handle friend actions
+  // Handle friend actions - TODO: Replace with API calls
   const handleAccept = (senderId: string) => {
-    dispatch(acceptFriendRequest({ senderId, receiverId: currentUserId }));
+    console.log("Accept friend request from:", senderId);
   };
 
-  // Handle decline action
   const handleDecline = (senderId: string) => {
-    dispatch(rejectFriendRequest({ senderId, receiverId: currentUserId }));
+    console.log("Decline friend request from:", senderId);
   };
 
-  // Handle add friend action
   const handleAddFriend = (receiverId: string) => {
-    dispatch(sendFriendRequest({ senderId: currentUserId, receiverId }));
+    console.log("Send friend request to:", receiverId);
   };
 
-  // Handle cancel request action
   const handleCancelRequest = (receiverId: string) => {
-    dispatch(cancelFriendRequest({ senderId: currentUserId, receiverId }));
+    console.log("Cancel friend request to:", receiverId);
   };
 
-  // Handle unfriend action
   const handleUnfriend = async (friendId: string) => {
     const ok = await confirm({
       title: "Are you sure?",
@@ -78,8 +82,82 @@ const ProfileHeader: React.FC<Props> = ({
     });
 
     if (ok) {
-      dispatch(removeFriendship({ user1Id: currentUserId, user2Id: friendId }));
+      console.log("Unfriend user:", friendId);
     }
+  };
+
+  // Render action buttons based on friendshipStatus
+  const renderActionButtons = () => {
+    // Own profile - Edit button
+    if (friendshipStatus === PROFILE_RELATION_STATUS.SELF || isOwnProfile) {
+      return (
+        <div className="flex gap-3">
+          <button
+            onClick={onEditProfile}
+            className="flex items-center gap-2 rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
+          >
+            <FaEdit className="h-4 w-4" />
+            Edit Profile
+          </button>
+          <button
+            onClick={onViewDetails}
+            className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
+          >
+            <FaInfoCircle className="h-4 w-4" />
+            Details
+          </button>
+        </div>
+      );
+    }
+
+    // Other user's profile
+    return (
+      <div className="flex items-center gap-3">
+        {/* FRIENDS - Message & Unfriend */}
+        {friendshipStatus === PROFILE_RELATION_STATUS.FRIENDS && (
+          <>
+            <MessageButton onClick={() => handleMessage(userData._id)} />
+            <UnfriendButton onClick={() => handleUnfriend(userData._id)} />
+          </>
+        )}
+
+        {/* REQUEST_SENT - Cancel Request */}
+        {friendshipStatus === PROFILE_RELATION_STATUS.REQUEST_SENT && (
+          <CancelRequestButton
+            onClick={() => handleCancelRequest(userData._id)}
+          />
+        )}
+
+        {/* REQUEST_RECEIVED - Accept/Reject */}
+        {friendshipStatus === PROFILE_RELATION_STATUS.REQUEST_RECEIVED && (
+          <>
+            <AcceptButton onClick={() => handleAccept(userData._id)} />
+            <RejectButton onClick={() => handleDecline(userData._id)} />
+          </>
+        )}
+
+        {/* NONE - Add Friend */}
+        {friendshipStatus === PROFILE_RELATION_STATUS.NONE && (
+          <AddFriendButton onClick={() => handleAddFriend(userData._id)} />
+        )}
+
+        {/* BLOCKED - Show blocked message */}
+        {friendshipStatus === PROFILE_RELATION_STATUS.BLOCKED && (
+          <span className="rounded-md bg-red-100 px-4 py-2 text-red-600">
+            User Blocked
+          </span>
+        )}
+
+        {/* View Details button for all */}
+        <button
+          onClick={onViewDetails}
+          className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
+        >
+          <FaInfoCircle className="h-4 w-4" />
+          View Details
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -89,7 +167,7 @@ const ProfileHeader: React.FC<Props> = ({
         <div className="flex-shrink-0">
           <img
             src={userData.avatar}
-            alt={userData.name}
+            alt={userData.fullName}
             className="h-32 w-32 rounded-full border-4 border-white shadow-lg"
           />
         </div>
@@ -98,102 +176,71 @@ const ProfileHeader: React.FC<Props> = ({
         <div className="flex-1">
           <div>
             <h1 className="mb-1 text-3xl leading-tight font-bold text-gray-900">
-              {userData.name}
+              {userData.fullName}
             </h1>
 
-            <p className="flex items-center gap-2 text-sm text-gray-600 md:text-lg">
-              <FaUniversity className="h-4 w-4 text-blue-600" />
-              <span className="font-medium text-gray-800">
-                {userData.educationLevel === "UNIVERSITY" ? (
-                  <>
-                    {userData.university?.name} -{" "}
-                    {userData.university?.department}
-                    {userData.userType?.includes("student") &&
-                      userData.university?.section && (
+            {/* Institution & Department */}
+            {getInstitutionName() || getDepartmentName() ? (
+              <div className="mt-1 space-y-1">
+                <p className="flex items-center gap-2 text-sm text-gray-600 md:text-base">
+                  <FaUniversity className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium text-gray-800">
+                    {getInstitutionName() || "Institution not set"}
+                  </span>
+                </p>
+                <p className="flex items-center gap-2 text-sm text-gray-600 md:text-base">
+                  <FaGraduationCap className="h-4 w-4 text-green-600" />
+                  <span className="font-medium text-gray-800">
+                    {getDepartmentName() || "Department not set"}
+                    {userData.userType === USER_TYPES.STUDENT &&
+                      userData.academicInfo?.section && (
                         <span className="text-gray-600">
                           {" "}
-                          (Section: {userData.university?.section}
-                          {userData.university?.subsection &&
-                            `-${userData.university?.subsection}`}
-                          )
+                          (Section: {userData.academicInfo.section})
                         </span>
                       )}
-                  </>
-                ) : (
-                  <>
-                    {userData.college?.name}
-                    {userData.college?.department &&
-                      ` - ${userData.college.department}`}
-                  </>
-                )}
-              </span>
-            </p>
+                  </span>
+                </p>
+              </div>
+            ) : (
+              <p className="flex items-center gap-2 text-sm text-gray-400 italic md:text-lg">
+                <FaUniversity className="h-4 w-4 text-gray-400" />
+                <span>No institution added yet</span>
+              </p>
+            )}
 
-            <p className="mt-3 max-w-prose text-base leading-relaxed text-gray-700">
-              {userData.bio}
-            </p>
+            {/* Bio */}
+            {userData.bio ? (
+              <p className="mt-3 max-w-prose text-base leading-relaxed text-gray-700">
+                {userData.bio}
+              </p>
+            ) : (
+              <p className="mt-3 max-w-prose text-base leading-relaxed text-gray-400 italic">
+                {isOwnProfile
+                  ? "Add a bio to tell people about yourself..."
+                  : "No bio added yet"}
+              </p>
+            )}
+
+            {/* Stats */}
+            <div className="mt-2 flex gap-4 text-sm text-gray-500">
+              <span>
+                <strong className="text-gray-900">
+                  {userData.connectionsCount || 0}
+                </strong>{" "}
+                Friends
+              </span>
+              <span>
+                <strong className="text-gray-900">
+                  {userData.followingCount || 0}
+                </strong>{" "}
+                Following
+              </span>
+            </div>
           </div>
 
           {/* Action Buttons */}
-          {isOwnProfile ? (
-            <div className="pt-4">
-              <div className="flex gap-3">
-                <button
-                  onClick={onEditProfile}
-                  className="flex items-center gap-2 rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
-                >
-                  <FaEdit className="h-4 w-4" />
-                  Edit Profile
-                </button>
-
-                <button
-                  onClick={onViewDetails}
-                  className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
-                >
-                  <FaInfoCircle className="h-4 w-4" />
-                  Details
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 pt-4">
-              {relationship === "friends" && (
-                <div className="flex items-center space-x-2">
-                  <MessageButton onClick={() => handleMessage(actualUserId)} />
-                  <UnfriendButton
-                    onClick={() => handleUnfriend(actualUserId)}
-                  />
-                </div>
-              )}
-
-              {relationship === "pending_sent" && (
-                <CancelRequestButton
-                  onClick={() => handleCancelRequest(actualUserId)}
-                />
-              )}
-
-              {relationship === "pending_received" && (
-                <div className="flex items-center gap-2">
-                  <AcceptButton onClick={() => handleAccept(actualUserId)} />
-                  <RejectButton onClick={() => handleDecline(actualUserId)} />
-                </div>
-              )}
-
-              {relationship === "none" && (
-                <AddFriendButton
-                  onClick={() => handleAddFriend(actualUserId)}
-                />
-              )}
-
-              <button
-                onClick={onViewDetails}
-                className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
-              >
-                <FaInfoCircle className="h-4 w-4" />
-                View Details
-              </button>
-            </div>
-          )}
+          <div className="pt-4">{renderActionButtons()}</div>
         </div>
       </div>
     </div>

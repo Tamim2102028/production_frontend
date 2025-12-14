@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useAppSelector } from "../../store/hooks";
 import DailyXPClaim from "../../components/Gaming/Dashboard/DailyXPClaim";
 import RegisterTournament from "../../components/Gaming/Dashboard/RegisterTournament";
 import MatchmakingStatus from "../../components/Gaming/Tournament/MatchmakingStatus";
@@ -9,9 +8,17 @@ import TournamentRules from "../../components/Gaming/Dashboard/TournamentRules";
 import { TOURNAMENT_CONSTANTS } from "../../components/Gaming/data/tournamentData";
 
 const Dashboard: React.FC = () => {
-  const { currentTournament, userXP, userRegistered } = useAppSelector(
-    (state) => state.tournament
-  );
+  // TODO: Replace with API data
+  const currentTournament = {
+    id: "1",
+    name: "Math Championship",
+    status: "open",
+    startDate: new Date().toISOString(),
+    registeredPlayers: [] as { id: string; name: string }[],
+    currentRound: "round-1",
+  };
+  const userXP = 0;
+  const userRegistered = false;
 
   // Matchmaking state
   const [isSearching, setIsSearching] = useState(false);

@@ -15,14 +15,8 @@ import {
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import { showSuccess, showError } from "../../utils/sweetAlert";
 import SeparatorDot from "../shared/SeparatorDot";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import {
-  addComment,
-  selectCommentsByPostId,
-} from "../../store/slices/commentsSlice";
-import { incrementCommentCount } from "../../store/slices/postsSlice";
-import { toggleLikePost } from "../../store/slices/postsSlice";
-import CommentItem from "../shared/CommentItem";
+import CommentItem, { type CommentData } from "../shared/CommentItem";
+import { DEFAULT_AVATAR_SM } from "../../constants/images";
 
 interface Author {
   id: string;
@@ -50,29 +44,29 @@ interface ProfilePostCardProps {
 }
 
 const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
-  const dispatch = useAppDispatch();
   const [showCommentBox, setShowCommentBox] = useState(false);
-  // derive like state from Redux so actions update across views
-  const reduxPost = useAppSelector((state) =>
-    state.posts.posts.find((p) => p.postId === post.id)
-  );
-  const isLiked = reduxPost ? reduxPost.likedBy.includes("1") : post.isLiked;
-  const likesCount = reduxPost ? reduxPost.likedBy.length : post.likes;
+  // TODO: Replace with API data
+  const [isLiked, setIsLiked] = useState(post.isLiked);
+  const [likesCount, setLikesCount] = useState(post.likes);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15); // Initially show 15 comments
-  const currentUser = useAppSelector((state) => state.profile);
+  const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15);
+  // TODO: Replace with actual current user from API/context
+  const currentUser = {
+    id: "current-user-id",
+    name: "Current User",
+    avatar: "",
+  };
   const isOwnPost = post.author.id === currentUser.id;
-  const postComments = useAppSelector((state) =>
-    selectCommentsByPostId(state, post.id)
-  );
-  // Get actual post from Redux store for comment count
-  const commentsCount = reduxPost?.comments || post.comments;
+  // TODO: Replace with API data for comments
+  const postComments: CommentData[] = [];
+  const commentsCount = post.comments;
 
   const handleLike = () => {
-    // dispatch global toggle so Home and other views stay in sync
-    dispatch(toggleLikePost(post.id));
+    // TODO: Replace with API call
+    setIsLiked(!isLiked);
+    setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
   };
 
   const handleBookmark = () => {
@@ -317,7 +311,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           <div className="border-t border-gray-100 px-4 pb-4">
             <div className="mt-3 flex items-center space-x-3">
               <img
-                src={currentUser.avatar || "https://via.placeholder.com/32"}
+                src={currentUser.avatar || DEFAULT_AVATAR_SM}
                 alt="Your avatar"
                 className="h-8 w-8 rounded-full bg-gray-300 object-cover"
               />
@@ -329,14 +323,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                 className="flex-1 rounded-full border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 onKeyPress={(e) => {
                   if (e.key === "Enter" && commentText.trim()) {
-                    dispatch(
-                      addComment({
-                        postId: post.id,
-                        userId: currentUser.id,
-                        content: commentText.trim(),
-                      })
-                    );
-                    dispatch(incrementCommentCount(post.id));
+                    // TODO: Call API to add comment
+                    console.log("Add comment:", commentText.trim());
                     setCommentText("");
                   }
                 }}
@@ -344,14 +332,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
               <button
                 onClick={() => {
                   if (commentText.trim()) {
-                    dispatch(
-                      addComment({
-                        postId: post.id,
-                        userId: currentUser.id,
-                        content: commentText.trim(),
-                      })
-                    );
-                    dispatch(incrementCommentCount(post.id));
+                    // TODO: Call API to add comment
+                    console.log("Add comment:", commentText.trim());
                     setCommentText("");
                   }
                 }}

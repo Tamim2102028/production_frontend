@@ -1,11 +1,11 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { FaUniversity, FaSearch, FaEnvelope, FaHome } from "react-icons/fa";
-import { useAppSelector } from "../store/hooks";
 import { IoExtensionPuzzleOutline } from "react-icons/io5";
 
 const Navbar: React.FC = () => {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  // TODO: Replace with actual auth state from API
+  const isAuthenticated = true;
 
   if (!isAuthenticated) {
     return null; // Don't show navbar if not authenticated

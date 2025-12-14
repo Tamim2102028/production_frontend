@@ -1,10 +1,24 @@
 import React from "react";
 import { FaUniversity, FaIdCard, FaTint } from "react-icons/fa";
-import { useAppSelector } from "../../../store/hooks";
 
-const FindDonorsTab: React.FC = () => {
-  const { donors } = useAppSelector((state) => state.bloodDonation);
+// TODO: Replace with API data
+interface Donor {
+  id: string;
+  name: string;
+  avatar?: string;
+  bloodGroup: string;
+  department?: string;
+  studentId?: string;
+  totalDonations: number;
+  lastDonation?: string;
+  availability: string;
+}
 
+interface FindDonorsTabProps {
+  donors?: Donor[];
+}
+
+const FindDonorsTab: React.FC<FindDonorsTabProps> = ({ donors = [] }) => {
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
       case "Available":

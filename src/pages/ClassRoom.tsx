@@ -2,7 +2,6 @@ import React from "react";
 import dayjs from "dayjs";
 import Header from "../components/ClassRoom/Header";
 import ClassroomTabs from "../components/ClassRoom/ClassroomTabs";
-// Section component removed per request
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useMatch } from "react-router-dom";
 import Rooms from "../components/ClassRoom/Tabs/Rooms";
@@ -10,24 +9,43 @@ import MoreTab from "../components/ClassRoom/Tabs/MoreTab";
 import RoomDetails from "./ClassRoom/RoomDetails";
 import RoomLive from "./ClassRoom/RoomLive";
 
-import { useAppDispatch } from "../store/hooks";
-import { updateRoom, addRoomMember } from "../store/slices/classRoom/classRoomSlice";
-import type { Room as SampleRoom } from "../data/rooms-data/roomsData";
-import type { RoomFormValues } from "../components/ClassRoom/RoomForm";
-import { getCurrentUserId } from "../services/userService";
+// TODO: Define types when API is connected
+interface Room {
+  id: string;
+  name: string;
+  university: string;
+  department: string;
+  year: string;
+  semester: string;
+  section: string;
+  subsection?: string;
+  createdAt: string;
+  lastActivityAt: string;
+}
+
+interface RoomFormValues {
+  name: string;
+  university: string;
+  department: string;
+  year: string;
+  semester: string;
+  section: string;
+  subsection?: string;
+}
 
 const ClassRoom: React.FC = () => {
-  const dispatch = useAppDispatch();
   const [showCreateForm, setShowCreateForm] = React.useState<boolean>(false);
 
   const openCreateForm = () => setShowCreateForm(true);
   const closeCreateForm = () => setShowCreateForm(false);
 
+  // TODO: Get current user from auth context/API
+  const currentUserId = "1";
+
   const handleCreate = (data: RoomFormValues) => {
     const id = `room_${Date.now()}`;
-    const currentUserId = getCurrentUserId();
-    
-    const room: SampleRoom = {
+
+    const room: Room = {
       id,
       name: data.name,
       university: data.university,
@@ -39,22 +57,15 @@ const ClassRoom: React.FC = () => {
       createdAt: dayjs().toISOString(),
       lastActivityAt: dayjs().toISOString(),
     };
-    
-    // dispatch to redux slice (updateRoom will add if not existing)
-    dispatch(updateRoom(room));
-    
-    // Add the creator as a room member with "creator" role
-    dispatch(
-      addRoomMember({
-        id: `member_${Date.now()}`,
-        userId: currentUserId,
-        roomId: id,
-        role: "creator",
-        joinedAt: dayjs().toISOString(),
-        status: "open",
-      })
-    );
-    
+
+    // TODO: Call API to create room
+    console.log("TODO: Create room via API", room);
+    console.log("TODO: Add creator as member", {
+      userId: currentUserId,
+      roomId: id,
+      role: "creator",
+    });
+
     setShowCreateForm(false);
   };
 

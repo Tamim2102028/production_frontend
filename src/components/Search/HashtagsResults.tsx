@@ -1,14 +1,22 @@
 import React from "react";
-import { useAppSelector } from "../../store/hooks";
-import { selectFilteredHashtags } from "../../store/slices/search/searchSlice";
 import HomePostCard from "../Home/HomePostCard";
+
+// TODO: Replace with API data
+interface Post {
+  postId: string;
+  [key: string]: unknown;
+}
 
 interface HashtagsResultsProps {
   isVisible: boolean;
+  posts?: Post[];
 }
 
-const HashtagsResults: React.FC<HashtagsResultsProps> = ({ isVisible }) => {
-  const filteredPosts = useAppSelector(selectFilteredHashtags);
+const HashtagsResults: React.FC<HashtagsResultsProps> = ({
+  isVisible,
+  posts = [],
+}) => {
+  const filteredPosts = posts;
 
   if (!isVisible) return null;
   if (filteredPosts.length === 0) return null;

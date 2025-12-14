@@ -1,38 +1,24 @@
 import React from "react";
-import { useAppSelector } from "../../../store/hooks";
 import GroupCard from "../utils/GroupCard";
-import { getMemberCount } from "../../../data/group-data/groupMembers";
 
-const SentGroupRequests: React.FC = () => {
-  const sent = useAppSelector((s) => s.profile.sentRequestGroup || []);
-  const allGroups = useAppSelector((s) => s.groups.groups || []);
+// TODO: Replace with API data
+interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  coverImage?: string;
+  memberCount?: number;
+  privacy?: string;
+}
 
-  if (sent.length === 0) {
-    return (
-      <div className="mb-8">
-        <h2 className="mb-2 text-xl font-semibold text-gray-900">
-          Sent Requests
-        </h2>
-        <p className="text-sm text-gray-600">
-          You have no pending group requests.
-        </p>
-      </div>
-    );
-  }
+interface SentGroupRequestsProps {
+  groups?: Group[];
+}
 
-  const requestGroups = sent
-    .map((gid) => allGroups.find((g) => g.id === gid))
-    .filter(Boolean)
-    // exclude groups that are closed — sent requests to closed groups shouldn't appear here
-    .filter((g) => g && g.privacy !== "closed")
-    .map((g) => ({
-      id: g!.id,
-      name: g!.name,
-      description: g!.description,
-      coverImage: g!.coverImage,
-      memberCount: getMemberCount(g!.id),
-      privacy: g!.privacy,
-    }));
+const SentGroupRequests: React.FC<SentGroupRequestsProps> = ({
+  groups = [],
+}) => {
+  const requestGroups = groups;
 
   return (
     <div>

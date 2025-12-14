@@ -1,5 +1,4 @@
-import React from "react";
-import { useAppSelector } from "../../store/hooks";
+import React, { useState } from "react";
 import BloodDonationHeader from "../../components/MainMore/BloodDonation/BloodDonationHeader";
 import BloodDonationTabs from "../../components/MainMore/BloodDonation/BloodDonationTabs";
 import BloodRequestsTab from "../../components/MainMore/BloodDonation/BloodRequestsTab";
@@ -7,7 +6,10 @@ import FindDonorsTab from "../../components/MainMore/BloodDonation/FindDonorsTab
 import DonorListTab from "../../components/MainMore/BloodDonation/DonorListTab";
 
 const BloodDonation: React.FC = () => {
-  const { activeTab } = useAppSelector((state) => state.bloodDonation);
+  // TODO: Replace with API data or local state
+  const [activeTab, setActiveTab] = useState<
+    "requests" | "donors" | "donorList"
+  >("requests");
 
   return (
     <div className="mx-auto min-h-screen max-w-7xl space-y-5">

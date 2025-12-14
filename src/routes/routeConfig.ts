@@ -213,7 +213,7 @@ export const routes: RouteConfig[] = [
     meta: { description: "Your profile page" },
   },
   {
-    path: "/profile/:userId",
+    path: "/profile/:username",
     component: lazy(() => import("../pages/Profile")),
     requireAuth: true,
     title: "User Profile",
@@ -245,7 +245,7 @@ export const routes: RouteConfig[] = [
     meta: { description: "View detailed profile information" },
   },
   {
-    path: "/profile/:userId/details",
+    path: "/profile/:username/details",
     component: lazy(() => import("../pages/ProfileDetails")),
     requireAuth: true,
     title: "User Profile Details",

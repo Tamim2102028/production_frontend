@@ -1,47 +1,29 @@
+import React, { useState } from "react";
 import StudyArchiveHeader from "./CommunityStudyArchive/StudyArchiveHeader";
 import ArchiveTabs from "./CommunityStudyArchive/ArchiveTabs";
 import FolderSection from "./CommunityStudyArchive/FolderSection";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import {
-  selectSelectedLevel,
-  selectSelectedTerm,
-  selectActiveArchiveTab,
-  selectSearchQuery,
-  selectLevels,
-  selectTerms,
-  setSelectedLevel,
-  setSelectedTerm,
-  setActiveArchiveTab,
-  setSearchQuery
-} from "../../store/slices/communityStudyArchiveSlice";
 
 export default function CommunityStudyArchive() {
-  const dispatch = useAppDispatch();
-  
-  // Redux state
-  const selectedLevel = useAppSelector(selectSelectedLevel);
-  const selectedTerm = useAppSelector(selectSelectedTerm);
-  const activeArchiveTab = useAppSelector(selectActiveArchiveTab);
-  const searchQuery = useAppSelector(selectSearchQuery);
-  const levels = useAppSelector(selectLevels);
-  const terms = useAppSelector(selectTerms);
-
-  // Redux actions
-  const handleSetSelectedLevel = (level: string) => dispatch(setSelectedLevel(level));
-  const handleSetSelectedTerm = (term: string) => dispatch(setSelectedTerm(term));
-  const handleSetActiveArchiveTab = (tab: "official" | "seniors" | "classmates") => dispatch(setActiveArchiveTab(tab));
-  const handleSetSearchQuery = (query: string) => dispatch(setSearchQuery(query));
+  // TODO: Replace with API data
+  const [selectedLevel, setSelectedLevel] = useState("all");
+  const [selectedTerm, setSelectedTerm] = useState("all");
+  const [activeArchiveTab, setActiveArchiveTab] = useState<
+    "official" | "seniors" | "classmates"
+  >("official");
+  const [searchQuery, setSearchQuery] = useState("");
+  const levels = ["all", "1", "2", "3", "4"];
+  const terms = ["all", "1", "2"];
 
   return (
     <div className="space-y-3">
       {/* Header Section */}
       <StudyArchiveHeader
         selectedLevel={selectedLevel}
-        setSelectedLevel={handleSetSelectedLevel}
+        setSelectedLevel={setSelectedLevel}
         selectedTerm={selectedTerm}
-        setSelectedTerm={handleSetSelectedTerm}
+        setSelectedTerm={setSelectedTerm}
         searchQuery={searchQuery}
-        setSearchQuery={handleSetSearchQuery}
+        setSearchQuery={setSearchQuery}
         levels={levels}
         terms={terms}
       />
@@ -49,7 +31,7 @@ export default function CommunityStudyArchive() {
       {/* Archive Tabs */}
       <ArchiveTabs
         activeArchiveTab={activeArchiveTab}
-        setActiveArchiveTab={handleSetActiveArchiveTab}
+        setActiveArchiveTab={setActiveArchiveTab}
       />
 
       {/* Main Content - Folder Sections */}

@@ -1,18 +1,29 @@
 import React, { useMemo } from "react";
-import type { GroupPost } from "../../data/group-data/groupPostsData";
-import { useAppSelector } from "../../store/hooks";
-import { selectGroupPosts } from "../../store/slices/groupSlice";
 import GroupPostCardSimple from "./GroupPostCard";
+
+// TODO: Replace with API data
+interface GroupPost {
+  postId: string;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+  isPinned?: boolean;
+  [key: string]: unknown;
+}
 
 type Mode = "posts" | "pinned";
 
 type Props = {
   groupId: string;
   mode?: Mode;
+  posts?: GroupPost[];
 };
 
-const GroupPostList: React.FC<Props> = ({ groupId, mode = "posts" }) => {
-  const posts: GroupPost[] = useAppSelector((s) => selectGroupPosts(s, groupId));
+const GroupPostList: React.FC<Props> = ({
+  groupId,
+  mode = "posts",
+  posts = [],
+}) => {
   const pinned: GroupPost[] = useMemo(
     () => posts.filter((p) => p.isPinned),
     [posts]

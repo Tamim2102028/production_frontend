@@ -12,12 +12,20 @@ import {
   FaSchool,
   FaEllipsisH,
   FaBriefcase,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { prefetchRoute } from "../routes/prefetch";
+import { useLogout } from "../hooks/useAuth";
+import { useAppSelector } from "../store/hooks";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
+  const { user } = useAppSelector((state) => state.auth);
+
+  // Dynamic profile path - uses username
+  const profilePath = user?.userName ? `/profile/${user.userName}` : "/profile";
 
   const navigationItems = [
     {
@@ -78,8 +86,8 @@ const Sidebar: React.FC = () => {
     {
       icon: FaUser,
       label: "Profile",
-      path: "/profile",
-      active: location.pathname === "/profile",
+      path: profilePath,
+      active: location.pathname.startsWith("/profile"),
     },
     {
       icon: FaEllipsisH,
@@ -97,26 +105,17 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="flex h-full flex-col space-y-1 p-3">
-      {/* Logo/Brand */}
+      {/* Logo/Brand - Click to go Home */}
       <NavLink
         to="/"
         className="flex items-center gap-3 border-b border-gray-300 px-2 pb-3"
       >
         <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shadow-md">
-          <img
-            src="/your-avatar.jpg"
-            alt="Profile"
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src =
-                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
-            }}
-          />
+          <span className="text-2xl font-bold text-white">S</span>
         </div>
         <div className="flex flex-col">
           <span className="text-lg font-semibold text-gray-900">SocialHub</span>
-          <span className="text-sm text-gray-500">Your Network</span>
+          <span className="text-sm text-gray-500">Connect & Learn</span>
         </div>
       </NavLink>
 
@@ -154,6 +153,18 @@ const Sidebar: React.FC = () => {
             </NavLink>
           ))}
         </nav>
+      </div>
+
+      {/* Logout Button */}
+      <div className="border-t border-gray-300 pt-3">
+        <button
+          onClick={() => logout()}
+          disabled={isLoggingOut}
+          className="flex w-full items-center rounded-xl px-4 py-3 text-base font-medium text-red-600 transition-all duration-200 hover:bg-red-50 disabled:opacity-50"
+        >
+          <FaSignOutAlt className="mr-3 h-5 w-5" />
+          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+        </button>
       </div>
     </div>
   );

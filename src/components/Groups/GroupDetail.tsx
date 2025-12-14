@@ -14,57 +14,45 @@ import {
   FaCog,
   FaLink,
 } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  requestJoinGroup,
-  cancelJoinRequest,
-  selectGroupById,
-  selectIsMember,
-  selectHasRequested,
-  makeAdmin,
-  removeAdmin,
-  removeMember,
-} from "../../store/slices/groupSlice";
-import { leaveGroup } from "../../store/slices/groupSlice";
 import GroupPostList from "./GroupPostList";
 import { BsPostcard } from "react-icons/bs";
-import { findGroupById } from "../../data/group-data/groupResolver";
 import { confirm, showSuccess } from "../../utils/sweetAlert";
 import GroupMembersTab from "./group-tabs/GroupMembersTab";
-import { usersData } from "../../data/profile-data/userData";
-import {
-  getMemberCount,
-  getGroupOwner,
-  getGroupAdmins,
-} from "../../data/group-data/groupMembers";
+
+// TODO: Replace with API data
+interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  coverImage?: string;
+  profileImage?: string;
+  privacy?: string;
+  memberCount?: number;
+}
 
 const GroupDetail: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  // resolve using central helper (handles pg* vs g* resolution)
-  const liveGroup = useAppSelector((s) =>
-    groupId ? selectGroupById(s, groupId) : undefined
-  );
+  // TODO: Replace with API call to get group data
+  const group: Group | undefined = groupId
+    ? {
+        id: groupId,
+        name: "Sample Group",
+        description: "Sample group description",
+        coverImage: undefined,
+        profileImage: undefined,
+        privacy: "public",
+        memberCount: 0,
+      }
+    : undefined;
 
-  // Resolve group using the centralized resolver. See `groupResolver.ts` for
-  // notes about simplifying this when backend IDs become uniform.
-  const resolved = groupId ? findGroupById(groupId) : undefined;
-  const group = liveGroup || resolved;
-
-  const isRequested = useAppSelector((s) =>
-    groupId ? selectHasRequested(s, groupId) : false
-  );
-
-  const isMember = useAppSelector((s) =>
-    groupId ? selectIsMember(s, groupId) : false
-  );
-
-  // Get member count from the new groupMembers data
-  const memberCount = groupId ? getMemberCount(groupId) : 0;
-  const groupOwner = groupId ? getGroupOwner(groupId) : undefined;
-  const groupAdmins = groupId ? getGroupAdmins(groupId) : [];
+  // TODO: Replace with API data
+  const isRequested = false;
+  const isMember = false;
+  const memberCount = group?.memberCount || 0;
+  const groupOwner = undefined;
+  const groupAdmins: string[] = [];
 
   const [activeTab, setActiveTab] = useState<
     "posts" | "pinned" | "members" | "media" | "about"
@@ -73,26 +61,28 @@ const GroupDetail: React.FC = () => {
 
   const handleJoin = () => {
     if (!groupId) return;
-    dispatch(requestJoinGroup(groupId));
+    // TODO: Replace with API call
+    console.log("Join group:", groupId);
   };
 
   const handleCancel = () => {
     if (!groupId) return;
-    dispatch(cancelJoinRequest(groupId));
+    // TODO: Replace with API call
+    console.log("Cancel join request:", groupId);
   };
 
-  // Get current user from profile
-  const currentUser = useAppSelector((s) => s.profile);
+  // TODO: Replace with actual current user data
+  const currentUser = { id: "current-user-id", name: "Current User" };
 
-  // Group member management handlers
+  // Group member management handlers - TODO: Replace with API calls
   const handleMakeAdmin = (userId: string) => {
     if (!groupId) return;
-    dispatch(makeAdmin({ groupId, userId }));
+    console.log("Make admin:", userId);
   };
 
   const handleRemoveAdmin = (userId: string) => {
     if (!groupId) return;
-    dispatch(removeAdmin({ groupId, userId }));
+    console.log("Remove admin:", userId);
   };
 
   const handleRemoveMember = async (userId: string) => {
@@ -105,7 +95,8 @@ const GroupDetail: React.FC = () => {
         confirmButtonText: "Yes, remove member!",
       })
     ) {
-      dispatch(removeMember({ groupId, userId }));
+      // TODO: Replace with API call
+      console.log("Remove member:", userId);
       showSuccess({
         title: "Removed!",
         text: "Member has been removed from the group.",

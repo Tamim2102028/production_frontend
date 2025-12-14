@@ -1,15 +1,4 @@
-import React from "react";
-import { useAppSelector, useAppDispatch } from "../store/hooks";
-import {
-  selectSearchQuery,
-  selectActiveFilter,
-  selectFilteredPeople,
-  selectFilteredPosts,
-  selectFilteredHashtags,
-  selectFilteredGroups,
-  setSearchQuery,
-  setActiveFilter,
-} from "../store/slices/search/searchSlice";
+import React, { useState } from "react";
 import SearchHeader from "../components/Search/SearchHeader";
 import SearchBar from "../components/Search/SearchBar";
 import SearchFilters from "../components/Search/SearchFilters";
@@ -19,23 +8,26 @@ import HashtagsResults from "../components/Search/HashtagsResults";
 import GroupsResults from "../components/Search/GroupsResults";
 
 const Search: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const searchQuery = useAppSelector(selectSearchQuery);
-  const activeFilter = useAppSelector(selectActiveFilter);
-  const filteredPeople = useAppSelector(selectFilteredPeople);
-  const filteredPosts = useAppSelector(selectFilteredPosts);
-  const filteredHashtags = useAppSelector(selectFilteredHashtags);
-  const filteredGroups = useAppSelector(selectFilteredGroups);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "people" | "posts" | "hashtags" | "groups"
+  >("all");
+
+  // TODO: Fetch search results from API
+  const filteredPeople: any[] = [];
+  const filteredPosts: any[] = [];
+  const filteredHashtags: any[] = [];
+  const filteredGroups: any[] = [];
 
   const handleSearchChange = (query: string) => {
-    dispatch(setSearchQuery(query));
+    setSearchQuery(query);
+    // TODO: Trigger API search
+    console.log("TODO: Search API for:", query);
   };
 
   const handleFilterChange = (filter: string) => {
-    dispatch(
-      setActiveFilter(
-        filter as "all" | "people" | "posts" | "hashtags" | "groups"
-      )
+    setActiveFilter(
+      filter as "all" | "people" | "posts" | "hashtags" | "groups"
     );
   };
 

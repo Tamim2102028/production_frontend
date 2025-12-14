@@ -1,11 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { FaUsers, FaLock, FaGlobe, FaBan } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  requestJoinGroup,
-  cancelJoinRequest,
-} from "../../../store/slices/groupSlice";
 
 // Accepts group with 'id' property instead of 'groupId'.
 type SmallGroup = {
@@ -23,36 +18,36 @@ type GroupCardProps = {
   group: SmallGroup;
   showJoinButton?: boolean;
   showCancelButton?: boolean;
+  isRequested?: boolean;
+  isMember?: boolean;
 };
 
 const GroupCard: React.FC<GroupCardProps> = ({
   group,
   showJoinButton = false,
   showCancelButton = false,
+  isRequested: propIsRequested = false,
+  isMember: propIsMember = false,
 }) => {
-  const dispatch = useAppDispatch();
-  const isRequested = useAppSelector(
-    (s) => !!s.profile?.sentRequestGroup?.includes(group.id)
-  );
-  const isMember = useAppSelector(
-    (s) => !!s.profile?.joinedGroup?.includes(group.id)
-  );
-  // treat pre-joined groups as membership too
-  const isPreJoined = useAppSelector(
-    (s) => !!s.profile?.preJoinedGroup?.includes(group.id)
-  );
-  const effectiveMember = isMember || isPreJoined;
+  // TODO: Replace with actual state from API
+  const [isRequested, setIsRequested] = useState(propIsRequested);
+  const isMember = propIsMember;
+  const effectiveMember = isMember;
 
   const handleJoin = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(requestJoinGroup(group.id));
+    // TODO: Replace with API call
+    console.log("Join group:", group.id);
+    setIsRequested(true);
   };
 
   const handleCancel = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(cancelJoinRequest(group.id));
+    // TODO: Replace with API call
+    console.log("Cancel join request:", group.id);
+    setIsRequested(false);
   };
   return (
     <NavLink

@@ -15,14 +15,6 @@ import {
   showSuccess,
   confirmDelete,
 } from "../../../utils/sweetAlert";
-import { useAppDispatch } from "../../../store/hooks";
-import {
-  renameItem,
-  deleteItem,
-  copyItem,
-  shareItem,
-  togglePublic,
-} from "../../../store/slices/filesSlice";
 
 interface FileItem {
   id: string;
@@ -41,6 +33,11 @@ interface FilesListProps {
   getFileIcon: (item: FileItem) => React.ReactElement;
   formatDate: (dateString: string) => string;
   formatTime: (dateString: string) => string;
+  onRename?: (id: string, newName: string) => void;
+  onDelete?: (id: string) => void;
+  onCopy?: (id: string) => void;
+  onShare?: (id: string) => void;
+  onTogglePublic?: (id: string) => void;
 }
 
 const FilesList: React.FC<FilesListProps> = ({
@@ -49,10 +46,14 @@ const FilesList: React.FC<FilesListProps> = ({
   getFileIcon,
   formatDate,
   formatTime,
+  onRename,
+  onDelete,
+  onCopy,
+  onShare,
+  onTogglePublic,
 }) => {
   const [showContextMenu, setShowContextMenu] = useState<string | null>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
-  const dispatch = useAppDispatch();
 
   // Close context menu when clicking outside
   useEffect(() => {

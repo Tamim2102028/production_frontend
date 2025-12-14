@@ -1,24 +1,20 @@
 import GroupCard from "../utils/GroupCard";
-import { useAppSelector } from "../../../store/hooks";
-import { getMemberCount } from "../../../data/group-data/groupMembers";
 
-const MyGroups = () => {
-  const joined = useAppSelector((s) => s.profile.joinedGroup || []);
+// TODO: Replace with API data
+interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  coverImage?: string;
+  memberCount?: number;
+  privacy?: string;
+}
 
-  const allGroups = useAppSelector((s) => s.groups.groups || []);
+interface MyGroupsProps {
+  groups?: Group[];
+}
 
-  const groups = joined
-    .map((gid) => allGroups.find((g) => g.id === gid))
-    .filter(Boolean)
-    .map((g) => ({
-      id: g!.id,
-      name: g!.name,
-      description: g!.description,
-      coverImage: g!.coverImage,
-      memberCount: getMemberCount(g!.id),
-      privacy: g!.privacy,
-    }));
-
+const MyGroups: React.FC<MyGroupsProps> = ({ groups = [] }) => {
   return (
     <div>
       <h2 className="mb-3 text-xl font-semibold text-gray-900">

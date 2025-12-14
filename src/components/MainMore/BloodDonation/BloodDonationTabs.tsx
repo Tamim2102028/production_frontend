@@ -1,21 +1,23 @@
 import React from "react";
 import { FaExclamationCircle, FaUser, FaUsers } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { setActiveTab } from "../../../store/slices/mainMore/bloodDonationSlice";
 
-const BloodDonationTabs: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { activeTab, requests, donors } = useAppSelector(
-    (state) => state.bloodDonation
-  );
+interface BloodDonationTabsProps {
+  activeTab: "requests" | "donors" | "donorList";
+  onTabChange: (tab: "requests" | "donors" | "donorList") => void;
+  requestsCount?: number;
+  donorsCount?: number;
+}
 
-  const handleTabChange = (tab: "requests" | "donors" | "donorList") => {
-    dispatch(setActiveTab(tab));
-  };
+const BloodDonationTabs: React.FC<BloodDonationTabsProps> = ({
+  activeTab,
+  onTabChange,
+  requestsCount = 0,
+  donorsCount = 0,
+}) => {
   return (
     <div className="flex gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
       <button
-        onClick={() => handleTabChange("requests")}
+        onClick={() => onTabChange("requests")}
         className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-3 font-semibold transition-colors ${
           activeTab === "requests"
             ? "bg-red-600 text-white"
@@ -23,10 +25,10 @@ const BloodDonationTabs: React.FC = () => {
         }`}
       >
         <FaExclamationCircle />
-        Blood Requests ({requests.length})
+        Blood Requests ({requestsCount})
       </button>
       <button
-        onClick={() => handleTabChange("donors")}
+        onClick={() => onTabChange("donors")}
         className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-3 font-semibold transition-colors ${
           activeTab === "donors"
             ? "bg-red-600 text-white"
@@ -34,10 +36,10 @@ const BloodDonationTabs: React.FC = () => {
         }`}
       >
         <FaUser />
-        Find Donors ({donors.length})
+        Find Donors ({donorsCount})
       </button>
       <button
-        onClick={() => handleTabChange("donorList")}
+        onClick={() => onTabChange("donorList")}
         className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-3 font-semibold transition-colors ${
           activeTab === "donorList"
             ? "bg-red-600 text-white"
@@ -45,7 +47,7 @@ const BloodDonationTabs: React.FC = () => {
         }`}
       >
         <FaUsers />
-        Donor List ({donors.length})
+        Donor List ({donorsCount})
       </button>
     </div>
   );

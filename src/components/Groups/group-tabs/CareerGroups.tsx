@@ -1,41 +1,21 @@
 import React from "react";
 import GroupCard from "../utils/GroupCard";
-import { useAppSelector } from "../../../store/hooks";
-import { getMemberCount } from "../../../data/group-data/groupMembers";
 
-const pick = ["g21", "g22", "g23"];
+// TODO: Replace with API data
+interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  coverImage?: string;
+  memberCount?: number;
+  privacy?: string;
+}
 
-const CareerGroups: React.FC = () => {
-  const joined = useAppSelector((s) => s.profile.joinedGroup || []);
-  const sent = useAppSelector((s) => s.profile.sentRequestGroup || []);
+interface CareerGroupsProps {
+  groups?: Group[];
+}
 
-  const allGroups = useAppSelector((s) => s.groups.groups || []);
-
-  // collect IDs from explicit picks and from groups that have type === 'jobs'
-  const ids = new Set<string>();
-  pick.forEach((id) => ids.add(id));
-  allGroups.forEach((g) => {
-    if (g?.type === "jobs") ids.add(g.id);
-  });
-
-  const groups = Array.from(ids)
-    .map((id) => allGroups.find((g) => g.id === id))
-    .filter(Boolean)
-    .filter((g) => g!.privacy !== "closed")
-    .filter((g) => {
-      const joinedSet = new Set(joined || []);
-      const sentSet = new Set(sent || []);
-      return !joinedSet.has(g!.id) && !sentSet.has(g!.id);
-    })
-    .map((g) => ({
-      id: g!.id,
-      name: g!.name,
-      description: g!.description,
-      coverImage: g!.coverImage,
-      memberCount: getMemberCount(g!.id),
-      privacy: g!.privacy,
-    }));
-
+const CareerGroups: React.FC<CareerGroupsProps> = ({ groups = [] }) => {
   return (
     <div>
       <h2 className="mb-3 text-xl font-semibold text-gray-900">

@@ -1,6 +1,19 @@
 import React from "react";
 import ProfilePostCard from "./ProfilePostCard";
-import type { PostData } from "../../data/profile-data/profilePostData";
+import { DEFAULT_AVATAR_MD } from "../../constants/images";
+
+// TODO: Replace with API types
+type PostData = {
+  postId: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+  likedBy: string[];
+  comments: number;
+  sharesBy: string[];
+  images?: string[];
+  tags?: string[];
+};
 
 interface ProfilePostsProps {
   posts: PostData[];
@@ -39,7 +52,7 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
                   id: post.userId,
                   name: userData?.name || "User Name",
                   username: userData?.username || "username",
-                  avatar: userData?.avatar || "https://via.placeholder.com/40",
+                  avatar: userData?.avatar || DEFAULT_AVATAR_MD,
                 },
                 timestamp: post.createdAt,
                 likes: post.likedBy.length,

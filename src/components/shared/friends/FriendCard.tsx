@@ -8,19 +8,24 @@ import {
   AddFriendButton,
   CancelRequestButton,
 } from "./FriendActions";
-import type { UserData } from "../../../data/profile-data/userData";
 import { BsThreeDots } from "react-icons/bs";
-import { useAppDispatch } from "../../../store/hooks";
-import {
-  acceptFriendRequest,
-  cancelFriendRequest,
-  rejectFriendRequest,
-  removeFriendship,
-  sendFriendRequest,
-} from "../../../store/slices/friendsSlice";
 import confirm from "../../../utils/sweetAlert";
-import { getCurrentUserId } from "../../../services/userService";
-import { setSelectedConversation } from "../../../store/slices/messagesSlice";
+
+// TODO: Replace with API data
+export interface UserData {
+  id: string;
+  name: string;
+  avatar?: string;
+  educationLevel?: "UNIVERSITY" | "COLLEGE";
+  university?: {
+    name?: string;
+    department?: string;
+    section?: string;
+    subsection?: string;
+  };
+  college?: { name?: string };
+  [key: string]: unknown;
+}
 
 interface FriendCardProps {
   friend: UserData;
@@ -43,33 +48,34 @@ const FriendCard: React.FC<FriendCardProps> = ({
   canShowMenu,
   handleMemberMenu,
 }) => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentUserId = getCurrentUserId();
+  // TODO: Replace with actual user ID from API/context
+  const currentUserId = "current-user-id";
 
   const handleMessage = (id: string) => {
-    dispatch(setSelectedConversation(id));
+    // TODO: Replace with API call to set selected conversation
+    console.log("Message user:", id);
     navigate("/messages");
   };
 
-  // Handle friend actions
+  // Handle friend actions - TODO: Replace with API calls
   const handleAccept = (senderId: string) => {
-    dispatch(acceptFriendRequest({ senderId, receiverId: currentUserId }));
+    console.log("Accept friend request from:", senderId);
   };
 
   // Handle decline action
   const handleDecline = (senderId: string) => {
-    dispatch(rejectFriendRequest({ senderId, receiverId: currentUserId }));
+    console.log("Decline friend request from:", senderId);
   };
 
   // Handle add friend action
   const handleAddFriend = (receiverId: string) => {
-    dispatch(sendFriendRequest({ senderId: currentUserId, receiverId }));
+    console.log("Send friend request to:", receiverId);
   };
 
   // Handle cancel request action
   const handleCancelRequest = (receiverId: string) => {
-    dispatch(cancelFriendRequest({ senderId: currentUserId, receiverId }));
+    console.log("Cancel friend request to:", receiverId);
   };
 
   // Handle unfriend action
@@ -82,7 +88,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
     });
 
     if (ok) {
-      dispatch(removeFriendship({ user1Id: currentUserId, user2Id: friendId }));
+      console.log("Unfriend user:", friendId);
     }
   };
 

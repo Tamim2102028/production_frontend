@@ -1,18 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaPaperPlane, FaEllipsisV, FaPhone, FaVideo } from "react-icons/fa";
 import { FaRegComments } from "react-icons/fa6";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  setMessageText,
-  clearMessageText,
-} from "../../store/slices/messagesSlice";
 import { mockConversations, mockMessages } from "./data/messagesData";
 
-const ChatArea: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { selectedConversation, messageText } = useAppSelector(
-    (state) => state.messages
-  );
+interface ChatAreaProps {
+  selectedConversation?: string;
+}
+
+const ChatArea: React.FC<ChatAreaProps> = ({
+  selectedConversation: propSelectedConversation,
+}) => {
+  // TODO: Replace with local state or API data
+  const [selectedConversation] = useState(propSelectedConversation || "");
+  const [messageText, setMessageText] = useState("");
 
   const selectedConv = mockConversations.find(
     (c) => c.id === selectedConversation
@@ -45,8 +45,9 @@ const ChatArea: React.FC = () => {
 
   const handleSendMessage = () => {
     if (messageText.trim()) {
-      // Handle send message logic here
-      dispatch(clearMessageText());
+      // TODO: Replace with API call to send message
+      console.log("Send message:", messageText);
+      setMessageText("");
     }
   };
 

@@ -1,17 +1,28 @@
 import React, { useState, useRef } from "react";
-import { roomFiles } from "../../../data/rooms-data/roomFilesData";
-import type { RoomFile } from "../../../data/rooms-data/roomFilesData";
-import { usersData } from "../../../data/profile-data/userData";
 import { formatPostDate } from "../../../utils/dateUtils";
 import { FaEye, FaDownload } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
 import { showMediaMenu } from "../../../utils/customModals";
+
+// TODO: Replace with API types
+type RoomFile = {
+  id: string;
+  roomId: string;
+  fileName: string;
+  fileUrl?: string;
+  uploadedBy: string;
+  uploadedAt: string;
+  isGeneral?: boolean;
+  isCT?: boolean;
+  isAssignment?: boolean;
+};
 
 interface Props {
   roomId: string;
   creatorId?: string;
   admins?: string[];
   currentUserId?: string;
+  files?: RoomFile[];
 }
 
 const MediaTab: React.FC<Props> = ({
@@ -19,6 +30,7 @@ const MediaTab: React.FC<Props> = ({
   creatorId,
   admins,
   currentUserId,
+  files = [],
 }) => {
   const [active, setActive] = useState<"general" | "ct" | "assignments">(
     "general"
@@ -26,7 +38,7 @@ const MediaTab: React.FC<Props> = ({
 
   // keep a local copy so we can rename/delete locally in the demo
   const [localFiles, setLocalFiles] = useState(() =>
-    roomFiles.filter((f) => f.roomId === roomId)
+    files.filter((f) => f.roomId === roomId)
   );
 
   const filtered = localFiles.filter((f) =>
@@ -69,11 +81,9 @@ const MediaTab: React.FC<Props> = ({
       id: `f-${roomId}-${Date.now()}`,
       roomId,
       fileName: file.name,
-      url,
-      uploadedBy: usersData[0]?.id ?? "1",
-      createdAt: new Date().toISOString(),
-      sizeKb: Math.round(file.size / 1024),
-      mimeType: file.type,
+      fileUrl: url,
+      uploadedBy: currentUserId ?? "1",
+      uploadedAt: new Date().toISOString(),
       isGeneral: active === "general",
       isCT: active === "ct",
       isAssignment: active === "assignments",
@@ -147,7 +157,8 @@ const MediaTab: React.FC<Props> = ({
           </div>
         ) : (
           filtered.map((f) => {
-            const user = usersData.find((u) => u.id === f.uploadedBy);
+            // TODO: Replace with API data
+            const uploaderName = "User";
             const extMatch = f.fileName.match(/\.([0-9a-zA-Z]+)$/);
             const ext = extMatch ? extMatch[1].toUpperCase() : "FILE";
             return (
@@ -167,18 +178,16 @@ const MediaTab: React.FC<Props> = ({
                       {f.fileName}
                     </div>
                     <div className="text-xs text-gray-500">
-                      <span>{user?.name ?? "Unknown"}</span>
+                      <span>{uploaderName}</span>
                       <span className="mx-2">•</span>
-                      <span>{formatPostDate(f.createdAt)}</span>
-                      {f.sizeKb ? <span className="mx-2">•</span> : null}
-                      {f.sizeKb ? <span>{f.sizeKb} KB</span> : null}
+                      <span>{formatPostDate(f.uploadedAt)}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {f.url && (
+                  {f.fileUrl && (
                     <a
-                      href={f.url}
+                      href={f.fileUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
@@ -188,10 +197,10 @@ const MediaTab: React.FC<Props> = ({
                     </a>
                   )}
 
-                  {f.url && (
+                  {f.fileUrl && (
                     <a
                       download={f.fileName}
-                      href={f.url}
+                      href={f.fileUrl}
                       className="inline-flex items-center gap-2 rounded-md border border-gray-100 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                     >
                       <FaDownload className="h-3 w-3" />

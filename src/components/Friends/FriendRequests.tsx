@@ -1,37 +1,20 @@
 import React from "react";
 import FriendCard from "../shared/friends/FriendCard";
-import { getUserById } from "../../services/userService";
-import { useAppSelector } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
-import { selectPendingRequestsForUser } from "../../store/slices/friendsSlice";
-import type { RootState } from "../../store/store";
 
-const FriendRequests: React.FC = () => {
-  const currentUser = useAppSelector((s) => selectUserById(s, s.profile.id));
+// TODO: Replace with API data
+interface FriendRequest {
+  id: string;
+  name: string;
+  avatar?: string;
+  [key: string]: unknown;
+}
 
-  // Get pending requests from Redux friends slice
-  // requesterIds = [userId1, userId2, ...] - যারা currentUser কে friend request পাঠিয়েছে
-  const requesterIds = useAppSelector((s: RootState) =>
-    selectPendingRequestsForUser(s, currentUser?.id || "")
-  );
+interface FriendRequestsProps {
+  requests?: FriendRequest[];
+}
 
-  if (!currentUser) {
-    return <div>User not found</div>;
-  }
-
-  // Get pending friend requests data from requesterIds
-  // friendRequests = [{userData}, {userData}, ...]
-  const friendRequests = requesterIds
-    .map((requestId) => {
-      const requester = getUserById(requestId);
-      if (!requester) return null;
-
-      console.log(requester);
-      return {
-        ...requester,
-      };
-    })
-    .filter((friend) => friend !== null);
+const FriendRequests: React.FC<FriendRequestsProps> = ({ requests = [] }) => {
+  const friendRequests = requests;
 
   return (
     <div>

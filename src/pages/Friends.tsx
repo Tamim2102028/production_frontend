@@ -8,15 +8,16 @@ import {
   SentRequests,
 } from "../components/Friends";
 import FriendCard from "../components/shared/friends/FriendCard";
-import { usersData } from "../data/profile-data/userData";
-import { getCurrentUserId } from "../services/userService";
-import { useAppSelector } from "../store/hooks";
-import {
-  selectFriendsForUser,
-  selectPendingRequestsForUser,
-  selectSentRequestsByUser,
-} from "../store/slices/friendsSlice";
-import type { RootState } from "../store/store";
+
+// TODO: Define types when API is connected
+interface UserData {
+  id: string;
+  name: string;
+  username: string;
+  avatar: string;
+  university?: { name: string };
+  college?: { name: string };
+}
 
 const Friends: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
@@ -24,18 +25,14 @@ const Friends: React.FC = () => {
   >("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const currentUserId = getCurrentUserId();
+  // TODO: Get current user ID from auth context/API
+  const currentUserId = "1";
 
-  // Get friend data from Redux
-  const friendIds = useAppSelector((s: RootState) =>
-    selectFriendsForUser(s, currentUserId)
-  );
-  const pendingRequestIds = useAppSelector((s: RootState) =>
-    selectPendingRequestsForUser(s, currentUserId)
-  );
-  const sentRequestIds = useAppSelector((s: RootState) =>
-    selectSentRequestsByUser(s, currentUserId)
-  );
+  // TODO: Fetch from API
+  const usersData: UserData[] = [];
+  const friendIds: string[] = [];
+  const pendingRequestIds: string[] = [];
+  const sentRequestIds: string[] = [];
 
   // Tab-specific search results filtering
   const searchResults = useMemo(() => {
@@ -87,6 +84,7 @@ const Friends: React.FC = () => {
     friendIds,
     pendingRequestIds,
     sentRequestIds,
+    usersData,
   ]);
 
   const renderSearchResults = () => {

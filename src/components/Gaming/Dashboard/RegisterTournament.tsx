@@ -1,39 +1,25 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FaTrophy, FaCoins } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  registerForTournament,
-  setUserUniversity,
-} from "../../../store/slices/tournamentSlice.ts";
 
 interface RegisterTournamentProps {
   entryFee: number;
   userXP: number;
+  hasUniversity?: boolean;
+  onRegister?: () => void;
 }
 
 const RegisterTournament: React.FC<RegisterTournamentProps> = ({
   entryFee,
   userXP,
+  hasUniversity = true,
+  onRegister,
 }) => {
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.auth.user);
-  const userUniversityId = useAppSelector(
-    (state) => state.tournament.userUniversityId
-  );
-
-  // Set user's university from their profile on component mount
-  useEffect(() => {
-    if (user?.universityId && !userUniversityId) {
-      dispatch(setUserUniversity(user.universityId));
-    }
-  }, [user, userUniversityId, dispatch]);
-
   const canRegister = userXP >= entryFee;
-  const hasUniversity = !!user?.universityId;
 
   const handleRegister = () => {
     if (canRegister && hasUniversity) {
-      dispatch(registerForTournament());
+      // TODO: Replace with API call
+      onRegister?.();
     }
   };
 

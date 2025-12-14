@@ -1,34 +1,20 @@
 import React from "react";
 import FriendCard from "../shared/friends/FriendCard";
-import { getUserById } from "../../services/userService";
-import { useAppSelector } from "../../store/hooks";
-import { selectUserById } from "../../store/slices/profileSlice";
-import { selectSentRequestsByUser } from "../../store/slices/friendsSlice";
-import type { RootState } from "../../store/store";
 
-const SentRequests: React.FC = () => {
-  const currentUser = useAppSelector((s) => selectUserById(s, s.profile.id));
+// TODO: Replace with API data
+interface SentRequest {
+  id: string;
+  name: string;
+  avatar?: string;
+  [key: string]: unknown;
+}
 
-  // Get sent requests from Redux friends slice
-  const receiverIds = useAppSelector((s: RootState) =>
-    selectSentRequestsByUser(s, currentUser?.id || "")
-  );
+interface SentRequestsProps {
+  requests?: SentRequest[];
+}
 
-  if (!currentUser) {
-    return <div>User not found</div>;
-  }
-
-  // Get sent requests data from receiverIds
-  const sentRequests = receiverIds
-    .map((requestId) => {
-      const requestedUser = getUserById(requestId);
-      if (!requestedUser) return null;
-
-      return {
-        ...requestedUser,
-      };
-    })
-    .filter((request) => request !== null);
+const SentRequests: React.FC<SentRequestsProps> = ({ requests = [] }) => {
+  const sentRequests = requests;
 
   return (
     <div className="space-y-3">
