@@ -83,12 +83,6 @@ const Sidebar: React.FC = () => {
       active: location.pathname === "/videos",
     },
     {
-      icon: FaUser,
-      label: "Profile",
-      path: profilePath,
-      active: location.pathname.startsWith("/profile"),
-    },
-    {
       icon: FaEllipsisH,
       label: "More",
       path: "/more",
@@ -154,16 +148,33 @@ const Sidebar: React.FC = () => {
         </nav>
       </div>
 
-      {/* Logout Button */}
+      {/* Profile & Logout Section */}
       <div className="border-t border-gray-300 pt-3">
-        <button
-          onClick={() => logout()}
-          disabled={isLoggingOut}
-          className="flex w-full items-center rounded-xl px-4 py-3 text-base font-medium text-red-600 transition-all duration-200 hover:bg-red-50 disabled:opacity-50"
-        >
-          <FaSignOutAlt className="mr-3 h-5 w-5" />
-          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <NavLink
+            to={profilePath}
+            onMouseEnter={() => prefetchRoute(profilePath)}
+            className={({ isActive }) =>
+              `group flex flex-1 items-center rounded-xl px-4 py-3 text-base font-medium transition-all duration-200 ${
+                isActive
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`
+            }
+          >
+            <FaUser className="mr-3 h-5 w-5" />
+            <span>Profile</span>
+          </NavLink>
+
+          <button
+            onClick={() => logout()}
+            disabled={isLoggingOut}
+            className="flex items-center rounded-xl px-4 py-3 text-base font-medium text-red-600 transition-all duration-200 hover:bg-red-50 disabled:opacity-50"
+            title="Logout"
+          >
+            <FaSignOutAlt className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
