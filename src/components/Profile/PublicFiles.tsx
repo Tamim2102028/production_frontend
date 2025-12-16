@@ -77,7 +77,7 @@ const PublicFiles: React.FC<PublicFilesProps> = ({
                 <div className="mt-1 flex items-center space-x-4">
                   <span className="flex items-center text-xs text-gray-500">
                     <FaCalendarAlt className="mr-1 h-3 w-3" />
-                    {formatDate(folder.createdAt)}
+                    {formatDate(folder.uploadDate)}
                   </span>
                 </div>
               </div>
