@@ -2,6 +2,7 @@ import React from "react";
 import ProfilePostCard from "./ProfilePostCard";
 import { DEFAULT_AVATAR_MD } from "../../constants/images";
 import { useProfilePosts } from "../../hooks/usePost";
+import PageLoader from "../../pages/Fallbacks/PageLoader";
 
 interface ProfilePostsProps {
   username: string;
@@ -12,18 +13,13 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
   username,
   isOwnProfile,
 }) => {
-  // Fetch posts inside this component
   const { data: postsData, isLoading } = useProfilePosts(username);
   const posts = postsData?.posts || [];
 
-  // Show loading state
   if (isLoading) {
-    return (
-      <div className="rounded-lg border border-gray-200 bg-white p-12 text-center shadow">
-        <p className="text-gray-500">Loading posts...</p>
-      </div>
-    );
+    return <PageLoader />;
   }
+
   return (
     <>
       {/* Posts List */}
