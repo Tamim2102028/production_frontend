@@ -3,17 +3,20 @@ import api from "../lib/axios";
 export interface Post {
   _id: string;
   content: string;
-  images: string[];
+  images?: string[];
+  attachments?: string[];
   author: {
     _id: string;
     fullName: string;
-    avatar: string;
-    username: string;
+    avatar?: string;
+    userName: string;
   };
+  privacy?: string;
   createdAt: string;
   likesCount: number;
   commentsCount: number;
-  isLiked: boolean;
+  isLiked?: boolean;
+  isOwnPost?: boolean;
 }
 
 interface FeedResponse {
@@ -23,6 +26,16 @@ interface FeedResponse {
     hasNextPage: boolean;
     nextPage: number | null;
     totalDocs: number;
+  };
+  message: string;
+  success: boolean;
+}
+
+interface ProfilePostsResponse {
+  statusCode: number;
+  data: {
+    posts: Post[];
+    isOwnProfile: boolean;
   };
   message: string;
   success: boolean;
@@ -50,6 +63,14 @@ export const postService = {
   // Like Post
   toggleLike: async (postId: string) => {
     const response = await api.post(`/posts/${postId}/like`);
+    return response.data;
+  },
+
+  // Get Profile Posts
+  getProfilePosts: async (username: string) => {
+    const response = await api.get<ProfilePostsResponse>(
+      `/posts/profile/${username}`
+    );
     return response.data;
   },
 };

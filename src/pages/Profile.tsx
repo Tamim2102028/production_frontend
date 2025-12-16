@@ -7,27 +7,8 @@ import {
   PublicFiles,
 } from "../components/Profile";
 import PageLoader from "./Fallbacks/PageLoader";
-import { DEFAULT_AVATAR_MD } from "../constants/images";
-import { PROFILE_RELATION_STATUS } from "../constants";
 import { useUser } from "../hooks/useAuth";
 import { useProfile } from "../hooks/useProfile";
-import type { FriendshipStatus } from "../types/profile.types";
-
-// TODO: Define proper types when Posts API is connected
-interface Post {
-  postId: string;
-  userId: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  comments: number;
-  likedBy: string[];
-  sharesBy: string[];
-  images?: string[];
-  status: string;
-  privacy: string;
-  tags?: string[];
-}
 
 interface PublicFileItem {
   fileId: string;
@@ -59,12 +40,6 @@ const Profile: React.FC = () => {
 
   // profileData IS the user with friendshipStatus (flat structure from Backend)
   const userData = profileData;
-  const friendshipStatus: FriendshipStatus =
-    (profileData?.friendshipStatus as FriendshipStatus) ||
-    PROFILE_RELATION_STATUS.NONE;
-
-  // TODO: Fetch user's posts from API
-  const userPosts: Post[] = [];
 
   // TODO: Fetch user's public folders from API
   const userPublicFolders: PublicFileItem[] = [];
@@ -92,27 +67,9 @@ const Profile: React.FC = () => {
     );
   }
 
-  const handleEditProfile = () => {
-    navigate("/profile/edit");
-  };
-
-  const handleViewDetails = () => {
-    if (isOwnProfile) {
-      navigate("/profile/details");
-    } else {
-      navigate(`/profile/${userData.userName}/details`);
-    }
-  };
-
   return (
     <>
-      <ProfileHeader
-        userData={userData}
-        isOwnProfile={isOwnProfile}
-        friendshipStatus={friendshipStatus}
-        onEditProfile={handleEditProfile}
-        onViewDetails={handleViewDetails}
-      />
+      <ProfileHeader userData={userData} isOwnProfile={isOwnProfile} />
 
       {/* Navigation Tabs */}
       <div className="rounded-t-lg border-b border-gray-200 bg-white">
@@ -126,7 +83,7 @@ const Profile: React.FC = () => {
             }`}
           >
             <FaFileAlt className="mr-2 inline h-4 w-4" />
-            <span>Posts</span> ({userPosts.length})
+            <span>Posts</span> ({userData?.stats?.postsCount || 0})
           </button>
 
           {/* Public Files tab - always visible */}
@@ -171,13 +128,8 @@ const Profile: React.FC = () => {
         {activeTab === "posts" && (
           <div className="space-y-3">
             <ProfilePosts
-              posts={userPosts}
+              username={userData.userName}
               isOwnProfile={isOwnProfile}
-              userData={{
-                name: userData.fullName,
-                username: userData.userName,
-                avatar: userData.avatar || DEFAULT_AVATAR_MD,
-              }}
             />
           </div>
         )}

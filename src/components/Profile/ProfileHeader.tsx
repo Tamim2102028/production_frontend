@@ -22,19 +22,27 @@ import type { FriendshipStatus } from "../../types/profile.types";
 type Props = {
   userData: User;
   isOwnProfile: boolean;
-  friendshipStatus: FriendshipStatus;
-  onEditProfile: () => void;
-  onViewDetails: () => void;
 };
 
-const ProfileHeader: React.FC<Props> = ({
-  userData,
-  isOwnProfile,
-  friendshipStatus,
-  onEditProfile,
-  onViewDetails,
-}) => {
+const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
   const navigate = useNavigate();
+
+  // Calculate friendshipStatus from userData
+  const friendshipStatus: FriendshipStatus =
+    (userData?.friendshipStatus as FriendshipStatus) ||
+    PROFILE_RELATION_STATUS.NONE;
+
+  const handleEditProfile = () => {
+    navigate("/profile/edit");
+  };
+
+  const handleViewDetails = () => {
+    if (isOwnProfile) {
+      navigate("/profile/details");
+    } else {
+      navigate(`/profile/${userData.userName}/details`);
+    }
+  };
 
   // Helper to get institution name
   const getInstitutionName = (): string => {
@@ -93,14 +101,14 @@ const ProfileHeader: React.FC<Props> = ({
       return (
         <div className="flex gap-3">
           <button
-            onClick={onEditProfile}
+            onClick={handleEditProfile}
             className="flex items-center gap-2 rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
           >
             <FaEdit className="h-4 w-4" />
             Edit Profile
           </button>
           <button
-            onClick={onViewDetails}
+            onClick={handleViewDetails}
             className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
           >
             <FaInfoCircle className="h-4 w-4" />
@@ -150,7 +158,7 @@ const ProfileHeader: React.FC<Props> = ({
 
         {/* View Details button for all */}
         <button
-          onClick={onViewDetails}
+          onClick={handleViewDetails}
           className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
         >
           <FaInfoCircle className="h-4 w-4" />
@@ -226,13 +234,13 @@ const ProfileHeader: React.FC<Props> = ({
             <div className="mt-2 flex gap-4 text-sm text-gray-500">
               <span>
                 <strong className="text-gray-900">
-                  {userData.connectionsCount || 0}
+                  {userData.stats?.friendsCount || 0}
                 </strong>{" "}
                 Friends
               </span>
               <span>
                 <strong className="text-gray-900">
-                  {userData.followingCount || 0}
+                  {userData.stats?.followingCount || 0}
                 </strong>{" "}
                 Following
               </span>

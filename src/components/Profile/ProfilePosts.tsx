@@ -1,35 +1,29 @@
 import React from "react";
 import ProfilePostCard from "./ProfilePostCard";
 import { DEFAULT_AVATAR_MD } from "../../constants/images";
-
-// TODO: Replace with API types
-type PostData = {
-  postId: string;
-  userId: string;
-  content: string;
-  createdAt: string;
-  likedBy: string[];
-  comments: number;
-  sharesBy: string[];
-  images?: string[];
-  tags?: string[];
-};
+import { useProfilePosts } from "../../hooks/usePost";
 
 interface ProfilePostsProps {
-  posts: PostData[];
+  username: string;
   isOwnProfile: boolean;
-  userData?: {
-    name: string;
-    username: string;
-    avatar: string;
-  }; // User data for author info
 }
 
 const ProfilePosts: React.FC<ProfilePostsProps> = ({
-  posts,
+  username,
   isOwnProfile,
-  userData,
 }) => {
+  // Fetch posts inside this component
+  const { data: postsData, isLoading } = useProfilePosts(username);
+  const posts = postsData?.posts || [];
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-12 text-center shadow">
+        <p className="text-gray-500">Loading posts...</p>
+      </div>
+    );
+  }
   return (
     <>
       {/* Posts Header */}
@@ -44,23 +38,23 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
         <div className="space-y-4">
           {posts.map((post) => (
             <ProfilePostCard
-              key={post.postId}
+              key={post._id}
               post={{
-                id: post.postId,
+                id: post._id,
                 content: post.content,
                 author: {
-                  id: post.userId,
-                  name: userData?.name || "User Name",
-                  username: userData?.username || "username",
-                  avatar: userData?.avatar || DEFAULT_AVATAR_MD,
+                  id: post.author._id,
+                  name: post.author.fullName,
+                  username: post.author.userName,
+                  avatar: post.author.avatar || DEFAULT_AVATAR_MD,
                 },
                 timestamp: post.createdAt,
-                likes: post.likedBy.length,
-                comments: post.comments,
-                shares: post.sharesBy.length,
-                isLiked: post.likedBy.includes("1"), // Current user ID
-                images: post.images || [],
-                tags: post.tags || [],
+                likes: post.likesCount,
+                comments: post.commentsCount,
+                shares: 0, // Backend doesn't send shares yet
+                isLiked: post.isLiked || false,
+                images: post.images || post.attachments || [],
+                tags: [], // Backend doesn't send tags yet
               }}
               isOwnProfile={isOwnProfile}
             />

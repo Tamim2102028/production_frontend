@@ -120,8 +120,15 @@ export interface User {
   interests?: string[];
 
   // Stats
-  connectionsCount: number;
-  followingCount: number;
+  stats?: {
+    postsCount: number;
+    friendsCount: number;
+    followersCount: number;
+    followingCount: number;
+  };
+
+  // Friendship
+  friendshipStatus?: string;
 
   // Institutional
   userType: UserType;
