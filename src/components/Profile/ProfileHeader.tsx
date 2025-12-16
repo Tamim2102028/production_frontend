@@ -25,25 +25,22 @@ type Props = {
 };
 
 const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
+  // এই userData যার profile visit করতেছি তার
   const navigate = useNavigate();
 
   // Calculate friendshipStatus from userData
   const friendshipStatus: FriendshipStatus =
-    (userData?.friendshipStatus as FriendshipStatus) ||
-    PROFILE_RELATION_STATUS.NONE;
+    (userData?.profile_relation_status as FriendshipStatus) ||
+    PROFILE_RELATION_STATUS.NOT_FRIENDS;
 
   // Helper to get institution name
   const getInstitutionName = (): string => {
-    if (!userData.institution) return "";
-    if (typeof userData.institution === "string") return "";
-    return (userData.institution as Institution).name || "";
+    return (userData.institution as Institution)?.name || "";
   };
 
   // Helper to get department name
   const getDepartmentName = (): string => {
-    if (!userData.academicInfo?.department) return "";
-    if (typeof userData.academicInfo.department === "string") return "";
-    return (userData.academicInfo.department as Department).name || "";
+    return (userData.academicInfo?.department as Department)?.name || "";
   };
 
   const handleMessage = (userId: string) => {
@@ -113,8 +110,8 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
     // Other user's profile
     return (
       <div className="flex items-center gap-3">
-        {/* FRIENDS - Message & Unfriend */}
-        {friendshipStatus === PROFILE_RELATION_STATUS.FRIENDS && (
+        {/* FRIEND - Message & Unfriend */}
+        {friendshipStatus === PROFILE_RELATION_STATUS.FRIEND && (
           <>
             <MessageButton onClick={() => handleMessage(userData._id)} />
             <UnfriendButton onClick={() => handleUnfriend(userData._id)} />
@@ -136,8 +133,8 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
           </>
         )}
 
-        {/* NONE - Add Friend */}
-        {friendshipStatus === PROFILE_RELATION_STATUS.NONE && (
+        {/* NOT_FRIENDS - Add Friend */}
+        {friendshipStatus === PROFILE_RELATION_STATUS.NOT_FRIENDS && (
           <AddFriendButton onClick={() => handleAddFriend(userData._id)} />
         )}
 
