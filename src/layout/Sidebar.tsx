@@ -16,13 +16,12 @@ import {
 } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { prefetchRoute } from "../routes/prefetch";
-import { useLogout } from "../hooks/useAuth";
-import { useAppSelector } from "../store/hooks";
+import { useLogout, useUser } from "../hooks/useAuth";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user } = useUser();
 
   // Dynamic profile path - uses username
   const profilePath = user?.userName ? `/profile/${user.userName}` : "/profile";

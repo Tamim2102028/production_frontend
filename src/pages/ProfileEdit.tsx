@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaCamera, FaUser, FaGraduationCap, FaArrowLeft } from "react-icons/fa";
 
 import PageLoader from "./Fallbacks/PageLoader";
-import { useAppSelector } from "../store/hooks";
+import { useUser } from "../hooks/useAuth";
 import { PhotosTab, GeneralTab, AcademicTab } from "../components/ProfileEdit";
 
 // ====================================
@@ -30,11 +30,11 @@ const TABS: Tab[] = [
 
 const ProfileEdit: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoading } = useAppSelector((state) => state.auth);
+  const { user, isCheckingAuth } = useUser();
   const [activeTab, setActiveTab] = useState<TabType>("photos");
 
   // Loading state
-  if (isLoading || !user) {
+  if (isCheckingAuth || !user) {
     return <PageLoader />;
   }
 

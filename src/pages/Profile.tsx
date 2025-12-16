@@ -9,7 +9,7 @@ import {
 import PageLoader from "./Fallbacks/PageLoader";
 import { DEFAULT_AVATAR_MD } from "../constants/images";
 import { PROFILE_RELATION_STATUS } from "../constants";
-import { useAppSelector } from "../store/hooks";
+import { useUser } from "../hooks/useAuth";
 import { useProfile } from "../hooks/useProfile";
 import type { FriendshipStatus } from "../types/profile.types";
 
@@ -44,8 +44,8 @@ const Profile: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"posts" | "files">("posts");
 
-  // Get current user from Redux
-  const { user: currentUser } = useAppSelector((state) => state.auth);
+  // Get current user from useUser hook
+  const { user: currentUser } = useUser();
 
   // Determine which username to fetch
   // If no param, use current user's username (own profile)
@@ -129,20 +129,18 @@ const Profile: React.FC = () => {
             <span>Posts</span> ({userPosts.length})
           </button>
 
-          {/* Only show Public Files tab if viewing someone else's profile or if current user has public folders */}
-          {(!isOwnProfile || userPublicFolders.length > 0) && (
-            <button
-              onClick={() => setActiveTab("files")}
-              className={`flex items-center border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
-                activeTab === "files"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:border-black hover:text-black"
-              }`}
-            >
-              <FaFolder className="mr-2 inline h-4 w-4" />
-              <span>Public Files</span> ({userPublicFolders.length})
-            </button>
-          )}
+          {/* Public Files tab - always visible */}
+          <button
+            onClick={() => setActiveTab("files")}
+            className={`flex items-center border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
+              activeTab === "files"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:border-black hover:text-black"
+            }`}
+          >
+            <FaFolder className="mr-2 inline h-4 w-4" />
+            <span>Public Files</span> ({userPublicFolders.length})
+          </button>
 
           {/* Friends button moved from main nav into profile tabs (navigates to friends page) */}
           {isOwnProfile && (

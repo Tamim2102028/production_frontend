@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useAppDispatch } from "../store/hooks";
-import { setUser, clearUser, setCheckingAuth } from "../store/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { setUser, clearUser } from "../store/slices/authSlice";
 import authApi from "../services/auth.service";
 import type { LoginCredentials, ApiError } from "../types/user.types";
 import type { AxiosError } from "axios";
@@ -17,22 +17,55 @@ import type { AxiosError } from "axios";
  * TanStack Query দিয়ে API call + Redux এ state update।
  *
  * Hooks:
+ * - useUser: Current user থেকে data access (Redux থেকে)
  * - useRegister: নতুন user registration
  * - useLogin: User login
  * - useLogout: User logout
- * - useCurrentUser: Current user fetch
  * - useAuthCheck: App load এ auth verify
  *
  * ব্যবহার:
+ * const { user, isAuthenticated } = useUser();
  * const { mutate: login, isPending } = useLogin();
  * login({ email: "...", password: "..." });
  */
+
+/**
+ * useUser Hook
+ *
+ * Redux থেকে current user data access করার জন্য।
+ * যেকোনো component থেকে easily user info পাওয়া যাবে।
+ *
+ * @returns {user, isAuthenticated, isCheckingAuth}
+ *
+ * @example
+ * const { user, isAuthenticated } = useUser();
+ * if (isAuthenticated) {
+ *   console.log(user.fullName);
+ * }
+ */
+export const useUser = () => {
+  const { user, isAuthenticated, isCheckingAuth } = useAppSelector(
+    (state) => state.auth
+  );
+
+  return {
+    user,
+    isAuthenticated,
+    isCheckingAuth,
+  };
+};
 
 /**
  * useRegister Hook
  *
  * নতুন user registration এর জন্য।
  * FormData নেয় কারণ avatar file upload আছে।
+ *
+ * ✅ Register Flow:
+ * 1. POST /users/register → Backend user create + cookie set
+ * 2. Success হলে GET /users/current-user → Fresh user data fetch
+ * 3. Redux এ user save → isAuthenticated = true
+ * 4. Home page এ redirect
  *
  * @returns {mutate, isPending, isError, error}
  *
@@ -48,16 +81,31 @@ export const useRegister = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (formData: FormData) => authApi.register(formData),
+    mutationFn: async (formData: FormData) => {
+      // Step 1: Register API call - user create + cookie set
+      const registerResponse = await authApi.register(formData);
+
+      // Step 2: Registration success হলে current user fetch করো
+      const userResponse = await authApi.getCurrentUser();
+
+      return {
+        registerData: registerResponse.data,
+        userData: userResponse.data,
+      };
+    },
     onSuccess: (response) => {
-      // ✅ Registration successful
-      // 1. Redux এ user save করো
-      dispatch(setUser(response.data.user));
-      // 2. Cache invalidate করো
+      // ✅ Registration successful + User data fetched
+      // Redux এ fresh user data save করো
+      dispatch(setUser(response.userData));
+
+      // Cache invalidate করো
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      // 3. Toast show
+      queryClient.invalidateQueries({ queryKey: ["authCheck"] });
+
+      // Welcome message
       toast.success("Account created successfully! Welcome to SocialHub!");
-      // 4. Home page এ redirect করো
+
+      // Home page এ redirect
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -73,6 +121,12 @@ export const useRegister = () => {
  * User login এর জন্য।
  * Email/Username + Password নেয়।
  *
+ * ✅ Login Flow:
+ * 1. POST /users/login → Backend cookie set করে
+ * 2. Success হলে GET /users/current-user → Fresh user data fetch
+ * 3. Redux এ user save → isAuthenticated = true
+ * 4. Home page এ redirect
+ *
  * @returns {mutate, isPending, isError, error}
  *
  * @example
@@ -85,18 +139,37 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (credentials: LoginCredentials) => authApi.login(credentials),
+    mutationFn: async (credentials: LoginCredentials) => {
+      // Step 1: Login API call - cookie set হবে
+      const loginResponse = await authApi.login(credentials);
+
+      // Step 2: Login success হলে current user fetch করো
+      // এটা ensure করে যে latest user data পাচ্ছি
+      const userResponse = await authApi.getCurrentUser();
+
+      return {
+        loginData: loginResponse.data,
+        userData: userResponse.data,
+      };
+    },
     onSuccess: (response) => {
-      // ✅ Login successful
-      // Backend cookie set করে দিয়েছে (HttpOnly)
-      // আমরা শুধু Redux update করি
-      dispatch(setUser(response.data.user));
+      // ✅ Login successful + User data fetched
+      // Redux এ fresh user data save করো
+      dispatch(setUser(response.userData));
+
+      // Cache invalidate করো
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      toast.success(`Welcome back, ${response.data.user.fullName}!`);
+      queryClient.invalidateQueries({ queryKey: ["authCheck"] });
+
+      // Welcome message
+      toast.success(`Welcome back, ${response.userData.fullName}!`);
+
+      // Home page এ redirect
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
       console.error("Login error:", error.response?.data?.message);
+      // Component এ error handle হবে
     },
   });
 };
@@ -140,57 +213,26 @@ export const useLogout = () => {
 };
 
 /**
- * useCurrentUser Hook
- *
- * Current logged in user fetch করে।
- * Manual refresh করতে চাইলে এটা use করো।
- *
- * @returns {data, isLoading, isError}
- */
-export const useCurrentUser = () => {
-  const dispatch = useAppDispatch();
-
-  const query = useQuery({
-    queryKey: ["currentUser"],
-    queryFn: async () => {
-      const response = await authApi.getCurrentUser();
-      return response.data;
-    },
-    retry: false, // 401 এ retry করার দরকার নেই
-    staleTime: 5 * 60 * 1000, // 5 minutes পর refetch
-    refetchOnWindowFocus: false,
-  });
-
-  useEffect(() => {
-    if (query.isSuccess && query.data) {
-      dispatch(setUser(query.data));
-    } else if (query.isError) {
-      dispatch(clearUser());
-    }
-  }, [query.data, query.isSuccess, query.isError, dispatch]);
-
-  useEffect(() => {
-    if (!query.isLoading) {
-      dispatch(setCheckingAuth(false));
-    }
-  }, [query.isLoading, dispatch]);
-
-  return query;
-};
-
-/**
  * useAuthCheck Hook
  *
- * ⚠️ IMPORTANT: এই hook টা App.tsx এ use হয়
+ * ⚠️ CRITICAL: এই hook শুধু App.tsx এ use হয়
  *
- * App load হলে এই hook check করে user logged in কিনা।
- * Cookie তে valid token থাকলে user data পাবে।
+ * App load হলে এটা check করে user logged in কিনা।
+ * Cookie তে valid token থাকলে user data fetch করে Redux এ save করে।
  *
- * Flow:
+ * ✅ Auth Check Flow:
  * 1. App load → useAuthCheck() call
- * 2. GET /current-user → Cookie সাথে যায়
- * 3. Success → Redux এ user save, isAuthenticated = true
- * 4. Fail → clearUser, redirect to login
+ * 2. isCheckingAuth = true → Loading spinner show
+ * 3. GET /users/current-user (cookie সাথে যায়)
+ * 4. Success:
+ *    - Redux এ user save
+ *    - isAuthenticated = true
+ *    - isCheckingAuth = false
+ * 5. Fail (401/403):
+ *    - clearUser
+ *    - isAuthenticated = false
+ *    - isCheckingAuth = false
+ *    - ProtectedRoute redirect করবে /login এ
  */
 export const useAuthCheck = () => {
   const dispatch = useAppDispatch();
@@ -199,35 +241,34 @@ export const useAuthCheck = () => {
     queryKey: ["authCheck"],
     queryFn: async () => {
       try {
-        // Cookie তে token থাকলে user পাবে
+        // Cookie থেকে token পড়ে user fetch করো
         const response = await authApi.getCurrentUser();
         return { isAuthenticated: true, user: response.data };
       } catch {
-        // Token নেই বা invalid → not authenticated
+        // Token নেই/invalid/expired
+        console.log("Auth check failed - user not logged in");
         return { isAuthenticated: false, user: null };
       }
     },
-    retry: false,
+    retry: false, // Auth check এ retry না করাই ভালো
     staleTime: Infinity, // একবার check করলেই যথেষ্ট
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
+  // Query result থেকে Redux update
   useEffect(() => {
     if (query.data) {
-      if (query.data.isAuthenticated) {
+      if (query.data.isAuthenticated && query.data.user) {
+        // ✅ User logged in
         dispatch(setUser(query.data.user));
       } else {
+        // ❌ Not logged in
         dispatch(clearUser());
       }
     }
   }, [query.data, dispatch]);
-
-  useEffect(() => {
-    if (!query.isLoading) {
-      dispatch(setCheckingAuth(false));
-    }
-  }, [query.isLoading, dispatch]);
 
   return query;
 };

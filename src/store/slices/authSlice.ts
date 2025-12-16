@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 import type { User, AuthState } from "../../types/user.types";
 
 /**
@@ -9,27 +10,23 @@ import type { User, AuthState } from "../../types/user.types";
  * এই slice এ authentication related সব state manage করা হয়।
  *
  * State:
- * - user: Current logged in user এর data
+ * - user: Current logged in user এর data (null if not logged in)
  * - isAuthenticated: User logged in কিনা
- * - isLoading: API call চলছে কিনা
- * - isCheckingAuth: App load এ auth check হচ্ছে কিনা
+ * - isInitializing: App load এ auth check হচ্ছে কিনা
  *
  * Actions:
- * - setUser: Login/Register success এ user set করে
+ * - setUser: Login/Register success এ user set করে এবং isAuthenticated = true
  * - clearUser: Logout এ সব clear করে
- * - setLoading: Loading state toggle
- * - setCheckingAuth: Initial auth check state
- * - updateUser: User data partially update
+ * - updateUser: User data partially update (profile edit এ use)
+ * - setInitializing: App load এ initial auth check state
  */
 
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
   isLoading: false,
-
-  // ⚠️ IMPORTANT: এটা true থেকে শুরু হয়
-  // কারণ app load এ আমরা /current-user check করি
-  // Check শেষ না হওয়া পর্যন্ত loading দেখাই
+  // ⚠️ App load এ true থেকে শুরু
+  // /current-user check শেষ না হওয়া পর্যন্ত loading দেখাবে
   isCheckingAuth: true,
 };
 
@@ -37,25 +34,31 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser: (state, action) => {
+    /**
+     * Login/Register success এ call হয়
+     * User data Redux এ save করে
+     */
+    setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
-      state.isLoading = false;
       state.isCheckingAuth = false;
     },
+
+    /**
+     * Logout বা token expire এ call হয়
+     * সব state clear করে initial state এ ফিরিয়ে আনে
+     */
     clearUser: (state) => {
       state.user = null;
       state.isAuthenticated = false;
-      state.isLoading = false;
       state.isCheckingAuth = false;
     },
-    setLoading: (state, action) => {
-      state.isLoading = action.payload;
-    },
-    setCheckingAuth: (state, action) => {
-      state.isCheckingAuth = action.payload;
-    },
-    updateUser: (state, action) => {
+
+    /**
+     * Profile update করার পর partial update
+     * শুধু changed fields update করে
+     */
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
       }
@@ -63,7 +66,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, clearUser, setLoading, setCheckingAuth, updateUser } =
-  authSlice.actions;
+export const { setUser, clearUser, updateUser } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -13,36 +13,66 @@ import { clearUser } from "./store/slices/authSlice";
  * APP COMPONENT - Main Entry Point
  * ====================================
  *
- * App load হলে যা হয়:
- * 1. useAuthCheck() call → /current-user API check
- * 2. isCheckingAuth = true → Loading spinner দেখায়
- * 3. API response এলে:
- *    - Success → user Redux এ save, isAuthenticated = true
- *    - Fail → clearUser, redirect to /login
- * 4. isCheckingAuth = false → Actual UI দেখায়
+ * ✅ PROPER AUTH FLOW:
+ *
+ * 1. App Load (App.tsx mount):
+ *    → useAuthCheck() call
+ *    → isCheckingAuth = true
+ *    → Loading spinner show করে
+ *
+ * 2. Auth Check (Background):
+ *    → GET /users/current-user API call
+ *    → Cookie থেকে accessToken/refreshToken automatically যায়
+ *
+ * 3. Auth Check Success (User logged in):
+ *    → User data পাওয়া গেছে
+ *    → Redux এ setUser(userData)
+ *    → isAuthenticated = true
+ *    → isCheckingAuth = false
+ *    → UI render হয়
+ *    → ProtectedRoute allow করে
+ *
+ * 4. Auth Check Failed (User not logged in):
+ *    → 401/403 error
+ *    → Redux এ clearUser()
+ *    → isAuthenticated = false
+ *    → isCheckingAuth = false
+ *    → ProtectedRoute redirect করে /login এ
+ *
+ * 5. Login করার পর:
+ *    → POST /users/login
+ *    → Success → GET /users/current-user (fresh data)
+ *    → Redux এ setUser(userData)
+ *    → Navigate to "/"
+ *
+ * 6. Logout করার পর:
+ *    → POST /users/logout
+ *    → Redux এ clearUser()
+ *    → Navigate to "/login"
  *
  * ⚠️ auth:logout Event:
- * axios interceptor থেকে fire হয় যখন refresh token ও fail হয়।
- * এটা listen করে user কে logout করে দেয়।
+ * Axios interceptor থেকে fire হয় যখন refresh token ও expire/invalid।
+ * এটা listen করে automatically user logout করে দেয়।
  */
 
 const App: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
 
-  // Redux থেকে auth state নাও
+  // Redux থেকে auth state
   const { isAuthenticated, isCheckingAuth } = useAppSelector(
     (state) => state.auth
   );
 
-  // ⚠️ IMPORTANT: App load এ auth check করো
-  // এটা /current-user call করে cookie valid কিনা check করে
+  // ⚠️ CRITICAL: App load এ auth check
+  // Cookie valid কিনা check করে, valid হলে user data fetch করে Redux এ save করে
   useAuthCheck();
 
-  // 🔔 Listen for logout event from axios interceptor
-  // যখন refresh token expire হয়, axios এই event fire করে
+  // 🔔 Global logout event listener
+  // Axios interceptor থেকে fire হয় যখন সব token expire
   useEffect(() => {
     const handleLogout = () => {
+      console.log("Global logout event received");
       dispatch(clearUser());
     };
 

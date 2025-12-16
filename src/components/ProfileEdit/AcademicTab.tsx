@@ -37,6 +37,8 @@ const studentAcademicSchema = z.object({
   session: z.string().optional(),
   section: z.string().optional(),
   studentId: z.string().optional(),
+  institutionId: z.string().optional(),
+  departmentId: z.string().optional(),
 });
 
 // Teacher Academic Schema
@@ -44,6 +46,8 @@ const teacherAcademicSchema = z.object({
   teacherId: z.string().optional(),
   rank: z.string().optional(),
   officeHours: z.array(officeHourSchema).optional(),
+  institutionId: z.string().optional(),
+  departmentId: z.string().optional(),
 });
 
 // Local form types (inferred from Zod)
@@ -89,6 +93,8 @@ const StudentForm: React.FC<{ user: User }> = ({ user }) => {
       session: user.academicInfo?.session || "",
       section: user.academicInfo?.section || "",
       studentId: user.academicInfo?.studentId || "",
+      institutionId: (user.institution as Institution)?._id || "",
+      departmentId: (user.academicInfo?.department as Department)?._id || "",
     },
   });
 
@@ -116,30 +122,71 @@ const StudentForm: React.FC<{ user: User }> = ({ user }) => {
         </div>
       )}
 
-      {/* Institution & Department Display */}
+      {/* Institution & Department */}
       <div className="rounded-lg bg-white p-6 shadow-md">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
           <FaBuilding className="mr-2 inline text-blue-600" />
           Institution & Department
+          {user.isStudentEmail && (
+            <span className="ml-2 text-xs font-normal text-gray-500">
+              (Verified - Cannot be changed)
+            </span>
+          )}
         </h2>
 
         <div className="space-y-4">
+          {/* Institution */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Institution
+              Institution{" "}
+              {user.isStudentEmail && (
+                <FaLock className="ml-1 inline text-xs text-green-600" />
+              )}
             </label>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
-              {institution?.name || "Not set"}
-            </div>
+            {user.isStudentEmail ? (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
+                {institution?.name || "Not set"}
+              </div>
+            ) : (
+              <input
+                type="text"
+                {...register("institutionId")}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Enter institution ID or select from list"
+              />
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              {user.isStudentEmail
+                ? "Verified via institutional email"
+                : "TODO: Add institution dropdown/search"}
+            </p>
           </div>
 
+          {/* Department */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Department
+              Department{" "}
+              {user.isStudentEmail && (
+                <FaLock className="ml-1 inline text-xs text-green-600" />
+              )}
             </label>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
-              {department?.name || "Not set"}
-            </div>
+            {user.isStudentEmail ? (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
+                {department?.name || "Not set"}
+              </div>
+            ) : (
+              <input
+                type="text"
+                {...register("departmentId")}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Enter department ID or select from list"
+              />
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              {user.isStudentEmail
+                ? "Verified via institutional email"
+                : "TODO: Add department dropdown/search"}
+            </p>
           </div>
         </div>
       </div>
@@ -255,6 +302,8 @@ const TeacherForm: React.FC<{ user: User }> = ({ user }) => {
           timeRange: oh.timeRange,
           room: oh.room || "",
         })) || [],
+      institutionId: (user.institution as Institution)?._id || "",
+      departmentId: (user.academicInfo?.department as Department)?._id || "",
     },
   });
 
@@ -287,30 +336,71 @@ const TeacherForm: React.FC<{ user: User }> = ({ user }) => {
         </div>
       )}
 
-      {/* Institution & Department Display */}
+      {/* Institution & Department */}
       <div className="rounded-lg bg-white p-6 shadow-md">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
           <FaBuilding className="mr-2 inline text-blue-600" />
           Institution & Department
+          {user.isStudentEmail && (
+            <span className="ml-2 text-xs font-normal text-gray-500">
+              (Verified - Cannot be changed)
+            </span>
+          )}
         </h2>
 
         <div className="space-y-4">
+          {/* Institution */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Institution
+              Institution{" "}
+              {user.isStudentEmail && (
+                <FaLock className="ml-1 inline text-xs text-green-600" />
+              )}
             </label>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
-              {institution?.name || "Not set"}
-            </div>
+            {user.isStudentEmail ? (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
+                {institution?.name || "Not set"}
+              </div>
+            ) : (
+              <input
+                type="text"
+                {...register("institutionId")}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Enter institution ID or select from list"
+              />
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              {user.isStudentEmail
+                ? "Verified via institutional email"
+                : "TODO: Add institution dropdown/search"}
+            </p>
           </div>
 
+          {/* Department */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Department
+              Department{" "}
+              {user.isStudentEmail && (
+                <FaLock className="ml-1 inline text-xs text-green-600" />
+              )}
             </label>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
-              {department?.name || "Not set"}
-            </div>
+            {user.isStudentEmail ? (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
+                {department?.name || "Not set"}
+              </div>
+            ) : (
+              <input
+                type="text"
+                {...register("departmentId")}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Enter department ID or select from list"
+              />
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              {user.isStudentEmail
+                ? "Verified via institutional email"
+                : "TODO: Add department dropdown/search"}
+            </p>
           </div>
         </div>
       </div>
