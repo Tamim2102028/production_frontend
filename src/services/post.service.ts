@@ -35,7 +35,7 @@ export const postService = {
     limit: number;
     type?: string;
   }) => {
-    const response = await api.get<FeedResponse>("/posts", { params });
+    const response = await api.get<FeedResponse>("/posts/feed", { params });
     return response.data;
   },
 
