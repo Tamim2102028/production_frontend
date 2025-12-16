@@ -15,6 +15,8 @@ export interface Post {
   createdAt: string;
   likesCount: number;
   commentsCount: number;
+  sharesCount: number;
+  tags?: string[];
   isLiked?: boolean;
   isOwnPost?: boolean;
 }

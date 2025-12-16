@@ -1,6 +1,5 @@
 import React from "react";
 import ProfilePostCard from "./ProfilePostCard";
-import { DEFAULT_AVATAR_MD } from "../../constants/images";
 import { useProfilePosts } from "../../hooks/usePost";
 import PageLoader from "../../pages/Fallbacks/PageLoader";
 
@@ -28,23 +27,7 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
           {posts.map((post) => (
             <ProfilePostCard
               key={post._id}
-              post={{
-                id: post._id,
-                content: post.content,
-                author: {
-                  id: post.author._id,
-                  name: post.author.fullName,
-                  username: post.author.userName,
-                  avatar: post.author.avatar || DEFAULT_AVATAR_MD,
-                },
-                timestamp: post.createdAt,
-                likes: post.likesCount,
-                comments: post.commentsCount,
-                shares: 0, // Backend doesn't send shares yet
-                isLiked: post.isLiked || false,
-                images: post.images || post.attachments || [],
-                tags: [], // Backend doesn't send tags yet
-              }}
+              post={post}
               isOwnProfile={isOwnProfile}
             />
           ))}

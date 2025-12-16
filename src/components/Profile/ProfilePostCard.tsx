@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "sonner";
 import {
   FaHeart,
   FaShare,
@@ -13,33 +14,14 @@ import {
   FaLink,
 } from "react-icons/fa";
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
-import { showSuccess, showError } from "../../utils/sweetAlert";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem, { type CommentData } from "../shared/CommentItem";
-import { DEFAULT_AVATAR_SM } from "../../constants/images";
-
-interface Author {
-  id: string;
-  name: string;
-  username: string;
-  avatar: string;
-}
-
-interface ProfilePost {
-  id: string;
-  content: string;
-  author: Author;
-  timestamp: string;
-  likes: number;
-  comments: number;
-  shares: number;
-  isLiked: boolean;
-  images?: string[];
-  tags?: string[];
-}
+import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
+import type { Post } from "../../services/post.service";
+import { useUser } from "../../hooks/useAuth";
 
 interface ProfilePostCardProps {
-  post: ProfilePost;
+  post: Post;
   isOwnProfile: boolean;
 }
 
@@ -47,41 +29,37 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   // TODO: Replace with API data
   const [isLiked, setIsLiked] = useState(post.isLiked);
-  const [likesCount, setLikesCount] = useState(post.likes);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15);
-  // TODO: Replace with actual current user from API/context
-  const currentUser = {
-    id: "current-user-id",
-    name: "Current User",
-    avatar: "",
-  };
-  const isOwnPost = post.author.id === currentUser.id;
+
+  // Get current logged-in user
+  const { user: currentUser } = useUser();
+  const isOwnPost = post.author._id === currentUser?._id;
+
   // TODO: Replace with API data for comments
   const postComments: CommentData[] = [];
-  const commentsCount = post.comments;
 
   const handleLike = () => {
-    // TODO: Replace with API call
+    // TODO: Replace with API call and refetch to get updated count from backend
     setIsLiked(!isLiked);
-    setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
   };
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
+    toast.success(isBookmarked ? "Post removed from saved" : "Post saved");
     setShowMenu(false);
   };
 
   const handleCopyLink = async () => {
-    const link = `${window.location.origin}/post/${post.id}`;
     try {
+      const link = `${window.location.origin}/post/${post._id}`;
       await navigator.clipboard.writeText(link);
-      showSuccess({ title: "Copied!", text: "Post link copied to clipboard" });
+      toast.success("Post link copied to clipboard");
       setShowMenu(false);
     } catch {
-      showError({ title: "Copy failed", text: "Could not copy link" });
+      toast.error("Failed to copy link");
     }
   };
 
@@ -91,16 +69,18 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-3">
           <img
-            src={post.author.avatar}
-            alt={post.author.name}
+            src={post.author.avatar || DEFAULT_AVATAR_MD}
+            alt={post.author.fullName}
             className="h-10 w-10 rounded-full bg-gray-300"
           />
           <div>
-            <h3 className="font-semibold text-gray-900">{post.author.name}</h3>
+            <h3 className="font-semibold text-gray-900">
+              {post.author.fullName}
+            </h3>
             <p className="flex items-center gap-2 text-sm text-gray-500">
-              <span>{formatPostDate(post.timestamp)}</span>
+              <span>{formatPostDate(post.createdAt)}</span>
               <SeparatorDot ariaHidden />
-              <span>{formatPostClock(post.timestamp)}</span>
+              <span>{formatPostClock(post.createdAt)}</span>
             </p>
           </div>
         </div>
@@ -124,7 +104,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                   {isBookmarked ? (
                     <>
                       <FaBookmark className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Remove bookmark</span>
+                      <span className="font-medium">Remove from saved</span>
                     </>
                   ) : (
                     <>
@@ -143,6 +123,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
 
                 {isOwnPost ? (
                   <>
+                    {/* edit button */}
                     <button
                       onClick={() => setShowMenu(false)}
                       className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
@@ -150,6 +131,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                       <FaEdit className="h-4 w-4 flex-shrink-0" />
                       <span className="font-medium">Edit post</span>
                     </button>
+                    {/* delete button */}
                     <button
                       onClick={() => setShowMenu(false)}
                       className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
@@ -192,6 +174,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       </div>
 
       {/* Post Images */}
+      {/* not in backend response yet - will be added later */}
       {post.images && post.images.length > 0 && (
         <div className="px-4 pb-3">
           {post.images.length === 1 ? (
@@ -227,18 +210,19 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       <div className="border-t border-gray-100 px-4 py-2">
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-3">
-            <span>{likesCount} likes</span>
+            <span>{post.likesCount} likes</span>
             <SeparatorDot />
-            <span>{commentsCount} comments</span>
+            <span>{post.commentsCount} comments</span>
             <SeparatorDot />
-            <span>{post.shares} shares</span>
+            <span>{post.sharesCount} shares</span>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* like/comment/share - Buttons */}
       <div className="border-t border-gray-100 px-4 py-3">
         <div className="grid grid-cols-3 gap-2">
+          {/* like button */}
           <button
             onClick={handleLike}
             className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
@@ -251,6 +235,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
             <span className="text-sm font-medium">Like</span>
           </button>
 
+          {/* comment button */}
           <button
             onClick={() => setShowCommentBox(!showCommentBox)}
             className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
@@ -263,6 +248,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
             <span className="text-sm font-medium">Comment</span>
           </button>
 
+          {/* share button */}
           <button className="flex items-center justify-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100">
             <FaShare size={18} />
             <span className="text-sm font-medium">Share</span>
@@ -285,7 +271,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                     <CommentItem
                       key={comment.commentId}
                       comment={comment}
-                      postOwnerId={post.author.id}
+                      postOwnerId={post.author._id}
                     />
                   ))}
 
@@ -311,7 +297,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           <div className="border-t border-gray-100 px-4 pb-4">
             <div className="mt-3 flex items-center space-x-3">
               <img
-                src={currentUser.avatar || DEFAULT_AVATAR_SM}
+                src={currentUser?.avatar || DEFAULT_AVATAR_SM}
                 alt="Your avatar"
                 className="h-8 w-8 rounded-full bg-gray-300 object-cover"
               />
