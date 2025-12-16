@@ -32,10 +32,6 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
     (userData?.friendshipStatus as FriendshipStatus) ||
     PROFILE_RELATION_STATUS.NONE;
 
-  const handleEditProfile = () => {
-    navigate("/profile/edit");
-  };
-
   const handleViewDetails = () => {
     if (isOwnProfile) {
       navigate("/profile/details");
@@ -99,22 +95,27 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
     // Own profile - Edit button
     if (friendshipStatus === PROFILE_RELATION_STATUS.SELF || isOwnProfile) {
       return (
-        <div className="flex gap-3">
-          <button
-            onClick={handleEditProfile}
-            className="flex items-center gap-2 rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
-          >
-            <FaEdit className="h-4 w-4" />
-            Edit Profile
-          </button>
-          <button
-            onClick={handleViewDetails}
-            className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
-          >
-            <FaInfoCircle className="h-4 w-4" />
-            Details
-          </button>
-        </div>
+        <>
+          {/* edit and details buttons */}
+          <div className="flex gap-3">
+            {/* edit button */}
+            <button
+              onClick={() => navigate("/profile/edit")}
+              className="flex items-center gap-2 rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
+            >
+              <FaEdit className="h-4 w-4" />
+              Edit Profile
+            </button>
+            {/* details button */}
+            <button
+              onClick={handleViewDetails}
+              className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
+            >
+              <FaInfoCircle className="h-4 w-4" />
+              Details
+            </button>
+          </div>
+        </>
       );
     }
 
