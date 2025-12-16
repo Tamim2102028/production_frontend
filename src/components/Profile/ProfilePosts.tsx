@@ -26,13 +26,6 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
   }
   return (
     <>
-      {/* Posts Header */}
-      <div className="mb-5 flex items-center">
-        <h2 className="text-xl font-semibold text-gray-900">
-          {isOwnProfile ? "Your Posts" : "Posts"}
-        </h2>
-      </div>
-
       {/* Posts List */}
       {posts.length > 0 ? (
         <div className="space-y-4">
