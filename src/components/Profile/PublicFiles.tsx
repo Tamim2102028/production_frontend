@@ -13,14 +13,17 @@ type PublicFileItem = {
 };
 
 interface PublicFilesProps {
-  publicFolders: PublicFileItem[];
-  userName: string;
+  username: string;
+  isOwnProfile: boolean;
 }
 
 const PublicFiles: React.FC<PublicFilesProps> = ({
-  publicFolders,
-  userName,
+  username,
+  isOwnProfile,
 }) => {
+  // TODO: Fetch user's public folders from API
+  // const { data: publicFolders, isLoading } = usePublicFiles(username);
+  const publicFolders: PublicFileItem[] = [];
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -43,7 +46,9 @@ const PublicFiles: React.FC<PublicFilesProps> = ({
           No Public Files
         </h3>
         <p className="mt-2 text-gray-500">
-          {userName} hasn't shared any files publicly yet.
+          {isOwnProfile
+            ? "You haven't shared any files publicly yet."
+            : `${username} hasn't shared any files publicly yet.`}
         </p>
       </div>
     );

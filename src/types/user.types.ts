@@ -125,6 +125,7 @@ export interface User {
     friendsCount: number;
     followersCount: number;
     followingCount: number;
+    publicFilesCount: number;
   };
 
   // Friendship

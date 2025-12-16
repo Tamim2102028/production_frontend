@@ -18,7 +18,7 @@ import type { AxiosError } from "axios";
  * Profile related সব hooks এখানে।
  *
  * Hooks:
- * - useProfile: Username দিয়ে profile fetch
+ * - useProfileHeader: Username দিয়ে profile header data fetch
  * - useUpdateGeneral: General info update (name, bio, etc.)
  * - useUpdateAcademic: Academic info update
  * - useUpdateAvatar: Avatar image update
@@ -27,20 +27,18 @@ import type { AxiosError } from "axios";
  */
 
 /**
- * useProfile Hook
+ * useProfileHeader Hook
  *
- * যেকোনো user এর profile fetch করে username দিয়ে।
- * friendshipStatus ও return করে (SELF, FRIENDS, NONE, etc.)
+ * User এর profile header data fetch করে (bio, stats, friendship status)।
+ * Posts/files এর data এতে নেই - আলাদা hooks আছে।
  *
  * @param username - User's unique username
  * @returns { data, isLoading, error, refetch }
  *
  * @example
- * const { data: profile, isLoading } = useProfile("tamim2102028");
- * // profile.user → User object
- * // profile.friendshipStatus → "SELF" | "FRIENDS" | "NONE" | etc.
+ * const { data: headerData, isLoading } = useProfileHeader("tamim2102028");
  */
-export const useProfile = (username: string | undefined) => {
+export const useProfileHeader = (username: string | undefined) => {
   return useQuery({
     queryKey: ["profile", username],
     queryFn: async () => {
