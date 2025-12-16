@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaEdit,
   FaUniversity,
@@ -31,14 +31,6 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
   const friendshipStatus: FriendshipStatus =
     (userData?.friendshipStatus as FriendshipStatus) ||
     PROFILE_RELATION_STATUS.NONE;
-
-  const handleViewDetails = () => {
-    if (isOwnProfile) {
-      navigate("/profile/details");
-    } else {
-      navigate(`/profile/${userData.userName}/details`);
-    }
-  };
 
   // Helper to get institution name
   const getInstitutionName = (): string => {
@@ -92,28 +84,27 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
 
   // Render action buttons based on friendshipStatus
   const renderActionButtons = () => {
-    // Own profile - Edit button
     if (friendshipStatus === PROFILE_RELATION_STATUS.SELF || isOwnProfile) {
       return (
         <>
           {/* edit and details buttons */}
           <div className="flex gap-3">
             {/* edit button */}
-            <button
-              onClick={() => navigate("/profile/edit")}
+            <Link
+              to="/profile/edit"
               className="flex items-center gap-2 rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
             >
               <FaEdit className="h-4 w-4" />
               Edit Profile
-            </button>
+            </Link>
             {/* details button */}
-            <button
-              onClick={handleViewDetails}
+            <Link
+              to="/profile/details"
               className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
             >
               <FaInfoCircle className="h-4 w-4" />
               Details
-            </button>
+            </Link>
           </div>
         </>
       );
@@ -158,13 +149,13 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
         )}
 
         {/* View Details button for all */}
-        <button
-          onClick={handleViewDetails}
+        <Link
+          to={`/profile/${userData.userName}/details`}
           className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
         >
           <FaInfoCircle className="h-4 w-4" />
           View Details
-        </button>
+        </Link>
       </div>
     );
   };
