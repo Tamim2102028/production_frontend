@@ -1,279 +1,365 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import type { IconType } from "react-icons";
 import {
   FaArrowLeft,
   FaUser,
+  FaGraduationCap,
+  FaBriefcase,
   FaEnvelope,
   FaPhone,
-  FaUniversity,
-  FaBriefcase,
+  FaMapMarkerAlt,
+  FaGlobe,
+  FaLinkedin,
+  FaGithub,
+  FaFacebook,
+  FaVenusMars,
+  FaPray,
 } from "react-icons/fa";
+import { useUser } from "../hooks/useAuth";
+import { useProfileHeader } from "../hooks/useProfile";
 import PageLoader from "./Fallbacks/PageLoader";
-
-// TODO: Replace with API types
-type UserData = {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  phone?: string;
-  avatar: string;
-  institution?: string;
-  department?: string;
-  bio?: string;
-};
-
-type UserInfo = UserData | null;
+import { USER_TYPES } from "../constants";
+import type { Institution, Department } from "../types/user.types";
 
 const ProfileDetails: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const { user: currentUser } = useUser();
 
-  // TODO: Replace with API calls
-  const currentUserId = "1";
-  const [userData, setUserData] = useState<UserInfo>(null);
+  // Determine which username to fetch
+  const profileUsername = username || currentUser?.userName;
 
-  // Check if viewing own profile
-  const isOwnProfile = !userId || userId === currentUserId;
-
-  // Get actual user ID (default to current user ID)
-  const actualUserId = userId || currentUserId;
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [userData, userId, actualUserId, isOwnProfile, currentUserId]);
-
-  // If user not found, show error
-  if (!userData) {
-    return (
-      <>
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h2 className="text-2xl font-bold text-gray-900">User Not Found</h2>
-          <p className="mt-2 text-gray-600">
-            The user you're looking for doesn't exist.
-          </p>
-          <button
-            onClick={() => navigate(-1)}
-            className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          >
-            Go Back
-          </button>
-        </div>
-      </>
-    );
-  }
+  // Fetch profile data
+  const {
+    data: userData,
+    isLoading,
+    error,
+  } = useProfileHeader(profileUsername);
 
   if (isLoading) {
     return <PageLoader />;
   }
 
+  if (error || !userData) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
+        <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <h2 className="text-2xl font-bold text-gray-900">User Not Found</h2>
+          <p className="mt-2 text-gray-600">
+            The user details you're looking for aren't available.
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          >
+            <FaArrowLeft /> Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Helpers for safe data access
+  const getInstitutionName = (): string => {
+    if (!userData.institution) return "";
+    if (typeof userData.institution === "string") return userData.institution;
+    return (userData.institution as Institution).name;
+  };
+
+  const getDepartmentName = (): string => {
+    if (!userData.academicInfo?.department) return "";
+    if (typeof userData.academicInfo.department === "string")
+      return userData.academicInfo.department;
+    return (userData.academicInfo.department as Department).name;
+  };
+
+  const InfoSection = ({
+    title,
+    icon: Icon,
+    children,
+  }: {
+    title: string;
+    icon: IconType;
+    children: React.ReactNode;
+  }) => (
+    <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mb-4 flex items-center gap-3 border-b border-gray-100 pb-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+          <Icon className="h-5 w-5" />
+        </div>
+        <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+      </div>
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
+
+  const InfoItem = ({
+    label,
+    value,
+    icon: ItemIcon,
+    link,
+  }: {
+    label: string;
+    value?: string | null;
+    icon?: IconType;
+    link?: string;
+  }) => {
+    if (!value) return null;
+
+    return (
+      <div className="flex items-start gap-3">
+        {ItemIcon && <ItemIcon className="mt-1 h-4 w-4 text-gray-400" />}
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-500">{label}</p>
+          {link ? (
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-base text-blue-600 hover:underline"
+            >
+              {value}
+            </a>
+          ) : (
+            <p className="text-base text-gray-900">{value}</p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <>
-      {/* Header */}
-      <div className="mb-6 flex items-center gap-3">
-        <button
-          onClick={() => navigate(-1)}
-          className="rounded-lg border border-gray-300 p-2 text-gray-600 transition-colors hover:bg-gray-100"
-        >
-          <FaArrowLeft className="h-5 w-5" />
-        </button>
-        <h1 className="text-3xl font-bold text-gray-900">User Details</h1>
+    <div className="min-h-screen bg-gray-50 pb-12">
+      {/* Header / Nav */}
+      <div className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
+        <div className="mx-auto flex max-w-4xl items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
+          >
+            <FaArrowLeft className="h-5 w-5" />
+          </button>
+          <h1 className="text-xl font-bold text-gray-900">Full Profile</h1>
+        </div>
       </div>
 
-      {/* Profile Card */}
-      <div className="rounded-lg border border-gray-300 bg-white p-8 shadow-sm">
-        {/* Profile Header */}
-        <div className="mb-8 flex items-start gap-6 border-b border-gray-200 pb-8">
-          {/* Avatar */}
-          <div className="flex-shrink-0">
-            <img
-              src={userData.avatar}
-              alt={userData.name}
-              className="h-40 w-40 rounded-full border-4 border-blue-100 shadow-lg"
+      <div className="mx-auto mt-6 max-w-4xl px-4">
+        {/* Basic Identity Card */}
+        <div className="mb-6 flex flex-col items-center rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm md:flex-row md:text-left">
+          <img
+            src={userData.avatar}
+            alt={userData.fullName}
+            className="h-32 w-32 rounded-full border-4 border-white shadow-lg ring-2 ring-gray-100"
+          />
+          <div className="mt-4 md:mt-0 md:ml-8">
+            <h1 className="text-3xl font-bold text-gray-900">
+              {userData.fullName}
+            </h1>
+            <p className="text-lg text-gray-600">@{userData.userName}</p>
+            {userData.bio && (
+              <p className="mt-3 max-w-xl text-gray-700">{userData.bio}</p>
+            )}
+            <div className="mt-4 flex flex-wrap justify-center gap-2 md:justify-start">
+              {userData.userType === USER_TYPES.STUDENT ? (
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+                  Student
+                </span>
+              ) : (
+                <span className="rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800">
+                  Teacher
+                </span>
+              )}
+              {userData.isStudentEmail && (
+                <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
+                  Verified Student
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Academic Information */}
+          <InfoSection title="Academic Info" icon={FaGraduationCap}>
+            <InfoItem
+              label="Institution"
+              value={getInstitutionName()}
+              icon={FaBriefcase}
             />
-          </div>
+            <InfoItem
+              label="Department"
+              value={getDepartmentName()}
+              icon={FaGraduationCap}
+            />
 
-          {/* Basic Info */}
-          <div className="flex-1 space-y-4">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900">
-                {userData.name}
-              </h2>
-              <p className="flex items-center gap-2 text-lg text-gray-600">
-                <FaUniversity className="h-4 w-4" />
-                {userData.educationLevel === "UNIVERSITY" ? (
-                  <span className="font-medium text-gray-800">
-                    {userData.university?.name} -{" "}
-                    {userData.university?.department}
-                  </span>
-                ) : (
-                  <span className="font-medium text-gray-800">
-                    {userData.college?.name}
-                  </span>
-                )}
-              </p>
-            </div>
+            {userData.userType === USER_TYPES.STUDENT && (
+              <>
+                <InfoItem
+                  label="Session"
+                  value={userData.academicInfo?.session}
+                />
+                <InfoItem
+                  label="Current Semester"
+                  value={userData.academicInfo?.currentSemester?.toString()}
+                />
+                <InfoItem
+                  label="Section"
+                  value={userData.academicInfo?.section}
+                />
+                <InfoItem
+                  label="Student ID"
+                  value={userData.academicInfo?.studentId}
+                />
+              </>
+            )}
 
-            <div>
-              <p className="text-gray-700">{userData.bio}</p>
-            </div>
+            {userData.userType === USER_TYPES.TEACHER && (
+              <>
+                <InfoItem
+                  label="Rank / Designation"
+                  value={userData.academicInfo?.rank}
+                />
+                <InfoItem
+                  label="Teacher ID"
+                  value={userData.academicInfo?.teacherId}
+                />
+              </>
+            )}
+          </InfoSection>
+
+          {/* Contact & Personal Info */}
+          <div className="space-y-6">
+            <InfoSection title="Contact Info" icon={FaEnvelope}>
+              <InfoItem
+                label="Email"
+                value={userData.email}
+                icon={FaEnvelope}
+                link={`mailto:${userData.email}`}
+              />
+              <InfoItem
+                label="Phone"
+                value={userData.phoneNumber}
+                icon={FaPhone}
+                link={
+                  userData.phoneNumber
+                    ? `tel:${userData.phoneNumber}`
+                    : undefined
+                }
+              />
+
+              {/* Social Links */}
+              <div className="mt-4 border-t border-gray-100 pt-4">
+                <p className="mb-3 text-sm font-medium text-gray-500">
+                  Social Profiles
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  {userData.socialLinks?.linkedin && (
+                    <a
+                      href={userData.socialLinks.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-700 hover:text-blue-800"
+                    >
+                      <FaLinkedin className="h-6 w-6" />
+                    </a>
+                  )}
+                  {userData.socialLinks?.github && (
+                    <a
+                      href={userData.socialLinks.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-800 hover:text-black"
+                    >
+                      <FaGithub className="h-6 w-6" />
+                    </a>
+                  )}
+                  {userData.socialLinks?.facebook && (
+                    <a
+                      href={userData.socialLinks.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      <FaFacebook className="h-6 w-6" />
+                    </a>
+                  )}
+                  {userData.socialLinks?.website && (
+                    <a
+                      href={userData.socialLinks.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-600 hover:text-gray-800"
+                    >
+                      <FaGlobe className="h-6 w-6" />
+                    </a>
+                  )}
+                  {!userData.socialLinks?.linkedin &&
+                    !userData.socialLinks?.github &&
+                    !userData.socialLinks?.facebook &&
+                    !userData.socialLinks?.website && (
+                      <p className="text-sm text-gray-400 italic">
+                        No social links added
+                      </p>
+                    )}
+                </div>
+              </div>
+            </InfoSection>
+
+            <InfoSection title="Personal Details" icon={FaUser}>
+              <InfoItem
+                label="Gender"
+                value={userData.gender}
+                icon={FaVenusMars}
+              />
+              <InfoItem
+                label="Religion"
+                value={userData.religion}
+                icon={FaPray}
+              />
+              {/* Add more personal fields if available in backend response */}
+            </InfoSection>
           </div>
         </div>
 
-        {/* Details Grid */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          {/* Section 1: Contact Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Contact Information
-            </h3>
-
-            {userData.email && (
-              <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                <FaEnvelope className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Email</p>
-                  <p className="text-gray-900">{userData.email}</p>
-                </div>
+        {/* Skills & Interests */}
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <InfoSection title="Skills" icon={FaBriefcase}>
+            {userData.skills && userData.skills.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {userData.skills.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="rounded-md bg-gray-100 px-3 py-1 text-sm text-gray-700"
+                  >
+                    {skill}
+                  </span>
+                ))}
               </div>
-            )}
-
-            {userData.phone && (
-              <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                <FaPhone className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Phone</p>
-                  <p className="text-gray-900">{userData.phone}</p>
-                </div>
-              </div>
-            )}
-
-            {userData.gender && (
-              <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                <FaUser className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Gender</p>
-                  <p className="text-gray-900 capitalize">{userData.gender}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Section 2: Education Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Education Information
-            </h3>
-
-            {userData.educationLevel === "UNIVERSITY" && userData.university ? (
-              <>
-                <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                  <FaUniversity className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
-                      University
-                    </p>
-                    <p className="text-gray-900">{userData.university.name}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                  <FaBriefcase className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
-                      Department
-                    </p>
-                    <p className="text-gray-900">
-                      {userData.university.department}
-                    </p>
-                  </div>
-                </div>
-
-                {userData.university.section && (
-                  <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                    <FaUser className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">
-                        Section
-                      </p>
-                      <p className="text-gray-900">
-                        {userData.university.section}
-                        {userData.university.subsection &&
-                          `-${userData.university.subsection}`}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : userData.educationLevel === "COLLEGE" && userData.college ? (
-              <>
-                <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                  <FaUniversity className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">College</p>
-                    <p className="text-gray-900">{userData.college.name}</p>
-                  </div>
-                </div>
-
-                {userData.college.department && (
-                  <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                    <FaBriefcase className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">
-                        Department
-                      </p>
-                      <p className="text-gray-900">
-                        {userData.college.department}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </>
             ) : (
-              <p className="text-gray-600">
-                No education information available
-              </p>
+              <p className="text-gray-400 italic">No skills added yet</p>
             )}
-          </div>
+          </InfoSection>
 
-          {/* Section 3: Account Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Account Information
-            </h3>
-
-            <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-              <FaUser className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-              <div>
-                <p className="text-sm font-medium text-gray-600">User Type</p>
-                <p className="text-gray-900 capitalize">
-                  {Array.isArray(userData.userType)
-                    ? userData.userType.join(", ")
-                    : userData.userType}
-                </p>
+          <InfoSection title="Interests" icon={FaMapMarkerAlt}>
+            {userData.interests && userData.interests.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {userData.interests.map((interest, index) => (
+                  <span
+                    key={index}
+                    className="rounded-md bg-blue-50 px-3 py-1 text-sm text-blue-700"
+                  >
+                    {interest}
+                  </span>
+                ))}
               </div>
-            </div>
-
-            {userData.id && (
-              <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4">
-                <FaUser className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">User ID</p>
-                  <p className="text-sm break-all text-gray-900">
-                    {userData.id}
-                  </p>
-                </div>
-              </div>
+            ) : (
+              <p className="text-gray-400 italic">No interests added yet</p>
             )}
-          </div>
+          </InfoSection>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

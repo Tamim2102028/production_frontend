@@ -130,7 +130,6 @@ export interface User {
 
   // Friendship
   profile_relation_status?: string;
-  friendshipStatus?: string;
 
   // Institutional
   userType: UserType;

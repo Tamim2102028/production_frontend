@@ -1,7 +1,7 @@
 // Profile Types - For Profile Feature
 
 import { PROFILE_RELATION_STATUS } from "../constants";
-import type { User, Gender, SocialLinks } from "./user.types";
+import type { Gender, SocialLinks } from "./user.types";
 
 // ====================================
 // FRIENDSHIP STATUS (from Backend constants)
@@ -11,11 +11,11 @@ import type { User, Gender, SocialLinks } from "./user.types";
  * Profile relation status between currentUser and profile owner
  *
  * - SELF: নিজের প্রোফাইল → Edit Profile button
- * - FRIENDS: বন্ধু → Message / Unfriend buttons
+ * - FRIEND: বন্ধু → Message / Unfriend buttons
  * - REQUEST_SENT: আমি পাঠিয়েছি → Cancel Request button
  * - REQUEST_RECEIVED: সে পাঠিয়েছে → Accept/Reject buttons
  * - BLOCKED: আমি ব্লক করেছি → Unblock button
- * - NONE: কোনো সম্পর্ক নেই → Add Friend button
+ * - NOT_FRIENDS: কোনো সম্পর্ক নেই → Add Friend button
  */
 export type FriendshipStatus =
   (typeof PROFILE_RELATION_STATUS)[keyof typeof PROFILE_RELATION_STATUS];
@@ -26,12 +26,9 @@ export type FriendshipStatus =
 
 /**
  * GET /users/p/:username response
- * Backend returns user fields + friendshipStatus in flat structure
- * { ...user, friendshipStatus: "SELF" | "FRIENDS" | ... }
+ * Backend returns user fields + profile_relation_status in flat structure
+ * We use 'User' type directly as it includes profile_relation_status
  */
-export interface ProfileResponse extends User {
-  friendshipStatus: FriendshipStatus;
-}
 
 // ====================================
 // UPDATE PROFILE DATA TYPES

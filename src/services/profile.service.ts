@@ -1,7 +1,6 @@
 import api from "../lib/axios";
-import type { ApiResponse } from "../types/user.types";
+import type { ApiResponse, User } from "../types/user.types";
 import type {
-  ProfileResponse,
   UpdateGeneralData,
   UpdateAcademicData,
 } from "../types/profile.types";
@@ -27,22 +26,18 @@ export const profileApi = {
    * Get user profile by username
    *
    * @param username - User's unique username
-   * @returns User profile with friendshipStatus
+   * @returns User profile with profile_relation_status
    *
-   * friendshipStatus:
+   * profile_relation_status:
    * - SELF: নিজের প্রোফাইল
-   * - FRIENDS: বন্ধু
+   * - FRIEND: বন্ধু
    * - REQUEST_SENT: আমি request পাঠিয়েছি
    * - REQUEST_RECEIVED: সে request পাঠিয়েছে
    * - BLOCKED: ব্লক করা
-   * - NONE: কোনো relation নেই
+   * - NOT_FRIENDS: কোনো relation নেই
    */
-  getProfile: async (
-    username: string
-  ): Promise<ApiResponse<ProfileResponse>> => {
-    const response = await api.get<ApiResponse<ProfileResponse>>(
-      `/users/p/${username}`
-    );
+  getProfile: async (username: string): Promise<ApiResponse<User>> => {
+    const response = await api.get<ApiResponse<User>>(`/users/p/${username}`);
     return response.data;
   },
 
@@ -54,8 +49,8 @@ export const profileApi = {
    */
   updateGeneral: async (
     data: UpdateGeneralData
-  ): Promise<ApiResponse<ProfileResponse>> => {
-    const response = await api.patch<ApiResponse<ProfileResponse>>(
+  ): Promise<ApiResponse<User>> => {
+    const response = await api.patch<ApiResponse<User>>(
       "/users/update-general",
       data
     );
@@ -71,8 +66,8 @@ export const profileApi = {
    */
   updateAcademic: async (
     data: UpdateAcademicData
-  ): Promise<ApiResponse<ProfileResponse>> => {
-    const response = await api.patch<ApiResponse<ProfileResponse>>(
+  ): Promise<ApiResponse<User>> => {
+    const response = await api.patch<ApiResponse<User>>(
       "/users/update-academic",
       data
     );
@@ -85,10 +80,8 @@ export const profileApi = {
    * @param formData - FormData with 'avatar' file
    * @returns Updated user with new avatar URL
    */
-  updateAvatar: async (
-    formData: FormData
-  ): Promise<ApiResponse<ProfileResponse>> => {
-    const response = await api.patch<ApiResponse<ProfileResponse>>(
+  updateAvatar: async (formData: FormData): Promise<ApiResponse<User>> => {
+    const response = await api.patch<ApiResponse<User>>(
       "/users/avatar",
       formData,
       {
@@ -106,10 +99,8 @@ export const profileApi = {
    * @param formData - FormData with 'coverImage' file
    * @returns Updated user with new cover image URL
    */
-  updateCoverImage: async (
-    formData: FormData
-  ): Promise<ApiResponse<ProfileResponse>> => {
-    const response = await api.patch<ApiResponse<ProfileResponse>>(
+  updateCoverImage: async (formData: FormData): Promise<ApiResponse<User>> => {
+    const response = await api.patch<ApiResponse<User>>(
       "/users/cover-image",
       formData,
       {
