@@ -17,8 +17,9 @@ import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem, { type CommentData } from "../shared/CommentItem";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
-import type { Post } from "../../services/post.service";
+import type { Post } from "../../types/post.types";
 import { useUser } from "../../hooks/useAuth";
+import { useToggleLikePost } from "../../hooks/usePost";
 
 interface ProfilePostCardProps {
   post: Post;
@@ -28,7 +29,6 @@ interface ProfilePostCardProps {
 const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   // TODO: Replace with API data
-  const [isLiked, setIsLiked] = useState(post.isLiked);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -41,9 +41,11 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   // TODO: Replace with API data for comments
   const postComments: CommentData[] = [];
 
+  // আমাদের বানানো হুক কল করলাম
+  const { mutate: likeMutate } = useToggleLikePost();
   const handleLike = () => {
-    // TODO: Replace with API call and refetch to get updated count from backend
-    setIsLiked(!isLiked);
+    // শুধু আইডি পাস করে দিলেই হবে, বাকি সব হুক সামলাবে
+    likeMutate(post._id);
   };
 
   const handleBookmark = () => {
@@ -226,12 +228,12 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           <button
             onClick={handleLike}
             className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
-              isLiked
+              post.isLiked
                 ? "bg-red-50 text-red-600 hover:bg-red-100"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {isLiked ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
+            {post.isLiked ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
             <span className="text-sm font-medium">Like</span>
           </button>
 

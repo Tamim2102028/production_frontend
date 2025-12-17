@@ -1,47 +1,5 @@
 import api from "../lib/axios";
-
-export interface Post {
-  _id: string;
-  content: string;
-  images?: string[];
-  attachments?: string[];
-  author: {
-    _id: string;
-    fullName: string;
-    avatar?: string;
-    userName: string;
-  };
-  privacy?: string;
-  createdAt: string;
-  likesCount: number;
-  commentsCount: number;
-  sharesCount: number;
-  tags?: string[];
-  isLiked?: boolean;
-  isOwnPost?: boolean;
-}
-
-interface FeedResponse {
-  statusCode: number;
-  data: {
-    posts: Post[];
-    hasNextPage: boolean;
-    nextPage: number | null;
-    totalDocs: number;
-  };
-  message: string;
-  success: boolean;
-}
-
-interface ProfilePostsResponse {
-  statusCode: number;
-  data: {
-    posts: Post[];
-    isOwnProfile: boolean;
-  };
-  message: string;
-  success: boolean;
-}
+import type { FeedResponse, ProfilePostsResponse } from "../types/post.types";
 
 export const postService = {
   // Get News Feed
@@ -63,9 +21,10 @@ export const postService = {
   },
 
   // Like Post
-  toggleLike: async (postId: string) => {
-    const response = await api.post(`/posts/${postId}/like`);
-    return response.data;
+  togglePostLike: async (postId: string) => {
+    // সার্ভারে রিকোয়েস্ট (POST বা PUT)
+    const { data } = await api.post(`/posts/${postId}/toggle-like`);
+    return data;
   },
 
   // Get Profile Posts
