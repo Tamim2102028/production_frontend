@@ -94,7 +94,9 @@ export const useToggleLikePost = () => {
     // ৩. সবকিছু শেষে (সফল বা ব্যর্থ)
     onSettled: () => {
       // ডেটা সিঙ্ক ঠিক রাখার জন্য একবার রিফ্রেশ
-      queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      // Mock Backend এ স্টেট সেভ হচ্ছে না, তাই রিফ্রেশ করলে লাইক চলে যাবে।
+      // Real Backend এ এটা uncomment করতে হবে।
+      // queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
     },
   });
 };
