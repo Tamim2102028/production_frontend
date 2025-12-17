@@ -28,11 +28,11 @@ interface ProfilePostCardProps {
 
 const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15);
   // TODO: Replace with API data
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15);
 
   // Get current logged-in user
   const { user: currentUser } = useUser();
