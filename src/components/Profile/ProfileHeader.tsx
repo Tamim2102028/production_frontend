@@ -229,6 +229,12 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
               </span>
               <span>
                 <strong className="text-gray-900">
+                  {userData.stats?.followersCount || 0}
+                </strong>{" "}
+                Followers
+              </span>
+              <span>
+                <strong className="text-gray-900">
                   {userData.stats?.followingCount || 0}
                 </strong>{" "}
                 Following
