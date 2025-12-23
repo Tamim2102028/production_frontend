@@ -2,10 +2,14 @@ import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/store.hooks";
 import { setUser, clearUser } from "../store/slices/authSlice";
 import authApi from "../services/auth.service";
-import type { LoginCredentials, ApiError } from "../types/user.types";
+import type {
+  LoginCredentials,
+  ApiError,
+  AuthState,
+} from "../types/user.types";
 import type { AxiosError } from "axios";
 
 /**
@@ -29,21 +33,7 @@ import type { AxiosError } from "axios";
  * login({ email: "...", password: "..." });
  */
 
-/**
- * useUser Hook
- *
- * Redux থেকে current user data access করার জন্য।
- * যেকোনো component থেকে easily user info পাওয়া যাবে।
- *
- * @returns {user, isAuthenticated, isCheckingAuth}
- *
- * @example
- * const { user, isAuthenticated } = useUser();
- * if (isAuthenticated) {
- *   console.log(user.fullName);
- * }
- */
-export const useUser = () => {
+export const useUser = (): AuthState => {
   const { user, isAuthenticated, isCheckingAuth } = useAppSelector(
     (state) => state.auth
   );

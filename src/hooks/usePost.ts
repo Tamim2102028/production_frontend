@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { postService } from "../services/post.service";
 import { type Post } from "../types/post.types";
 import { toast } from "sonner";
+import type { POST_VISIBILITY } from "../constants";
 
 /**
  * ====================================
@@ -66,8 +67,15 @@ export const useToggleLikePost = () => {
               if (post._id === postId) {
                 return {
                   ...post,
-                  isLiked: !post.isLiked,
-                  likesCount: (post.isLiked ? -1 : 1) + post.likesCount,
+                  context: {
+                    ...post.context,
+                    isLiked: !post.context.isLiked,
+                  },
+                  stats: {
+                    ...post.stats,
+                    likes:
+                      (post.context.isLiked ? -1 : 1) + (post.stats.likes || 0),
+                  },
                 };
               }
               return post;
@@ -80,7 +88,7 @@ export const useToggleLikePost = () => {
       return { previousProfilePosts };
     },
 
-    // ২. যদি সার্ভারে এরর হয়
+    // ২. যদি সার্ভারে এরর হয়
     onError: (_err, _postId, context) => {
       // আগের অবস্থায় ফিরিয়ে নেওয়া
       if (context?.previousProfilePosts) {
@@ -97,6 +105,61 @@ export const useToggleLikePost = () => {
       // Mock Backend এ স্টেট সেভ হচ্ছে না, তাই রিফ্রেশ করলে লাইক চলে যাবে।
       // Real Backend এ এটা uncomment করতে হবে।
       // queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+    },
+  });
+};
+
+/**
+ * useCreateProfilePost Hook
+ *
+ * Profile এ নতুন পোস্ট তৈরি করার জন্য।
+ * এটি User মডেলের উপর পোস্ট তৈরি করে।
+ */
+export const useCreateProfilePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      content,
+      visibility,
+      targetId,
+    }: {
+      content: string;
+      visibility: keyof typeof POST_VISIBILITY;
+      targetId: string;
+    }) => {
+      // JSON payload তৈরি
+      const payload = {
+        content,
+        visibility,
+        type: "TEXT",
+        targetModel: "User",
+        targetId: targetId,
+        attachments: [], // আপাতত খালি
+        pollOptions: [], // আপাতত খালি
+        tags: [], // আপাতত খালি
+      };
+
+      return postService.createPost(payload);
+    },
+    onSuccess: (data) => {
+      // Optimistic update: নতুন পোস্ট লিস্টের শুরুতে যোগ করা
+      queryClient.setQueriesData(
+        { queryKey: ["profilePosts"] },
+        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+          if (!oldData) return oldData;
+          const newPost = data.data.post;
+          return {
+            ...oldData,
+            posts: [newPost, ...oldData.posts],
+          };
+        }
+      );
+      toast.success("Post created successfully!");
+    },
+    onError: (error: any) => {
+      console.error("Create post error:", error);
+      toast.error(error.response?.data?.message || "Failed to create post");
     },
   });
 };

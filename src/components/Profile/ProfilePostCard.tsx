@@ -176,7 +176,6 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       </div>
 
       {/* Post Images */}
-      {/* not in backend response yet - will be added later */}
       {post.images && post.images.length > 0 && (
         <div className="px-4 pb-3">
           {post.images.length === 1 ? (
@@ -212,11 +211,11 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       <div className="border-t border-gray-100 px-4 py-2">
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-3">
-            <span>{post.likesCount} likes</span>
+            <span>{post.stats.likes || 0} likes</span>
             <SeparatorDot />
-            <span>{post.commentsCount} comments</span>
+            <span>{post.stats.comments || 0} comments</span>
             <SeparatorDot />
-            <span>{post.sharesCount} shares</span>
+            <span>{post.stats.shares || 0} shares</span>
           </div>
         </div>
       </div>
@@ -228,12 +227,16 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           <button
             onClick={handleLike}
             className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
-              post.isLiked
+              post.context?.isLiked
                 ? "bg-red-50 text-red-600 hover:bg-red-100"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {post.isLiked ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
+            {post.context?.isLiked ? (
+              <FaHeart size={18} />
+            ) : (
+              <FaRegHeart size={18} />
+            )}
             <span className="text-sm font-medium">Like</span>
           </button>
 

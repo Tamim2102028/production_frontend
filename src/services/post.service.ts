@@ -14,9 +14,7 @@ export const postService = {
 
   // Create Post
   createPost: async (data: FormData) => {
-    const response = await api.post("/posts", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const response = await api.post("/posts", data);
     return response.data;
   },
 

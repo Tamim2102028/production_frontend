@@ -12,28 +12,18 @@ import {
   FaFlag,
   FaEdit,
   FaTrash,
+  FaBuilding,
+  FaLock,
+  FaUserFriends,
+  FaGlobe,
 } from "react-icons/fa";
 
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem from "../shared/CommentItem";
 import { DEFAULT_AVATAR_MD, DEFAULT_AVATAR_SM } from "../../constants/images";
-
-// TODO: Import Post type from shared types when API is connected
-interface PostData {
-  postId: string;
-  userId: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  comments: number;
-  likedBy: string[];
-  sharesBy: string[];
-  images?: string[];
-  status: string;
-  privacy: string;
-  tags?: string[];
-}
+import { POST_VISIBILITY } from "../../constants";
+import type { Post } from "../../types/post.types";
 
 // TODO: Import Comment type from shared types when API is connected
 interface Comment {
@@ -45,7 +35,7 @@ interface Comment {
 }
 
 interface HomePostCardProps {
-  post: PostData;
+  post: Post;
 }
 
 const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
@@ -55,13 +45,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
   const [imageError, setImageError] = useState(false);
   const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15); // Initially show 15 comments
   const [showMenu, setShowMenu] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-
-  // TODO: Fetch user data from API based on post.userId
-  const userData = {
-    name: "User",
-    avatar: DEFAULT_AVATAR_MD,
-  };
+  const [isLiked, setIsLiked] = useState(post.context?.isLiked || false);
 
   // TODO: Get current user from auth context/API
   const currentUser = {
@@ -75,17 +59,17 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
 
   const handleLike = () => {
     // TODO: Call API to toggle like
-    console.log("TODO: Toggle like for post", post.postId);
+    console.log("TODO: Toggle like for post", post._id);
     setIsLiked(!isLiked);
   };
 
   const handleBookmark = () => {
     // TODO: Call API to toggle bookmark
-    console.log("TODO: Toggle bookmark for post", post.postId);
+    console.log("TODO: Toggle bookmark for post", post._id);
   };
 
   const handleProfileClick = () => {
-    navigate(`/profile/${post.userId}`);
+    navigate(`/profile/${post.author._id}`);
   };
 
   const handleToggleMenu = () => {
@@ -101,9 +85,9 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
             src={
               imageError
                 ? DEFAULT_AVATAR_MD
-                : userData?.avatar || DEFAULT_AVATAR_MD
+                : post.author.avatar || DEFAULT_AVATAR_MD
             }
-            alt={userData?.name || "User"}
+            alt={post.author.fullName || "User"}
             className="h-10 w-10 cursor-pointer rounded-full bg-gray-300 transition-all hover:ring-2 hover:ring-blue-300"
             onClick={handleProfileClick}
             onError={() => setImageError(true)}
@@ -113,12 +97,25 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
               className="cursor-pointer font-semibold text-gray-900 transition-colors hover:text-blue-600 hover:underline"
               onClick={handleProfileClick}
             >
-              {userData?.name || "User"}
+              {post.author.fullName || "User"}
             </h3>
             <p className="flex items-center gap-2 text-sm text-gray-500">
               <span>{formatPostDate(post.createdAt)}</span>
               <SeparatorDot ariaHidden />
               <span>{formatPostClock(post.createdAt)}</span>
+              <SeparatorDot ariaHidden />
+              {post.visibility === POST_VISIBILITY.PUBLIC && (
+                <FaGlobe className="h-3 w-3" title="Public" />
+              )}
+              {post.visibility === POST_VISIBILITY.CONNECTIONS && (
+                <FaUserFriends className="h-3 w-3" title="Friends" />
+              )}
+              {post.visibility === POST_VISIBILITY.ONLY_ME && (
+                <FaLock className="h-3 w-3" title="Only Me" />
+              )}
+              {post.visibility === POST_VISIBILITY.INTERNAL && (
+                <FaBuilding className="h-3 w-3" title="Internal" />
+              )}
             </p>
           </div>
         </div>
@@ -144,7 +141,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                 </button>
                 <button
                   onClick={async () => {
-                    const link = `${window.location.origin}/post/${post.postId}`;
+                    const link = `${window.location.origin}/post/${post._id}`;
                     try {
                       await navigator.clipboard.writeText(link);
                       showSuccess({
@@ -165,13 +162,13 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                   <span className="font-medium">Copy link</span>
                 </button>
                 {/* Show Edit/Delete when this is the current user's post */}
-                {post.userId === currentUser.id ? (
+                {post.author._id === currentUser.id ? (
                   <>
                     <button
                       onClick={() => {
                         setShowMenu(false);
                         // TODO: Implement edit action with API
-                        console.log("TODO: Edit post", post.postId);
+                        console.log("TODO: Edit post", post._id);
                       }}
                       className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
                     >
@@ -182,7 +179,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                       onClick={() => {
                         setShowMenu(false);
                         // TODO: Implement delete action with API
-                        console.log("TODO: Delete post", post.postId);
+                        console.log("TODO: Delete post", post._id);
                       }}
                       className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
                     >
@@ -192,7 +189,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                   </>
                 ) : null}
                 {/* Report only for others' posts */}
-                {post.userId !== currentUser.id && (
+                {post.author._id !== currentUser.id && (
                   <button className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-gray-50">
                     <FaFlag className="h-4 w-4" />
                     <span className="font-medium">Report post</span>
@@ -259,11 +256,11 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
       <div className="border-t border-gray-100 px-4 py-2">
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-3">
-            <span>{post.likedBy.length} likes</span>
+            <span>{post.stats?.likes || 0} likes</span>
             <SeparatorDot />
-            <span>{post.comments} comments</span>
+            <span>{post.stats?.comments || 0} comments</span>
             <SeparatorDot />
-            <span>{post.sharesBy.length} shares</span>
+            <span>{post.stats?.shares || 0} shares</span>
           </div>
         </div>
       </div>
@@ -317,7 +314,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                     <CommentItem
                       key={comment.commentId}
                       comment={comment}
-                      postOwnerId={post.userId}
+                      postOwnerId={post.author._id}
                     />
                   ))}
 
@@ -358,7 +355,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                     // TODO: Call API to add comment
                     console.log(
                       "TODO: Add comment to post",
-                      post.postId,
+                      post._id,
                       commentText.trim()
                     );
                     setCommentText("");
@@ -371,7 +368,7 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
                     // TODO: Call API to add comment
                     console.log(
                       "TODO: Add comment to post",
-                      post.postId,
+                      post._id,
                       commentText.trim()
                     );
                     setCommentText("");

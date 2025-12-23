@@ -5,6 +5,7 @@ import {
   ProfilePosts,
   PublicFiles,
   ProfileTabs,
+  CreateProfilePost,
 } from "../components/Profile";
 import PageLoader from "./Fallbacks/PageLoader";
 import { useUser } from "../hooks/useAuth";
@@ -67,6 +68,12 @@ const Profile: React.FC = () => {
       <div>
         {activeTab === "posts" && (
           <div className="space-y-3">
+            {/* Create Post Section (Only for Own Profile) */}
+            {isOwnProfile && currentUser?._id && (
+              <div className="mb-4">
+                <CreateProfilePost targetId={currentUser._id} />
+              </div>
+            )}
             <ProfilePosts
               username={userData.userName}
               isOwnProfile={isOwnProfile}

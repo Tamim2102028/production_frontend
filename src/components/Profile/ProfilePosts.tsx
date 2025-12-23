@@ -2,17 +2,14 @@ import React from "react";
 import ProfilePostCard from "./ProfilePostCard";
 import { useProfilePosts } from "../../hooks/usePost";
 import PageLoader from "../../pages/Fallbacks/PageLoader";
-
-interface ProfilePostsProps {
-  username: string;
-  isOwnProfile: boolean;
-}
+import type { ProfilePostsProps } from "../../types/post.types";
 
 const ProfilePosts: React.FC<ProfilePostsProps> = ({
   username,
   isOwnProfile,
 }) => {
   const { data: postsData, isLoading } = useProfilePosts(username);
+
   const posts = postsData?.posts || [];
 
   if (isLoading) {

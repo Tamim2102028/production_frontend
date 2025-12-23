@@ -1,22 +1,57 @@
+import {
+  POST_TYPES,
+  POST_TARGET_MODELS,
+  POST_VISIBILITY,
+} from "../constants/post";
+
+export interface Attachment {
+  type: "IMAGE" | "VIDEO" | "PDF" | "DOC" | "LINK";
+  url: string;
+  name?: string;
+}
+
 export interface Post {
   _id: string;
   content: string;
-  images?: string[];
-  attachments?: string[];
+  images: string[];
+  videos: string[];
+  docs: string[];
+
+  type: (typeof POST_TYPES)[keyof typeof POST_TYPES];
+  postOnModel: (typeof POST_TARGET_MODELS)[keyof typeof POST_TARGET_MODELS];
+  postOnId: string;
+  visibility: (typeof POST_VISIBILITY)[keyof typeof POST_VISIBILITY];
+
   author: {
     _id: string;
     fullName: string;
     avatar?: string;
     userName: string;
   };
-  privacy?: string;
+
+  stats: {
+    likes: number;
+    comments: number;
+    shares: number;
+  };
+
+  context: {
+    isLiked: boolean;
+    isSaved: boolean;
+    isMine: boolean;
+    isRead: boolean;
+  };
+
   createdAt: string;
-  likesCount: number;
-  commentsCount: number;
-  sharesCount: number;
+  updatedAt: string;
+
+  // Flags
+  isArchived?: boolean;
+  isPinned?: boolean;
+  isDeleted?: boolean;
+
+  // Optional fields
   tags?: string[];
-  isLiked?: boolean;
-  isOwnPost?: boolean;
 }
 
 export interface FeedResponse {
@@ -39,4 +74,13 @@ export interface ProfilePostsResponse {
   };
   message: string;
   success: boolean;
+}
+
+export interface ProfilePostsProps {
+  username: string;
+  isOwnProfile: boolean;
+}
+
+export interface CreateProfilePostProps {
+  currentUserId: string;
 }

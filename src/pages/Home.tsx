@@ -1,28 +1,27 @@
 import React from "react";
-import { HomePostCard, CreatePost, LoadingSkeleton } from "../components/Home";
-
-// TODO: Define Post type when API is connected
-interface Post {
-  postId: string;
-  userId: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  comments: number;
-  likedBy: string[];
-  sharesBy: string[];
-  images?: string[];
-  status: string;
-  privacy: string;
-  tags?: string[];
-}
+import { HomePostCard, LoadingSkeleton } from "../components/Home";
+import type { Post } from "../types/post.types";
 
 const Home: React.FC = () => {
   // TODO: Replace with API call to fetch posts
   const posts: Post[] = [];
   const loading = false;
 
-  // TODO: Fetch current user from auth context/API
+  // const handleCreatePost = (data: CreatePostData) => {
+  //   createPost(
+  //     {
+  //       content: data.content,
+  //       visibility: data.visibility,
+  //       targetModel: data.targetModel,
+  //       targetId: data.targetId,
+  //       attachments: data.attachments,
+  //     },
+  //     {
+  //       onSuccess: () => {},
+  //     }
+  //   );
+  // };
+
   // TODO: Fetch friends list from API for filtering
 
   if (loading) {
@@ -38,8 +37,20 @@ const Home: React.FC = () => {
     <>
       {/* TODO: Add DailyXPClaim component when gaming features are connected */}
 
-      {/* Create Post Section */}
-      <CreatePost />
+      {/* Create Post Section - Shared Component */}
+      {/*user?._id && (
+        <CreatePost
+          key={isCreatingPost ? "submitting" : "idle"} // Simple hack: re-mount or re-render? No, this might cause focus loss.
+          // Better: Use a dedicated key state that increments on success.
+          // But for now, let's stick to just passing props.
+          targetModel={POST_TARGET_MODELS.USER}
+          targetId={user._id}
+          placeholder={`What's on your mind, ${user.fullName.split(" ")[0]}?`}
+          showPoll={true}
+          onSubmit={handleCreatePost}
+          isPending={isCreatingPost}
+        />
+      )*/}
 
       {/* Feed Header */}
       <h2 className="text-xl font-semibold text-gray-900">Latest Posts</h2>
@@ -54,7 +65,7 @@ const Home: React.FC = () => {
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           )
           .map((post) => (
-            <HomePostCard key={post.postId} post={post} />
+            <HomePostCard key={post._id} post={post} />
           ))}
       </div>
 

@@ -2,31 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { User, AuthState } from "../../types/user.types";
 
-/**
- * ====================================
- * AUTH SLICE - Redux State Management
- * ====================================
- *
- * এই slice এ authentication related সব state manage করা হয়।
- *
- * State:
- * - user: Current logged in user এর data (null if not logged in)
- * - isAuthenticated: User logged in কিনা
- * - isInitializing: App load এ auth check হচ্ছে কিনা
- *
- * Actions:
- * - setUser: Login/Register success এ user set করে এবং isAuthenticated = true
- * - clearUser: Logout এ সব clear করে
- * - updateUser: User data partially update (profile edit এ use)
- * - setInitializing: App load এ initial auth check state
- */
-
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
-  isLoading: false,
-  // ⚠️ App load এ true থেকে শুরু
-  // /current-user check শেষ না হওয়া পর্যন্ত loading দেখাবে
   isCheckingAuth: true,
 };
 

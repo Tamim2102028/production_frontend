@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useAppDispatch } from "../store/hooks";
+import { useAppDispatch } from "../store/store.hooks";
 import { setUser } from "../store/slices/authSlice";
 import profileApi from "../services/profile.service";
 import type {

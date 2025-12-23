@@ -4,8 +4,8 @@ import { Toaster } from "sonner";
 import Sidebar from "./layout/Sidebar";
 import SidebarRight from "./layout/SidebarRight";
 import MainContent from "./layout/MainContent";
-import { useAppSelector, useAppDispatch } from "./store/hooks";
-import { useAuthCheck } from "./hooks/useAuth";
+import { useAppDispatch } from "./store/store.hooks";
+import { useAuthCheck, useUser } from "./hooks/useAuth";
 import { clearUser } from "./store/slices/authSlice";
 
 /**
@@ -60,9 +60,7 @@ const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
   // Redux থেকে auth state
-  const { isAuthenticated, isCheckingAuth } = useAppSelector(
-    (state) => state.auth
-  );
+  const { isAuthenticated, isCheckingAuth } = useUser();
 
   // ⚠️ CRITICAL: App load এ auth check
   // Cookie valid কিনা check করে, valid হলে user data fetch করে Redux এ save করে

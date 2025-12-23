@@ -19,14 +19,14 @@
     "dayjs": "^1.11.18",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-hook-form": "^7.67.0",
+    "react-hook-form": "^7.69.0",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.1",
     "sonner": "^2.0.7",
     "sweetalert2": "^11.26.3",
     "tailwindcss": "^4.1.13",
-    "zod": "^4.1.13"
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
