@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { postService } from "../services/post.service";
-import { type Post } from "../types/post.types";
+import { type CreatePostRequest, type Post } from "../types/post.types";
 import { toast } from "sonner";
-import type { POST_VISIBILITY } from "../constants";
+import { AxiosError } from "axios";
+import type { ApiError } from "../types/user.types";
 
 /**
  * ====================================
@@ -89,7 +90,7 @@ export const useToggleLikePost = () => {
     },
 
     // ২. যদি সার্ভারে এরর হয়
-    onError: (_err, _postId, context) => {
+    onError: (_err: AxiosError<ApiError>, _postId, context) => {
       // আগের অবস্থায় ফিরিয়ে নেওয়া
       if (context?.previousProfilePosts) {
         context.previousProfilePosts.forEach(([queryKey, data]) => {
@@ -119,27 +120,7 @@ export const useCreateProfilePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      content,
-      visibility,
-      targetId,
-    }: {
-      content: string;
-      visibility: keyof typeof POST_VISIBILITY;
-      targetId: string;
-    }) => {
-      // JSON payload তৈরি
-      const payload = {
-        content,
-        visibility,
-        type: "TEXT",
-        targetModel: "User",
-        targetId: targetId,
-        attachments: [], // আপাতত খালি
-        pollOptions: [], // আপাতত খালি
-        tags: [], // আপাতত খালি
-      };
-
+    mutationFn: async (payload: CreatePostRequest) => {
       return postService.createPost(payload);
     },
     onSuccess: (data) => {
@@ -147,7 +128,7 @@ export const useCreateProfilePost = () => {
       queryClient.setQueriesData(
         { queryKey: ["profilePosts"] },
         (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
-          if (!oldData) return oldData;
+          if (!oldData || !oldData.posts) return oldData;
           const newPost = data.data.post;
           return {
             ...oldData,
@@ -157,7 +138,7 @@ export const useCreateProfilePost = () => {
       );
       toast.success("Post created successfully!");
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ApiError>) => {
       console.error("Create post error:", error);
       toast.error(error.response?.data?.message || "Failed to create post");
     },
