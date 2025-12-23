@@ -19,8 +19,9 @@ import CommentItem, { type CommentData } from "../shared/CommentItem";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
 import type { Attachment, Post } from "../../types/post.types";
 import { useUser } from "../../hooks/useAuth";
-import { useToggleLikePost } from "../../hooks/usePost";
+import { useToggleLikePost, useDeletePost } from "../../hooks/usePost";
 import { ATTACHMENT_TYPES } from "../../constants";
+import confirm from "../../utils/sweetAlert";
 
 interface ProfilePostCardProps {
   post: Post;
@@ -44,9 +45,25 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
 
   // আমাদের বানানো হুক কল করলাম
   const { mutate: likeMutate } = useToggleLikePost();
+  const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
+
   const handleLike = () => {
     // শুধু আইডি পাস করে দিলেই হবে, বাকি সব হুক সামলাবে
     likeMutate(post._id);
+  };
+
+  const handleDelete = async () => {
+    setShowMenu(false);
+    const isConfirmed = await confirm({
+      title: "Delete Post?",
+      text: "This action cannot be undone.",
+      confirmButtonText: "Yes, delete it",
+      icon: "warning",
+    });
+
+    if (isConfirmed) {
+      deletePost(post._id);
+    }
   };
 
   const handleBookmark = () => {
@@ -140,11 +157,14 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                     </button>
                     {/* delete button */}
                     <button
-                      onClick={() => setShowMenu(false)}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
                     >
                       <FaTrash className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Delete post</span>
+                      <span className="font-medium">
+                        {isDeleting ? "Deleting..." : "Delete post"}
+                      </span>
                     </button>
                   </>
                 ) : (

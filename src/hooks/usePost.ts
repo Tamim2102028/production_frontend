@@ -137,10 +137,43 @@ export const useCreateProfilePost = () => {
         }
       );
       toast.success("Post created successfully!");
+
+      // Profile Header Invalidate করা (যাতে Post Count বাড়ে)
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       console.error("Create post error:", error);
       toast.error(error.response?.data?.message || "Failed to create post");
+    },
+  });
+};
+
+export const useDeletePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) => postService.deletePost(postId),
+    onSuccess: (_data, postId) => {
+      // 1. Profile Posts থেকে পোস্টটি রিমুভ করা
+      queryClient.setQueriesData(
+        { queryKey: ["profilePosts"] },
+        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+          if (!oldData || !oldData.posts) return oldData;
+          return {
+            ...oldData,
+            posts: oldData.posts.filter((post) => post._id !== postId),
+          };
+        }
+      );
+
+      // 2. Profile Header Invalidate করা (যাতে Post Count কমে)
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+
+      toast.success("Post deleted successfully");
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      console.error("Delete post error:", error);
+      toast.error(error.response?.data?.message || "Failed to delete post");
     },
   });
 };
