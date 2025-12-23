@@ -90,8 +90,8 @@ export const useToggleLikePost = () => {
     },
 
     // ২. যদি সার্ভারে এরর হয়
-    onError: (_err, _postId, context) => {
-      // আগের অবস্থায় ফিরিয়ে নেওয়া
+    onError: (_error, _postId, context) => {
+      // আগের অবস্থায় ফিরিয়ে নেওয়া (Rollback)
       if (context?.previousProfilePosts) {
         context.previousProfilePosts.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
