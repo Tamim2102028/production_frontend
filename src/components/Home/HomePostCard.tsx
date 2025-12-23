@@ -22,8 +22,8 @@ import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem from "../shared/CommentItem";
 import { DEFAULT_AVATAR_MD, DEFAULT_AVATAR_SM } from "../../constants/images";
-import { POST_VISIBILITY } from "../../constants";
-import type { Post } from "../../types/post.types";
+import { ATTACHMENT_TYPES, POST_VISIBILITY } from "../../constants";
+import type { Attachment, Post } from "../../types/post.types";
 
 // TODO: Import Comment type from shared types when API is connected
 interface Comment {
@@ -75,6 +75,10 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
   const handleToggleMenu = () => {
     setShowMenu(!showMenu);
   };
+
+  const images = post.attachments.filter(
+    (attachment: Attachment) => attachment.type === ATTACHMENT_TYPES.IMAGE
+  );
 
   return (
     <div className="rounded-lg border border-gray-400 bg-white shadow">
@@ -221,27 +225,27 @@ const HomePostCard: React.FC<HomePostCardProps> = ({ post }) => {
       </div>
 
       {/* Post Images */}
-      {post.images && post.images.length > 0 && (
+      {images && images.length > 0 && (
         <div className="px-4 pb-3">
-          {post.images.length === 1 ? (
+          {images.length === 1 ? (
             <img
-              src={post.images[0]}
+              src={images[0].url}
               alt="Post content"
               className="h-auto max-h-96 w-full rounded-lg object-cover"
             />
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {post.images.slice(0, 4).map((image, index) => (
+              {images.slice(0, 4).map((image, index) => (
                 <div key={index} className="relative">
                   <img
-                    src={image}
+                    src={image.url}
                     alt={`Post content ${index + 1}`}
                     className="h-48 w-full rounded-lg object-cover"
                   />
-                  {index === 3 && post.images && post.images.length > 4 && (
+                  {index === 3 && images && images.length > 4 && (
                     <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center rounded-lg bg-black">
                       <span className="text-lg font-semibold text-white">
-                        +{post.images!.length - 4}
+                        +{images!.length - 4}
                       </span>
                     </div>
                   )}

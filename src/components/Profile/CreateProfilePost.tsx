@@ -39,7 +39,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
   currentUserId,
 }) => {
   const { user } = useUser();
-  const createPostMutation = useCreateProfilePost();
+  const { mutate, isPending } = useCreateProfilePost();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const {
@@ -63,10 +63,10 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
   const onSubmit = (data: CreateProfilePostFormData) => {
     if (!currentUserId) return;
 
-    createPostMutation.mutate(
+    mutate(
       {
         content: data.content,
-        visibility: POST_VISIBILITY.PUBLIC,
+        visibility: data.visibility,
         postOnId: currentUserId,
         postOnModel: POST_TARGET_MODELS.USER,
         type: POST_TYPES.GENERAL,
@@ -87,30 +87,63 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
     value: (typeof POST_VISIBILITY)[keyof typeof POST_VISIBILITY];
     label: string;
     Icon: IconType;
+    show: boolean;
   }> = [
     {
       value: POST_VISIBILITY.PUBLIC,
       label: "Public",
       Icon: FaGlobe,
+      show: true,
     },
     {
       value: POST_VISIBILITY.INTERNAL,
       label: "Internal",
       Icon: FaBuilding,
+      show: false,
     },
     {
       value: POST_VISIBILITY.CONNECTIONS,
       label: "Connections",
       Icon: FaUserFriends,
+      show: true,
     },
     {
       value: POST_VISIBILITY.ONLY_ME,
       label: "Only me",
       Icon: FaLock,
+      show: true,
     },
   ];
 
-  const isPending = createPostMutation.isPending;
+  const mediaOptions: Array<{
+    label: string;
+    Icon: IconType;
+    color: string;
+    onClick: () => void;
+    show: boolean;
+  }> = [
+    {
+      label: "Photo",
+      Icon: FaImage,
+      color: "text-green-500",
+      onClick: () => alert("Photo upload coming soon!"),
+      show: true,
+    },
+    {
+      label: "Video",
+      Icon: FaVideo,
+      color: "text-red-500",
+      onClick: () => alert("Video upload coming soon!"),
+      show: true,
+    },
+    {
+      label: "Poll",
+      Icon: FaPoll,
+      color: "text-orange-500",
+      onClick: () => alert("Poll creation coming soon!"),
+      show: true,
+    },
+  ];
 
   return (
     <div className="rounded-lg border border-gray-400 bg-white p-4 shadow">
@@ -139,59 +172,47 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
             {/* Media & Privacy Options */}
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center space-x-4">
-                {/* Image Upload - Placeholder */}
-                <button
-                  type="button"
-                  onClick={() => alert("Photo upload coming soon!")}
-                  className="flex items-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
-                >
-                  <FaImage className="h-5 w-5 text-green-500" />
-                  <span className="text-sm font-medium">Photo</span>
-                </button>
-
-                {/* Video (Placeholder) */}
-                <button
-                  type="button"
-                  className="flex items-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
-                  onClick={() => alert("Video upload coming soon!")}
-                >
-                  <FaVideo className="h-5 w-5 text-red-500" />
-                  <span className="text-sm font-medium">Video</span>
-                </button>
-
-                {/* Poll (Placeholder) */}
-                <button
-                  type="button"
-                  className="flex items-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
-                  onClick={() => alert("Poll creation coming soon!")}
-                >
-                  <FaPoll className="h-5 w-5 text-orange-500" />
-                  <span className="text-sm font-medium">Poll</span>
-                </button>
+                {mediaOptions
+                  .filter((opt) => opt.show)
+                  .map((option) => (
+                    <button
+                      key={option.label}
+                      type="button"
+                      onClick={option.onClick}
+                      className="flex items-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
+                    >
+                      <option.Icon className={`h-5 w-5 ${option.color}`} />
+                      <span className="text-sm font-medium">
+                        {option.label}
+                      </span>
+                    </button>
+                  ))}
               </div>
 
               {/* Privacy Selector */}
               <div className="flex items-center space-x-2">
-                {privacyOptions.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() =>
-                      setValue("visibility", opt.value, {
-                        shouldValidate: true,
-                      })
-                    }
-                    aria-pressed={privacy === opt.value}
-                    className={`flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
-                      privacy === opt.value
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    <opt.Icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{opt.label}</span>
-                  </button>
-                ))}
+                {privacyOptions
+                  .filter((opt) => opt.show)
+                  .map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() =>
+                        setValue("visibility", opt.value, {
+                          shouldValidate: true,
+                        })
+                      }
+                      aria-pressed={privacy === opt.value}
+                      className={`flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
+                        privacy === opt.value
+                          ? "bg-blue-50 text-blue-600"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      <opt.Icon className="h-4 w-4" />
+                      <span className="hidden sm:inline">{opt.label}</span>
+                    </button>
+                  ))}
               </div>
             </div>
 

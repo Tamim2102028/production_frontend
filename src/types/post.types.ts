@@ -13,9 +13,7 @@ export interface Attachment {
 export interface Post {
   _id: string;
   content: string;
-  images: string[];
-  videos: string[];
-  docs: string[];
+  attachments: Attachment[];
 
   type: (typeof POST_TYPES)[keyof typeof POST_TYPES];
   postOnModel: (typeof POST_TARGET_MODELS)[keyof typeof POST_TARGET_MODELS];

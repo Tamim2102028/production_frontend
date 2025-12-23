@@ -17,9 +17,10 @@ import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem, { type CommentData } from "../shared/CommentItem";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
-import type { Post } from "../../types/post.types";
+import type { Attachment, Post } from "../../types/post.types";
 import { useUser } from "../../hooks/useAuth";
 import { useToggleLikePost } from "../../hooks/usePost";
+import { ATTACHMENT_TYPES } from "../../constants";
 
 interface ProfilePostCardProps {
   post: Post;
@@ -64,6 +65,10 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       toast.error("Failed to copy link");
     }
   };
+
+  const images = post.attachments.filter(
+    (attachment: Attachment) => attachment.type === ATTACHMENT_TYPES.IMAGE
+  );
 
   return (
     <div className="rounded-lg border border-gray-400 bg-white shadow">
@@ -176,27 +181,27 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       </div>
 
       {/* Post Images */}
-      {post.images && post.images.length > 0 && (
+      {images && images.length > 0 && (
         <div className="px-4 pb-3">
-          {post.images.length === 1 ? (
+          {images.length === 1 ? (
             <img
-              src={post.images[0]}
+              src={images[0].url}
               alt="Post content"
               className="h-auto max-h-96 w-full rounded-lg object-cover"
             />
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {post.images.slice(0, 4).map((image, index) => (
+              {images.slice(0, 4).map((image, index) => (
                 <div key={index} className="relative">
                   <img
-                    src={image}
+                    src={image.url}
                     alt={`Post content ${index + 1}`}
                     className="h-48 w-full rounded-lg object-cover"
                   />
-                  {index === 3 && post.images && post.images.length > 4 && (
+                  {index === 3 && images.length > 4 && (
                     <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center rounded-lg bg-black">
                       <span className="text-lg font-semibold text-white">
-                        +{post.images!.length - 4}
+                        +{images.length - 4}
                       </span>
                     </div>
                   )}
@@ -206,8 +211,6 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           )}
         </div>
       )}
-
-      {/* Post Stats */}
       <div className="border-t border-gray-100 px-4 py-2">
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-3">
