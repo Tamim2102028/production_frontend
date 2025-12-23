@@ -25,6 +25,7 @@ import type { CreateProfilePostProps } from "../../types/post.types";
 
 const createProfilePostSchema = z.object({
   content: z.string().trim().min(1, "Post content is required"),
+  tags: z.string().optional(),
   visibility: z.enum([
     POST_VISIBILITY.PUBLIC,
     POST_VISIBILITY.INTERNAL,
@@ -53,6 +54,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
     resolver: zodResolver(createProfilePostSchema),
     defaultValues: {
       content: "",
+      tags: "",
       visibility: POST_VISIBILITY.PUBLIC,
     },
   });
@@ -63,6 +65,14 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
   const onSubmit = (data: CreateProfilePostFormData) => {
     if (!currentUserId) return;
 
+    // Process tags: split by comma or space, remove empty strings
+    const processedTags = data.tags
+      ? data.tags
+          .split(/[\s,]+/) // Split by comma or whitespace
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0)
+      : [];
+
     mutate(
       {
         content: data.content,
@@ -72,7 +82,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
         type: POST_TYPES.GENERAL,
         attachments: [],
         pollOptions: [],
-        tags: [],
+        tags: processedTags,
       },
       {
         onSuccess: () => {
@@ -163,6 +173,15 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
               className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
               rows={isExpanded ? 4 : 1}
             />
+            {/* Tags Input (Only visible when expanded) */}
+            {isExpanded && (
+              <input
+                type="text"
+                {...register("tags")}
+                placeholder="Add tags (separated by space or comma)"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            )}
           </div>
         </div>
 
