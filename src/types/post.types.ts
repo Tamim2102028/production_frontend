@@ -84,3 +84,14 @@ export interface ProfilePostsProps {
 export interface CreateProfilePostProps {
   currentUserId: string;
 }
+
+export interface CreatePostRequest {
+  content: string;
+  visibility: (typeof POST_VISIBILITY)[keyof typeof POST_VISIBILITY];
+  postOnId: string;
+  postOnModel: (typeof POST_TARGET_MODELS)[keyof typeof POST_TARGET_MODELS];
+  type: (typeof POST_TYPES)[keyof typeof POST_TYPES];
+  attachments: Attachment[];
+  pollOptions: string[];
+  tags: string[];
+}

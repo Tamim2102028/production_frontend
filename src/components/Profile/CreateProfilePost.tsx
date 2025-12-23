@@ -10,37 +10,73 @@ import {
   FaVideo,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { DEFAULT_AVATAR_MD } from "../../constants/images";
-import { POST_VISIBILITY } from "../../constants/post";
+import {
+  POST_VISIBILITY,
+  POST_TYPES,
+  POST_TARGET_MODELS,
+} from "../../constants/post";
 import { useUser } from "../../hooks/useAuth";
 import { useCreateProfilePost } from "../../hooks/usePost";
 import type { CreateProfilePostProps } from "../../types/post.types";
 
-const CreateProfilePost: React.FC<CreateProfilePostProps> = ({ currentUserId }) => {
+const createProfilePostSchema = z.object({
+  content: z.string().trim().min(1, "Post content is required"),
+  visibility: z.enum([
+    POST_VISIBILITY.PUBLIC,
+    POST_VISIBILITY.INTERNAL,
+    POST_VISIBILITY.CONNECTIONS,
+    POST_VISIBILITY.ONLY_ME,
+  ]),
+});
+
+type CreateProfilePostFormData = z.infer<typeof createProfilePostSchema>;
+
+const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
+  currentUserId,
+}) => {
   const { user } = useUser();
   const createPostMutation = useCreateProfilePost();
-
-  const [postContent, setPostContent] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [privacy, setPrivacy] = useState<
-    (typeof POST_VISIBILITY)[keyof typeof POST_VISIBILITY]
-  >(POST_VISIBILITY.PUBLIC);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { isValid },
+  } = useForm<CreateProfilePostFormData>({
+    resolver: zodResolver(createProfilePostSchema),
+    defaultValues: {
+      content: "",
+      visibility: POST_VISIBILITY.PUBLIC,
+    },
+  });
 
-    if (!postContent.trim()) return;
+  const privacy = watch("visibility");
+  const postContent = watch("content");
+
+  const onSubmit = (data: CreateProfilePostFormData) => {
     if (!currentUserId) return;
 
     createPostMutation.mutate(
       {
-        content: postContent.trim(),
-        visibility: privacy,
-        targetId: currentUserId,
+        content: data.content,
+        visibility: POST_VISIBILITY.PUBLIC,
+        postOnId: currentUserId,
+        postOnModel: POST_TARGET_MODELS.USER,
+        type: POST_TYPES.GENERAL,
+        attachments: [],
+        pollOptions: [],
+        tags: [],
       },
       {
         onSuccess: () => {
-          setPostContent("");
+          reset();
           setIsExpanded(false);
         },
       }
@@ -78,7 +114,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({ currentUserId }) 
 
   return (
     <div className="rounded-lg border border-gray-400 bg-white p-4 shadow">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         {/* User Avatar and Input */}
         <div className="flex space-x-3">
           <img
@@ -88,8 +124,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({ currentUserId }) 
           />
           <div className="flex-1">
             <textarea
-              value={postContent}
-              onChange={(e) => setPostContent(e.target.value)}
+              {...register("content")}
               onFocus={() => setIsExpanded(true)}
               placeholder={`What's on your mind, ${user?.fullName?.split(" ")[0]}?`}
               className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -141,7 +176,11 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({ currentUserId }) 
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => setPrivacy(opt.value)}
+                    onClick={() =>
+                      setValue("visibility", opt.value, {
+                        shouldValidate: true,
+                      })
+                    }
                     aria-pressed={privacy === opt.value}
                     className={`flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
                       privacy === opt.value
@@ -161,7 +200,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({ currentUserId }) 
               <button
                 type="button"
                 onClick={() => {
-                  setPostContent("");
+                  reset();
                   setIsExpanded(false);
                 }}
                 className="flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:border-red-200 hover:bg-red-50"
@@ -171,7 +210,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({ currentUserId }) 
 
               <button
                 type="submit"
-                disabled={!postContent.trim() || isPending}
+                disabled={!isValid || isPending}
                 className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span>{isPending ? "Posting..." : "Post"}</span>

@@ -1,5 +1,9 @@
 import api from "../lib/axios";
-import type { FeedResponse, ProfilePostsResponse } from "../types/post.types";
+import type {
+  CreatePostRequest,
+  FeedResponse,
+  ProfilePostsResponse,
+} from "../types/post.types";
 
 export const postService = {
   // Get News Feed
@@ -13,8 +17,8 @@ export const postService = {
   },
 
   // Create Post
-  createPost: async (data: FormData) => {
-    const response = await api.post("/posts", data);
+  createPost: async (reqData: CreatePostRequest) => {
+    const response = await api.post("/posts", reqData);
     return response.data;
   },
 

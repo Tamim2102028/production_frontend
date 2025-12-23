@@ -90,7 +90,7 @@ export const useToggleLikePost = () => {
     },
 
     // ২. যদি সার্ভারে এরর হয়
-    onError: (_err: AxiosError<ApiError>, _postId, context) => {
+    onError: (_err, _postId, context) => {
       // আগের অবস্থায় ফিরিয়ে নেওয়া
       if (context?.previousProfilePosts) {
         context.previousProfilePosts.forEach(([queryKey, data]) => {
