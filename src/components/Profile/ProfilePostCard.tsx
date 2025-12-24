@@ -397,8 +397,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                 ref={textareaRef}
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment..."
-                className="flex-1 resize-none rounded-2xl border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Write a comment... (max 1000 chars)"
+                className="flex-1 resize-none rounded-2xl border border-gray-300 px-3 py-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 rows={1}
                 style={{ minHeight: "38px" }}
                 onKeyDown={(e) => {
@@ -411,6 +411,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                   e.currentTarget.style.height =
                     e.currentTarget.scrollHeight + "px";
                 }}
+                maxLength={1000}
               />
               <button
                 onClick={handleAddComment}

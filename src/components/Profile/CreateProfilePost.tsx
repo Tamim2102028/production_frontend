@@ -24,7 +24,11 @@ import { useCreateProfilePost } from "../../hooks/usePost";
 import type { CreateProfilePostProps } from "../../types/post.types";
 
 const createProfilePostSchema = z.object({
-  content: z.string().trim().min(1, "Post content is required"),
+  content: z
+    .string()
+    .trim()
+    .min(1, "Post content is required")
+    .max(5000, "Post cannot exceed 5000 characters"),
   tags: z.string().optional(),
   visibility: z.enum([
     POST_VISIBILITY.PUBLIC,
@@ -166,13 +170,16 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
             className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
           />
           <div className="flex-1">
-            <textarea
-              {...register("content")}
-              onFocus={() => setIsExpanded(true)}
-              placeholder={`What's on your mind, ${user?.fullName?.split(" ")[0]}?`}
-              className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              rows={isExpanded ? 4 : 1}
-            />
+            <div className="relative">
+              <textarea
+                {...register("content")}
+                onFocus={() => setIsExpanded(true)}
+                placeholder={`What's on your mind, ${user?.fullName?.split(" ")[0]}?`}
+                className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                rows={isExpanded ? 4 : 1}
+                maxLength={5000}
+              />
+            </div>
             {/* Tags Input (Only visible when expanded) */}
             {isExpanded && (
               <input
@@ -248,13 +255,18 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
                 <span>Cancel</span>
               </button>
 
-              <button
-                type="submit"
-                disabled={!isValid || isPending}
-                className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <span>{isPending ? "Posting..." : "Post"}</span>
-              </button>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-400">
+                  {postContent?.length || 0}/5000
+                </span>
+                <button
+                  type="submit"
+                  disabled={!isValid || isPending}
+                  className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span>{isPending ? "Posting..." : "Post"}</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
