@@ -43,6 +43,15 @@ export const postService = {
     return response.data;
   },
 
+  // Update Post
+  updatePost: async (
+    postId: string,
+    data: { content: string; tags?: string[]; visibility?: string }
+  ) => {
+    const response = await api.patch(`/posts/${postId}`, data);
+    return response.data;
+  },
+
   // Toggle Read Status
   toggleReadStatus: async (postId: string) => {
     const response = await api.post(`/posts/${postId}/toggle-read`);

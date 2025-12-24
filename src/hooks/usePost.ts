@@ -250,6 +250,53 @@ export const useCreateProfilePost = () => {
   });
 };
 
+/**
+ * useUpdatePost Hook
+ *
+ * পোস্ট আপডেট করার জন্য।
+ */
+export const useUpdatePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      postId,
+      data,
+    }: {
+      postId: string;
+      data: { content: string; tags?: string[]; visibility?: string };
+    }) => {
+      return postService.updatePost(postId, data);
+    },
+    onSuccess: (data) => {
+      // Optimistic update
+      queryClient.setQueriesData(
+        { queryKey: ["profilePosts"] },
+        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+          if (!oldData || !oldData.posts) return oldData;
+          return {
+            ...oldData,
+            posts: oldData.posts.map((post: Post) =>
+              post._id === data.data._id
+                ? {
+                    ...data.data,
+                    stats: post.stats,
+                    context: post.context,
+                  }
+                : post
+            ),
+          };
+        }
+      );
+      toast.success("Post updated successfully!");
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      console.error("Update post error:", error);
+      toast.error(error.response?.data?.message || "Failed to update post");
+    },
+  });
+};
+
 export const useDeletePost = () => {
   const queryClient = useQueryClient();
 

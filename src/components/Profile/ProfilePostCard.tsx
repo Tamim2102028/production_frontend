@@ -26,6 +26,7 @@ import {
   useDeletePost,
   useToggleReadStatus,
   useToggleBookmark,
+  useUpdatePost,
 } from "../../hooks/usePost";
 import {
   usePostComments,
@@ -48,6 +49,11 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const [commentText, setCommentText] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Edit Mode States
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
+  const editTextAreaRef = React.useRef<HTMLTextAreaElement>(null);
+
   // Get current logged-in user
   const { user: currentUser } = useUser();
   const isOwnPost = post.author._id === currentUser?._id;
@@ -55,6 +61,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   // Post hooks
   const { mutate: likeMutate } = useToggleLikePost();
   const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
+  const { mutate: updatePost, isPending: isUpdating } = useUpdatePost();
   const { mutate: toggleReadStatus } = useToggleReadStatus();
   const { mutate: toggleBookmark } = useToggleBookmark();
 
@@ -132,6 +139,32 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
     } catch {
       toast.error("Failed to copy link");
     }
+  };
+
+  const handleUpdatePost = () => {
+    if (!editContent.trim()) {
+      toast.error("Content cannot be empty");
+      return;
+    }
+
+    if (editContent.length > 5000) {
+      toast.error("Post cannot exceed 5000 characters");
+      return;
+    }
+
+    updatePost(
+      { postId: post._id, data: { content: editContent } },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+        },
+      }
+    );
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditContent(post.content);
   };
 
   const images = post.attachments.filter(
@@ -219,7 +252,10 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                     <>
                       {/* edit button */}
                       <button
-                        onClick={() => setShowMenu(false)}
+                        onClick={() => {
+                          setShowMenu(false);
+                          setIsEditing(true);
+                        }}
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
                       >
                         <FaEdit className="h-4 w-4 flex-shrink-0" />
@@ -254,20 +290,65 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
 
       {/* Post Content */}
       <div className="px-4 pb-3">
-        <div
-          className={`whitespace-pre-wrap text-gray-900 ${
-            !isExpanded ? "line-clamp-5" : ""
-          }`}
-        >
-          {post.content}
-        </div>
-        {isLongContent && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-1 cursor-pointer text-sm font-medium text-blue-500 hover:text-blue-700 hover:underline"
-          >
-            {isExpanded ? "See less" : "See more"}
-          </button>
+        {isEditing ? (
+          <div className="space-y-3">
+            <div className="relative">
+              <textarea
+                ref={editTextAreaRef}
+                value={editContent}
+                onChange={(e) => {
+                  setEditContent(e.target.value);
+                  // Auto-resize
+                  e.target.style.height = "auto";
+                  e.target.style.height = e.target.scrollHeight + "px";
+                }}
+                className="w-full resize-none rounded-xl border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                placeholder="Write something..."
+                rows={3}
+                style={{ minHeight: "80px" }}
+                maxLength={5000}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCancelEdit}
+                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50"
+                  disabled={isUpdating}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdatePost}
+                  disabled={!editContent.trim() || isUpdating}
+                  className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isUpdating ? "Saving..." : "Save"}
+                </button>
+              </div>
+              <div className="text-xs font-medium text-gray-700">
+                {editContent.length}/5000
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div
+              className={`whitespace-pre-wrap text-gray-900 ${
+                !isExpanded ? "line-clamp-5" : ""
+              }`}
+            >
+              {post.content}
+            </div>
+            {isLongContent && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="mt-1 cursor-pointer text-sm font-medium text-blue-500 hover:text-blue-700 hover:underline"
+              >
+                {isExpanded ? "See less" : "See more"}
+              </button>
+            )}
+          </>
         )}
 
         {/* Tags */}
