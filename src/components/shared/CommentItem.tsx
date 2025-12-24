@@ -105,7 +105,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
               </div>
             </div>
           ) : (
-            <p className="mt-1 text-sm text-gray-800">{comment.content}</p>
+            <p className="mt-2 text-sm whitespace-pre-wrap text-gray-800">
+              {comment.content}
+            </p>
           )}
         </div>
 
@@ -142,7 +144,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
               <>
                 <SeparatorDot />
                 <span className="text-xs text-gray-400 italic">
-                  Edited {comment.updatedAt ? `• ${formatPostDateTime(comment.updatedAt)}` : ""}
+                  Edited{" "}
+                  {comment.updatedAt
+                    ? `• ${formatPostDateTime(comment.updatedAt)}`
+                    : ""}
                 </span>
               </>
             )}

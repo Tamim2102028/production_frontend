@@ -80,6 +80,9 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
     setShowCommentBox(!showCommentBox);
   };
 
+  // Ref for textarea
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
   const handleAddComment = (
     e?: React.FormEvent | React.KeyboardEvent | React.MouseEvent
   ) => {
@@ -89,7 +92,13 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
     addComment(
       { content: commentText },
       {
-        onSuccess: () => setCommentText(""),
+        onSuccess: () => {
+          setCommentText("");
+          // Reset textarea height
+          if (textareaRef.current) {
+            textareaRef.current.style.height = "auto";
+          }
+        },
       }
     );
   };
@@ -384,16 +393,23 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                 alt="Your avatar"
                 className="h-8 w-8 rounded-full bg-gray-300 object-cover"
               />
-              <input
-                type="text"
+              <textarea
+                ref={textareaRef}
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Write a comment..."
-                className="flex-1 rounded-full border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
+                className="flex-1 resize-none rounded-2xl border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                rows={1}
+                style={{ minHeight: "38px" }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
                     handleAddComment(e);
                   }
+                  // Auto-resize
+                  e.currentTarget.style.height = "auto";
+                  e.currentTarget.style.height =
+                    e.currentTarget.scrollHeight + "px";
                 }}
               />
               <button
