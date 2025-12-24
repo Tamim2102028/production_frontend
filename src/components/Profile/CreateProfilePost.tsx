@@ -179,7 +179,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
                 type="text"
                 {...register("tags")}
                 placeholder="Add tags (separated by space or comma)"
-                className="mt-2 w-full rounded-lg border border-gray-300 p-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-gray-300 p-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             )}
           </div>
