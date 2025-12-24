@@ -16,6 +16,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Check if current user can delete/edit this comment
   const isOwner = currentUserId === comment.author._id;
@@ -24,6 +25,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
   const isLiked = comment.isLiked;
   const likesCount = comment.stats.likes;
+  const isLongContent =
+    comment.content.length > 300 || comment.content.split("\n").length > 5;
 
   const handleProfileClick = () => {
     navigate(`/profile/${comment.author.userName}`);
@@ -113,9 +116,23 @@ const CommentItem: React.FC<CommentItemProps> = ({
               </div>
             </div>
           ) : (
-            <p className="mt-2 text-sm whitespace-pre-wrap text-gray-800">
-              {comment.content}
-            </p>
+            <div>
+              <div
+                className={`mt-2 text-sm whitespace-pre-wrap text-gray-800 ${
+                  !isExpanded ? "line-clamp-5" : ""
+                }`}
+              >
+                {comment.content}
+              </div>
+              {isLongContent && (
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="mt-1 cursor-pointer text-xs font-medium text-blue-500 hover:text-blue-700 hover:underline"
+                >
+                  {isExpanded ? "See less" : "See more"}
+                </button>
+              )}
+            </div>
           )}
         </div>
 
