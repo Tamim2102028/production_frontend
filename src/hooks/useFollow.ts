@@ -3,33 +3,28 @@ import { toast } from "sonner";
 import { followApi } from "../services/follow.service";
 import type { ApiError } from "../types/user.types";
 import type { AxiosError } from "axios";
+import { FOLLOW_TARGET_MODELS } from "../constants";
 
-export const useFollowUser = () => {
+export const useToggleFollow = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => followApi.followUser(userId),
-    onSuccess: () => {
-      toast.success("Followed successfully");
+    mutationFn: ({
+      targetId,
+      targetModel = FOLLOW_TARGET_MODELS.USER,
+    }: {
+      targetId: string;
+      targetModel?: (typeof FOLLOW_TARGET_MODELS)[keyof typeof FOLLOW_TARGET_MODELS];
+    }) => followApi.toggleFollow(targetId, targetModel),
+    onSuccess: (data) => {
+      const isFollowing = data.data.isFollowing;
+      toast.success(
+        isFollowing ? "Followed successfully" : "Unfollowed successfully"
+      );
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error.response?.data?.message || "Failed to follow user");
-    },
-  });
-};
-
-export const useUnfollowUser = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (userId: string) => followApi.unfollowUser(userId),
-    onSuccess: () => {
-      toast.info("Unfollowed successfully");
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to unfollow user");
     },
   });
 };

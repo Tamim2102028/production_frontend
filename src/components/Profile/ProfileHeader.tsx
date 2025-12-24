@@ -22,8 +22,12 @@ import {
   useCancelFriendRequest,
   useUnfriendUser,
 } from "../../hooks/useFriendship";
-import { useFollowUser, useUnfollowUser } from "../../hooks/useFollow";
-import { PROFILE_RELATION_STATUS, USER_TYPES } from "../../constants";
+import { useToggleFollow } from "../../hooks/useFollow";
+import {
+  FOLLOW_TARGET_MODELS,
+  PROFILE_RELATION_STATUS,
+  USER_TYPES,
+} from "../../constants";
 import type { User, Institution, Department } from "../../types/user.types";
 import type { FriendshipStatus } from "../../types/profile.types";
 
@@ -43,9 +47,8 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
   const cancelFriendRequest = useCancelFriendRequest();
   const unfriendUser = useUnfriendUser();
 
-  // Hooks for follow actions
-  const followUser = useFollowUser();
-  const unfollowUser = useUnfollowUser();
+  // Hook for follow actions
+  const toggleFollow = useToggleFollow();
 
   // Calculate friendshipStatus from userData
   const friendshipStatus: FriendshipStatus =
@@ -101,12 +104,8 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
   };
 
   // Handle follow actions
-  const handleFollow = (userId: string) => {
-    followUser.mutate(userId);
-  };
-
-  const handleUnfollow = (userId: string) => {
-    unfollowUser.mutate(userId);
+  const handleToggleFollow = (targetId: string) => {
+    toggleFollow.mutate({ targetId, targetModel: FOLLOW_TARGET_MODELS.USER });
   };
 
   // Render action buttons based on friendshipStatus
@@ -185,21 +184,16 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
         </Link>
 
         {/* Follow/Unfollow Button */}
-        {isFollowing ? (
-          <button
-            onClick={() => handleUnfollow(userData._id)}
-            className="flex items-center gap-2 rounded-md bg-gray-200 px-6 py-2 text-gray-700 transition-colors hover:bg-gray-300"
-          >
-            Unfollow
-          </button>
-        ) : (
-          <button
-            onClick={() => handleFollow(userData._id)}
-            className="flex items-center gap-2 rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
-          >
-            Follow
-          </button>
-        )}
+        <button
+          onClick={() => handleToggleFollow(userData._id)}
+          className={`flex items-center gap-2 rounded-md px-6 py-2 transition-colors ${
+            isFollowing
+              ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+        >
+          {isFollowing ? "Unfollow" : "Follow"}
+        </button>
       </div>
     );
   };

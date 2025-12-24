@@ -1,18 +1,14 @@
+import { FOLLOW_TARGET_MODELS } from "../constants";
 import api from "../lib/axios";
 import type { ApiResponse } from "../types/user.types";
 
 export const followApi = {
-  followUser: async (
-    userId: string
+  // Toggle follow status (handles both follow and unfollow)
+  toggleFollow: async (
+    targetId: string,
+    targetModel: (typeof FOLLOW_TARGET_MODELS)[keyof typeof FOLLOW_TARGET_MODELS] = FOLLOW_TARGET_MODELS.USER
   ): Promise<ApiResponse<{ isFollowing: boolean }>> => {
-    const response = await api.post(`/follows/${userId}`);
-    return response.data;
-  },
-
-  unfollowUser: async (
-    userId: string
-  ): Promise<ApiResponse<{ isFollowing: boolean }>> => {
-    const response = await api.delete(`/follows/${userId}`);
+    const response = await api.post(`/follows/${targetId}`, { targetModel });
     return response.data;
   },
 };
