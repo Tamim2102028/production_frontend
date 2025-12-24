@@ -1,59 +1,61 @@
-import { FRIENDSHIP_STATUS } from "../constants/friendship";
+import type { AcademicInfo } from "./user.types";
 
-export interface Pagination {
-  totalDocs: number;
-  totalPages: number;
-  page: number;
-  limit: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
+// ====================================
+// ACTION RESPONSE DATA TYPES
+// ====================================
+
+export interface SendFriendRequestData {
+  status: string;
+  recipientId: string;
+  friendshipId: string;
 }
 
-export interface FriendUser {
+export interface AcceptFriendRequestData {
+  status: string;
+  requesterId: string;
+  friendshipId: string;
+}
+
+export interface RejectFriendRequestData {
+  requesterId: string;
+}
+
+export interface CancelFriendRequestData {
+  recipientId: string;
+}
+
+export interface UnfriendData {
+  userId: string;
+}
+
+// ====================================
+// LIST RESPONSE DATA TYPES
+// ====================================
+
+export interface Friend {
   _id: string;
   fullName: string;
   userName: string;
   avatar: string;
-  institutionName: string;
+  academicInfo?: AcademicInfo;
+  friendshipId: string;
 }
 
-export interface FriendshipItem {
-  _id: string | null; // Friendship ID (null for suggestions)
-  status: keyof typeof FRIENDSHIP_STATUS | "NONE";
-  createdAt?: string;
-  profile: FriendUser;
+export interface FriendsListResponseData {
+  friends: Friend[];
 }
 
-export interface PaginatedData<T> {
-  docs: T[];
-  pagination: Pagination;
-}
-
-export type FriendsListResponse = PaginatedData<FriendshipItem>;
-export type IncomingRequestsResponse = PaginatedData<FriendshipItem>;
-export type SentRequestsResponse = PaginatedData<FriendshipItem>;
-export type SuggestionsResponse = PaginatedData<FriendshipItem>;
-
-// Backend ApiResponse wrapper structure
-interface ApiResponse<T> {
-  statusCode: number;
-  data: T;
-  message: string;
-  success: boolean;
-}
-
-// Friendship document structure from backend
-interface FriendshipDocument {
-  _id: string;
-  requester: string;
-  recipient: string;
-  status: keyof typeof FRIENDSHIP_STATUS;
+export interface FriendRequest {
+  requestId: string;
+  requester: {
+    _id: string;
+    fullName: string;
+    userName: string;
+    avatar: string;
+  };
   createdAt: string;
-  updatedAt: string;
 }
 
-// Response types wrapped in ApiResponse
-export type SendRequestResponse = ApiResponse<FriendshipDocument>;
-export type AcceptRequestResponse = ApiResponse<{ message: string }>;
-export type RejectRequestResponse = ApiResponse<{ message: string }>;
-export type UnfriendResponse = ApiResponse<{ message: string }>;
+export interface ReceivedRequestsResponseData {
+  requests: FriendRequest[];
+}

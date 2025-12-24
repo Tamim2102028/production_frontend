@@ -15,6 +15,13 @@ import {
   CancelRequestButton,
 } from "../shared/friends/FriendActions";
 import confirm from "../../utils/sweetAlert";
+import {
+  useSendFriendRequest,
+  useAcceptFriendRequest,
+  useRejectFriendRequest,
+  useCancelFriendRequest,
+  useUnfriendUser,
+} from "../../hooks/useFriendship";
 import { PROFILE_RELATION_STATUS, USER_TYPES } from "../../constants";
 import type { User, Institution, Department } from "../../types/user.types";
 import type { FriendshipStatus } from "../../types/profile.types";
@@ -27,6 +34,13 @@ type Props = {
 const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
   // এই userData যার profile visit করতেছি তার
   const navigate = useNavigate();
+
+  // Hooks for friendship actions
+  const sendFriendRequest = useSendFriendRequest();
+  const acceptFriendRequest = useAcceptFriendRequest();
+  const rejectFriendRequest = useRejectFriendRequest();
+  const cancelFriendRequest = useCancelFriendRequest();
+  const unfriendUser = useUnfriendUser();
 
   // Calculate friendshipStatus from userData
   const friendshipStatus: FriendshipStatus =
@@ -49,21 +63,21 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
     navigate("/messages");
   };
 
-  // Handle friend actions - TODO: Replace with API calls
+  // Handle friend actions
   const handleAccept = (senderId: string) => {
-    console.log("Accept friend request from:", senderId);
+    acceptFriendRequest.mutate(senderId);
   };
 
   const handleDecline = (senderId: string) => {
-    console.log("Decline friend request from:", senderId);
+    rejectFriendRequest.mutate(senderId);
   };
 
   const handleAddFriend = (receiverId: string) => {
-    console.log("Send friend request to:", receiverId);
+    sendFriendRequest.mutate(receiverId);
   };
 
   const handleCancelRequest = (receiverId: string) => {
-    console.log("Cancel friend request to:", receiverId);
+    cancelFriendRequest.mutate(receiverId);
   };
 
   const handleUnfriend = async (friendId: string) => {
@@ -75,7 +89,7 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
     });
 
     if (ok) {
-      console.log("Unfriend user:", friendId);
+      unfriendUser.mutate(friendId);
     }
   };
 
