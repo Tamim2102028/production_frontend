@@ -44,6 +44,7 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
               isOwnProfile={isOwnProfile}
             />
           ))}
+          {/* TODO: Implement 'Load More' button for pagination */}
         </div>
       ) : (
         <div className="rounded-lg border border-gray-200 bg-white p-12 text-center shadow">

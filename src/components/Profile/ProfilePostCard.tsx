@@ -399,6 +399,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                     }
                   />
                 ))}
+                {/* TODO: Implement 'Load More' button for pagination */}
               </div>
             </div>
           )}
