@@ -52,3 +52,18 @@ export const useDeleteComment = (postId: string) => {
     },
   });
 };
+
+export const useToggleLikeComment = (postId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (commentId: string) => commentService.toggleLikeComment(commentId),
+    onSuccess: () => {
+      // Invalidate comments for this post to refresh like count and status
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      toast.error(error.response?.data?.message || "Failed to like comment");
+    },
+  });
+};

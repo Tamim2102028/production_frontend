@@ -42,3 +42,11 @@ export interface AddCommentResponse {
   };
   message: string;
 }
+
+export interface CommentItemProps {
+  comment: Comment;
+  postOwnerId?: string; // Optional now as we don't use it for delete logic anymore, but kept for compatibility or future use
+  currentUserId?: string;
+  onLikeComment?: (commentId: string) => void;
+  onDeleteComment?: (commentId: string) => void;
+}

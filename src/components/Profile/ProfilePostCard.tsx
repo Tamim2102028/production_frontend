@@ -30,6 +30,7 @@ import {
   usePostComments,
   useAddComment,
   useDeleteComment,
+  useToggleLikeComment,
 } from "../../hooks/useComment";
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
@@ -63,6 +64,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
     post._id
   );
   const { mutate: deleteComment } = useDeleteComment(post._id);
+  const { mutate: toggleLikeComment } = useToggleLikeComment(post._id);
 
   const postComments = commentsData?.data?.comments || [];
 
@@ -359,6 +361,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                     postOwnerId={post.author._id}
                     currentUserId={currentUser?._id}
                     onDeleteComment={(commentId) => deleteComment(commentId)}
+                    onLikeComment={(commentId) => toggleLikeComment(commentId)}
                   />
                 ))}
               </div>

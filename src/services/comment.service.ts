@@ -38,4 +38,10 @@ export const commentService = {
     const response = await api.patch(`/comments/${commentId}`, { content });
     return response.data;
   },
+
+  // Toggle like comment
+  toggleLikeComment: async (commentId: string) => {
+    const response = await api.post(`/comments/${commentId}/toggle-like`);
+    return response.data;
+  },
 };

@@ -4,19 +4,10 @@ import { formatPostDateTime } from "../../utils/dateUtils";
 import { confirmDelete } from "../../utils/sweetAlert";
 import { DEFAULT_AVATAR_SM } from "../../constants/images";
 import SeparatorDot from "./SeparatorDot";
-import type { Comment } from "../../types/comment.types";
-
-interface CommentItemProps {
-  comment: Comment;
-  postOwnerId: string;
-  currentUserId?: string;
-  onLikeComment?: (commentId: string) => void;
-  onDeleteComment?: (commentId: string) => void;
-}
+import type { CommentItemProps } from "../../types/comment.types";
 
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
-  postOwnerId,
   currentUserId = "",
   onLikeComment,
   onDeleteComment,
@@ -24,8 +15,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const navigate = useNavigate();
 
   // Check if current user can delete this comment
-  const canDelete =
-    currentUserId === comment.author._id || currentUserId === postOwnerId;
+  const canDelete = currentUserId === comment.author._id;
 
   const isLiked = comment.isLiked;
   const likesCount = comment.stats.likes;
@@ -70,12 +60,6 @@ const CommentItem: React.FC<CommentItemProps> = ({
             <span className="text-xs text-gray-500">
               {formatPostDateTime(comment.createdAt)}
             </span>
-            {comment.isEdited && (
-              <>
-                <SeparatorDot />
-                <span className="text-xs text-gray-400 italic">Edited</span>
-              </>
-            )}
           </div>
           <p className="text-sm text-gray-800">{comment.content}</p>
         </div>
@@ -96,6 +80,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
             >
               Delete
             </button>
+          )}
+          {comment.isEdited && (
+            <>
+              <SeparatorDot />
+              <span className="text-xs text-gray-400 italic">Edited</span>
+            </>
           )}
         </div>
       </div>
