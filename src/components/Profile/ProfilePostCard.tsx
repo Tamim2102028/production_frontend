@@ -162,6 +162,12 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       return;
     }
 
+    // If content hasn't changed, just exit edit mode without API call
+    if (editContent.trim() === post.content) {
+      setIsEditing(false);
+      return;
+    }
+
     updatePost(
       { postId: post._id, data: { content: editContent } },
       {
