@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaEdit,
   FaUniversity,
   FaInfoCircle,
   FaGraduationCap,
+  FaEllipsisV,
+  FaLink,
+  FaBan,
 } from "react-icons/fa";
 import {
   MessageButton,
@@ -39,6 +42,7 @@ type Props = {
 const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
   // এই userData যার profile visit করতেছি তার
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(false);
 
   // Hooks for friendship actions
   const sendFriendRequest = useSendFriendRequest();
@@ -199,7 +203,55 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
   };
 
   return (
-    <div className="rounded-lg border border-gray-300 bg-white p-5 shadow-sm">
+    <div className="relative rounded-lg border border-gray-300 bg-white p-5 shadow-sm">
+      {/* 3-Dot Menu */}
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 focus:outline-none"
+        >
+          <FaEllipsisV className="h-5 w-5" />
+        </button>
+
+        {showMenu && (
+          <>
+            {/* Backdrop to close menu */}
+            <div
+              className="fixed inset-0 z-10"
+              onClick={() => setShowMenu(false)}
+            ></div>
+
+            {/* Dropdown content */}
+            <div className="absolute right-0 z-20 mt-1 w-48 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+              <div className="py-1">
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    // Copy logic can be added here
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  <FaLink className="h-4 w-4 text-gray-400" />
+                  Copy profile link
+                </button>
+                {!isOwnProfile && (
+                  <button
+                    onClick={() => {
+                      setShowMenu(false);
+                      // Block logic can be added here
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    <FaBan className="h-4 w-4" />
+                    Block user
+                  </button>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
       <div className="flex items-start space-x-5">
         {/* Avatar */}
         <div className="flex-shrink-0">
