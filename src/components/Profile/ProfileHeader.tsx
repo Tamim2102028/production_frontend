@@ -24,6 +24,8 @@ import {
   useRejectFriendRequest,
   useCancelFriendRequest,
   useUnfriendUser,
+  useBlockUser,
+  useUnblockUser,
 } from "../../hooks/useFriendship";
 import { useToggleFollow } from "../../hooks/useFollow";
 import {
@@ -33,6 +35,7 @@ import {
 } from "../../constants";
 import type { User, Institution, Department } from "../../types/user.types";
 import type { FriendshipStatus } from "../../types/profile.types";
+import { toast } from "sonner";
 
 type Props = {
   userData: User;
@@ -50,6 +53,8 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
   const rejectFriendRequest = useRejectFriendRequest();
   const cancelFriendRequest = useCancelFriendRequest();
   const unfriendUser = useUnfriendUser();
+  const blockUser = useBlockUser();
+  const unblockUser = useUnblockUser();
 
   // Hook for follow actions
   const toggleFollow = useToggleFollow();
@@ -112,8 +117,68 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
     toggleFollow.mutate({ targetId, targetModel: FOLLOW_TARGET_MODELS.USER });
   };
 
+  const handleCopyLink = () => {
+    const profileUrl = window.location.href;
+    navigator.clipboard.writeText(profileUrl);
+    toast.success("Profile link copied to clipboard!");
+    setShowMenu(false);
+  };
+
+  const handleBlock = async () => {
+    const ok = await confirm({
+      title: "Block User?",
+      text: "All existing relationships (friendship, follows) will be removed. You won't see each other's updates.",
+      confirmButtonText: "Yes, block",
+      icon: "warning",
+    });
+
+    if (ok) {
+      blockUser.mutate(userData._id);
+      setShowMenu(false);
+    }
+  };
+
+  const handleUnblock = async () => {
+    const ok = await confirm({
+      title: "Unblock User?",
+      text: "You will be able to send friend requests or follow this user again.",
+      confirmButtonText: "Yes, unblock",
+      icon: "question",
+    });
+
+    if (ok) {
+      unblockUser.mutate(userData._id);
+    }
+  };
+
   // Render action buttons based on friendshipStatus
   const renderActionButtons = () => {
+    // 1. BLOCKED BY ME
+    if (userData.isBlockedByMe) {
+      return (
+        <div className="flex items-center gap-3">
+          <span className="rounded-md bg-red-100 px-4 py-2 text-sm font-medium text-red-600">
+            You blocked this user
+          </span>
+          <button
+            onClick={handleUnblock}
+            className="rounded-md bg-gray-100 px-6 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+          >
+            Unblock
+          </button>
+        </div>
+      );
+    }
+
+    // 2. BLOCKED BY TARGET
+    if (userData.isBlockedByTarget) {
+      return (
+        <span className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500">
+          {userData.fullName} blocked you
+        </span>
+      );
+    }
+
     if (friendshipStatus === PROFILE_RELATION_STATUS.SELF || isOwnProfile) {
       return (
         <>
@@ -222,28 +287,36 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
             ></div>
 
             {/* Dropdown content */}
-            <div className="absolute right-0 z-20 mt-1 w-48 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+            <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
               <div className="py-1">
                 <button
-                  onClick={() => {
-                    setShowMenu(false);
-                    // Copy logic can be added here
-                  }}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                  onClick={handleCopyLink}
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
                 >
-                  <FaLink className="h-4 w-4 text-gray-400" />
-                  Copy profile link
+                  <FaLink className="h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <span className="font-medium">Copy profile link</span>
                 </button>
-                {!isOwnProfile && (
+                {!isOwnProfile &&
+                  !userData.isBlockedByMe &&
+                  !userData.isBlockedByTarget && (
+                    <button
+                      onClick={handleBlock}
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
+                    >
+                      <FaBan className="h-4 w-4 flex-shrink-0" />
+                      <span className="font-medium">Block user</span>
+                    </button>
+                  )}
+                {userData.isBlockedByMe && (
                   <button
                     onClick={() => {
                       setShowMenu(false);
-                      // Block logic can be added here
+                      handleUnblock();
                     }}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
                   >
-                    <FaBan className="h-4 w-4" />
-                    Block user
+                    <FaBan className="h-4 w-4 flex-shrink-0" />
+                    <span className="font-medium">Unblock user</span>
                   </button>
                 )}
               </div>

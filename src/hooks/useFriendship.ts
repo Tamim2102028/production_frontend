@@ -111,7 +111,43 @@ export const useUnfriendUser = () => {
   });
 };
 
-// 6. Get Friends List
+// 6. Block User
+export const useBlockUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: string) => friendshipApi.block(userId),
+    onSuccess: () => {
+      toast.success("User blocked successfully");
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      toast.error(error.response?.data?.message || "Failed to block user");
+    },
+  });
+};
+
+// 7. Unblock User
+export const useUnblockUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: string) => friendshipApi.unblock(userId),
+    onSuccess: () => {
+      toast.success("User unblocked successfully");
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      toast.error(error.response?.data?.message || "Failed to unblock user");
+    },
+  });
+};
+
+// 8. Get Friends List Hook
 export const useFriendsList = () => {
   return useQuery({
     queryKey: ["friends"],

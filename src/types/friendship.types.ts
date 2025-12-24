@@ -28,6 +28,21 @@ export interface UnfriendData {
   userId: string;
 }
 
+export interface BlockData {
+  blockRelation: {
+    _id: string;
+    requester: string;
+    recipient: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+export interface UnblockData {
+  userId: string;
+}
+
 // ====================================
 // LIST RESPONSE DATA TYPES
 // ====================================

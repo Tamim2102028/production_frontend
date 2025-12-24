@@ -6,6 +6,8 @@ import type {
   RejectFriendRequestData,
   CancelFriendRequestData,
   UnfriendData,
+  BlockData,
+  UnblockData,
   FriendsListResponseData,
   ReceivedRequestsResponseData,
 } from "../types/friendship.types";
@@ -72,6 +74,18 @@ export const friendshipApi = {
     ApiResponse<ReceivedRequestsResponseData>
   > => {
     const response = await api.get("/friendships/requests/received");
+    return response.data;
+  },
+
+  // Block User
+  block: async (userId: string): Promise<ApiResponse<BlockData>> => {
+    const response = await api.post(`/friendships/block/${userId}`);
+    return response.data;
+  },
+
+  // Unblock User
+  unblock: async (userId: string): Promise<ApiResponse<UnblockData>> => {
+    const response = await api.delete(`/friendships/unblock/${userId}`);
     return response.data;
   },
 };
