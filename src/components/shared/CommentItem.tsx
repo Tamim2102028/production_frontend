@@ -141,7 +141,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
             {comment.isEdited && (
               <>
                 <SeparatorDot />
-                <span className="text-xs text-gray-400 italic">Edited</span>
+                <span className="text-xs text-gray-400 italic">
+                  Edited {comment.updatedAt ? `• ${formatPostDateTime(comment.updatedAt)}` : ""}
+                </span>
               </>
             )}
           </div>
