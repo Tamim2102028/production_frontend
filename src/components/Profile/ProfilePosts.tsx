@@ -1,7 +1,7 @@
 import React from "react";
 import ProfilePostCard from "./ProfilePostCard";
 import { useProfilePosts } from "../../hooks/usePost";
-import PageLoader from "../../pages/Fallbacks/PageLoader";
+import PostSkeleton from "../shared/skeletons/PostSkeleton";
 import type { ProfilePostsProps } from "../../types/post.types";
 import type { AxiosError } from "axios";
 import type { ApiError } from "../../types/user.types";
@@ -15,7 +15,13 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
   const posts = postsData?.posts || [];
 
   if (isLoading) {
-    return <PageLoader />;
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <PostSkeleton key={i} />
+        ))}
+      </div>
+    );
   }
 
   if (error) {

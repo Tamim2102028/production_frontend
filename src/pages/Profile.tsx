@@ -7,9 +7,9 @@ import {
   ProfileTabs,
   CreateProfilePost,
 } from "../components/Profile";
-import PageLoader from "./Fallbacks/PageLoader";
 import { useUser } from "../hooks/useAuth";
 import { useProfileHeader } from "../hooks/useProfile";
+import ProfileHeaderSkeleton from "../components/shared/skeletons/ProfileHeaderSkeleton";
 
 const Profile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
@@ -33,7 +33,7 @@ const Profile: React.FC = () => {
   } = useProfileHeader(profileUsername);
 
   if (isLoading) {
-    return <PageLoader />;
+    return <ProfileHeaderSkeleton />;
   }
 
   if (error || !userData) {
