@@ -249,7 +249,7 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
           className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
         >
           <FaInfoCircle className="h-4 w-4" />
-          View Details
+          Details
         </Link>
 
         {/* Follow/Unfollow Button */}
