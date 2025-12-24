@@ -89,7 +89,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                   className="w-full rounded-md border border-gray-300 p-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                  rows={2}
+                  rows={3}
                   autoFocus
                   maxLength={1000}
                 />

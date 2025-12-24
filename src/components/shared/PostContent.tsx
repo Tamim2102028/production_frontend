@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -41,7 +41,6 @@ const PostContent: React.FC<PostContentProps> = ({
     setValue,
     watch,
     reset,
-    setFocus,
     formState: { isValid },
   } = useForm<EditPostFormData>({
     resolver: zodResolver(editPostSchema),
@@ -54,21 +53,6 @@ const PostContent: React.FC<PostContentProps> = ({
 
   const privacy = watch("visibility");
   const editContent = watch("content");
-
-  // Reset form when entering edit mode
-  useEffect(() => {
-    if (isEditing) {
-      reset({
-        content,
-        tags: tags.join(", "),
-        visibility: visibility,
-      });
-      // Auto focus on content
-      setTimeout(() => {
-        setFocus("content");
-      }, 0);
-    }
-  }, [isEditing, content, tags, visibility, reset, setFocus]);
 
   const onSubmit = (data: EditPostFormData) => {
     // Process tags
@@ -141,6 +125,7 @@ const PostContent: React.FC<PostContentProps> = ({
             placeholder="Write something..."
             rows={4}
             maxLength={5000}
+            autoFocus
             disabled={isUpdating}
           />
           <div className="absolute right-3 bottom-3 text-xs text-gray-400">
@@ -187,7 +172,14 @@ const PostContent: React.FC<PostContentProps> = ({
         <div className="flex items-center justify-end gap-2">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={() => {
+              reset({
+                content,
+                tags: tags.join(", "),
+                visibility: visibility,
+              });
+              onCancel();
+            }}
             className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50"
             disabled={isUpdating}
           >

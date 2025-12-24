@@ -14,7 +14,11 @@ import {
   FaLink,
   FaCheckDouble,
 } from "react-icons/fa";
-import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
+import {
+  formatPostDate,
+  formatPostClock,
+  formatPostDateTime,
+} from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem from "../shared/CommentItem";
 import CommentSkeleton from "../shared/skeletons/CommentSkeleton";
@@ -172,7 +176,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
             <h3 className="font-semibold text-gray-900">
               {post.author.fullName}
             </h3>
-            <p className="flex items-center gap-2 text-sm text-gray-500">
+            <p className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               <span>{formatPostDate(post.createdAt)}</span>
               <SeparatorDot ariaHidden />
               <span>{formatPostClock(post.createdAt)}</span>
@@ -338,6 +342,16 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
             <span>{post.stats.comments || 0} comments</span>
             <SeparatorDot />
             <span>{post.stats.shares || 0} shares</span>
+            <SeparatorDot />
+            {post.createdAt !== post.updatedAt && (
+              <>
+                <span className="text-gray-400 italic">Edited</span>
+                <SeparatorDot ariaHidden />
+                <span className="text-gray-400 italic">
+                  {formatPostDateTime(post.updatedAt)}
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>
