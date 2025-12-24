@@ -139,9 +139,13 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
     }
   };
 
-  const handleUpdatePost = (newContent: string) => {
+  const handleUpdatePost = (data: {
+    content: string;
+    tags: string[];
+    visibility: string;
+  }) => {
     updatePost(
-      { postId: post._id, data: { content: newContent } },
+      { postId: post._id, data },
       {
         onSuccess: () => {
           setIsEditing(false);
@@ -272,6 +276,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       <div className="px-4 pb-3">
         <PostContent
           content={post.content}
+          tags={post.tags}
+          visibility={post.visibility}
           isEditing={isEditing}
           isUpdating={isUpdating}
           onUpdate={handleUpdatePost}

@@ -96,8 +96,14 @@ export interface CreatePostRequest {
 
 export interface PostContentProps {
   content: string;
+  tags?: string[];
+  visibility: (typeof POST_VISIBILITY)[keyof typeof POST_VISIBILITY];
   isEditing: boolean;
   isUpdating: boolean;
-  onUpdate: (newContent: string) => void;
+  onUpdate: (data: {
+    content: string;
+    tags: string[];
+    visibility: string;
+  }) => void;
   onCancel: () => void;
 }
