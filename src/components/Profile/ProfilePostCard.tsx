@@ -55,6 +55,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
 
   // Edit Mode States
   const [isEditing, setIsEditing] = useState(false);
+  const [showAllTags, setShowAllTags] = useState(false);
 
   // Get current logged-in user
   const { user: currentUser } = useUser();
@@ -290,15 +291,38 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {post.tags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-block cursor-pointer rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
-              >
-                #{tag}
-              </span>
-            ))}
+          <div className="mt-3">
+            <div className="flex flex-wrap gap-2">
+              {(showAllTags || isEditing
+                ? post.tags
+                : post.tags.slice(0, 5)
+              ).map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-block cursor-pointer rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                >
+                  #{tag}
+                </span>
+              ))}
+              {/* Show "See more" if truncated */}
+              {!isEditing && !showAllTags && post.tags.length > 5 && (
+                <button
+                  onClick={() => setShowAllTags(true)}
+                  className="inline-block cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 hover:underline"
+                >
+                  +{post.tags.length - 5} more
+                </button>
+              )}
+              {/* Show "See less" if expanded */}
+              {!isEditing && showAllTags && post.tags.length > 5 && (
+                <button
+                  onClick={() => setShowAllTags(false)}
+                  className="inline-block cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 hover:underline"
+                >
+                  Show less
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
