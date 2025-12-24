@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { formatPostDateTime } from "../../utils/dateUtils";
 import { confirmDelete } from "../../utils/sweetAlert";
 import { DEFAULT_AVATAR_SM } from "../../constants/images";
+import SeparatorDot from "./SeparatorDot";
 
 export interface CommentData {
   _id: string;
@@ -76,18 +77,22 @@ const CommentItem: React.FC<CommentItemProps> = ({
       {/* Content */}
       <div className="flex-1">
         <div className="rounded-lg bg-gray-100 px-3 py-2">
-          <div className="mb-1 flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <span
-              className="cursor-pointer text-sm font-bold hover:underline"
+              className="cursor-pointer text-sm font-semibold text-gray-900 hover:underline"
               onClick={handleProfileClick}
             >
               {comment.author.fullName}
             </span>
-            <span className="text-[10px] text-gray-500">
+            {/* Post time */}
+            <span className="text-xs text-gray-500">
               {formatPostDateTime(comment.createdAt)}
             </span>
             {comment.isEdited && (
-              <span className="text-[10px] text-gray-400 italic">Edited</span>
+              <>
+                <SeparatorDot />
+                <span className="text-xs text-gray-400 italic">Edited</span>
+              </>
             )}
           </div>
           <p className="text-sm text-gray-800">{comment.content}</p>
