@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
   FaHeart,
@@ -53,6 +53,16 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const editTextAreaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  // Focus on textarea when editing starts
+  useEffect(() => {
+    if (isEditing && editTextAreaRef.current) {
+      editTextAreaRef.current.focus();
+      // Move cursor to end
+      const length = editTextAreaRef.current.value.length;
+      editTextAreaRef.current.setSelectionRange(length, length);
+    }
+  }, [isEditing]);
 
   // Get current logged-in user
   const { user: currentUser } = useUser();
@@ -296,16 +306,10 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
               <textarea
                 ref={editTextAreaRef}
                 value={editContent}
-                onChange={(e) => {
-                  setEditContent(e.target.value);
-                  // Auto-resize
-                  e.target.style.height = "auto";
-                  e.target.style.height = e.target.scrollHeight + "px";
-                }}
-                className="w-full resize-none rounded-xl border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="Write something..."
-                rows={3}
-                style={{ minHeight: "80px" }}
+                rows={4}
                 maxLength={5000}
               />
             </div>
