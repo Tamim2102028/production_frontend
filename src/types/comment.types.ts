@@ -18,7 +18,6 @@ export interface Comment {
   stats: CommentStats;
   isMine: boolean;
   isLiked: boolean;
-  isEdited?: boolean;
   updatedAt?: string;
 }
 
