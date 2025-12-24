@@ -366,9 +366,10 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
             <span>{post.stats.comments || 0} comments</span>
             <SeparatorDot />
             <span>{post.stats.shares || 0} shares</span>
-            <SeparatorDot />
+
             {post.createdAt !== post.updatedAt && (
               <>
+                <SeparatorDot />
                 <span className="text-gray-400 italic">Edited</span>
                 <SeparatorDot ariaHidden />
                 <span className="text-gray-400 italic">
