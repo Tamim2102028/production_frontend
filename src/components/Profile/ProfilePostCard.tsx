@@ -390,7 +390,10 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           </button>
 
           {/* share button */}
-          <button className="flex items-center justify-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100">
+          <button
+            onClick={handleCopyLink}
+            className="flex items-center justify-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
+          >
             <FaShare size={18} />
             <span className="text-sm font-medium">Share</span>
           </button>
