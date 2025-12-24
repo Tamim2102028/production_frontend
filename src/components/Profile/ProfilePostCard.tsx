@@ -17,6 +17,7 @@ import {
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem from "../shared/CommentItem";
+import CommentSkeleton from "../shared/skeletons/CommentSkeleton";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
 import type { Attachment, Post } from "../../types/post.types";
 import { useUser } from "../../hooks/useAuth";
@@ -31,6 +32,7 @@ import {
   useAddComment,
   useDeleteComment,
   useToggleLikeComment,
+  useUpdateComment,
 } from "../../hooks/useComment";
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
@@ -65,6 +67,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   );
   const { mutate: deleteComment } = useDeleteComment(post._id);
   const { mutate: toggleLikeComment } = useToggleLikeComment(post._id);
+  const { mutate: updateComment } = useUpdateComment(post._id);
 
   const postComments = commentsData?.data?.comments || [];
 
@@ -344,8 +347,10 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
         <div className="border-t border-gray-100">
           {/* Loading State */}
           {isLoadingComments && (
-            <div className="flex justify-center p-4">
-              <div className="text-sm text-gray-500"> Loading Comments...</div>
+            <div className="space-y-1 px-2.5 py-2">
+              <CommentSkeleton />
+              <CommentSkeleton />
+              <CommentSkeleton />
             </div>
           )}
 
@@ -362,6 +367,9 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                     currentUserId={currentUser?._id}
                     onDeleteComment={(commentId) => deleteComment(commentId)}
                     onLikeComment={(commentId) => toggleLikeComment(commentId)}
+                    onUpdateComment={(commentId, content) =>
+                      updateComment({ commentId, content })
+                    }
                   />
                 ))}
               </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatPostDateTime } from "../../utils/dateUtils";
 import { confirmDelete } from "../../utils/sweetAlert";
@@ -11,11 +11,16 @@ const CommentItem: React.FC<CommentItemProps> = ({
   currentUserId = "",
   onLikeComment,
   onDeleteComment,
+  onUpdateComment,
 }) => {
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
 
-  // Check if current user can delete this comment
-  const canDelete = currentUserId === comment.author._id;
+  // Check if current user can delete/edit this comment
+  const isOwner = currentUserId === comment.author._id;
+  const canDelete = isOwner;
+  const canEdit = isOwner;
 
   const isLiked = comment.isLiked;
   const likesCount = comment.stats.likes;
@@ -30,6 +35,18 @@ const CommentItem: React.FC<CommentItemProps> = ({
     if (result) {
       onDeleteComment?.(comment._id);
     }
+  };
+
+  const handleUpdate = () => {
+    if (editContent.trim() !== comment.content) {
+      onUpdateComment?.(comment._id, editContent);
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditContent(comment.content);
+    setIsEditing(false);
   };
 
   return (
@@ -61,33 +78,74 @@ const CommentItem: React.FC<CommentItemProps> = ({
               {formatPostDateTime(comment.createdAt)}
             </span>
           </div>
-          <p className="text-sm text-gray-800">{comment.content}</p>
+
+          {isEditing ? (
+            <div className="mt-2">
+              <textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                rows={2}
+                autoFocus
+              />
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={handleCancelEdit}
+                  className="rounded px-2 py-1 text-xs font-medium text-red-500 hover:bg-red-50 hover:text-red-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdate}
+                  className="rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
+                  disabled={!editContent.trim()}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-1 text-sm text-gray-800">{comment.content}</p>
+          )}
         </div>
 
-        <div className="mt-1 ml-1 flex items-center gap-4 text-xs font-semibold text-gray-500">
-          <button
-            onClick={() => onLikeComment?.(comment._id)}
-            className={`transition-colors hover:text-blue-600 ${
-              isLiked ? "text-blue-600" : ""
-            }`}
-          >
-            Like{likesCount > 0 ? ` (${likesCount})` : ""}
-          </button>
-          {canDelete && (
+        {!isEditing && (
+          <div className="mt-1 ml-1 flex items-center gap-4 text-xs font-semibold text-gray-500">
             <button
-              onClick={handleDelete}
-              className="transition-colors hover:text-red-600"
+              onClick={() => onLikeComment?.(comment._id)}
+              className={`transition-colors hover:text-blue-600 ${
+                isLiked ? "text-blue-600" : ""
+              }`}
             >
-              Delete
+              Like{likesCount > 0 ? ` (${likesCount})` : ""}
             </button>
-          )}
-          {comment.isEdited && (
-            <>
-              <SeparatorDot />
-              <span className="text-xs text-gray-400 italic">Edited</span>
-            </>
-          )}
-        </div>
+
+            {canEdit && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="transition-colors hover:text-blue-600"
+              >
+                Edit
+              </button>
+            )}
+
+            {canDelete && (
+              <button
+                onClick={handleDelete}
+                className="transition-colors hover:text-red-600"
+              >
+                Delete
+              </button>
+            )}
+
+            {comment.isEdited && (
+              <>
+                <SeparatorDot />
+                <span className="text-xs text-gray-400 italic">Edited</span>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

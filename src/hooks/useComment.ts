@@ -53,6 +53,27 @@ export const useDeleteComment = (postId: string) => {
   });
 };
 
+export const useUpdateComment = (postId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      commentId,
+      content,
+    }: {
+      commentId: string;
+      content: string;
+    }) => commentService.updateComment(commentId, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      toast.success("Comment updated");
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      toast.error(error.response?.data?.message || "Failed to update comment");
+    },
+  });
+};
+
 export const useToggleLikeComment = (postId: string) => {
   const queryClient = useQueryClient();
 

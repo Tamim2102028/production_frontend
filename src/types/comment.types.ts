@@ -49,4 +49,5 @@ export interface CommentItemProps {
   currentUserId?: string;
   onLikeComment?: (commentId: string) => void;
   onDeleteComment?: (commentId: string) => void;
+  onUpdateComment?: (commentId: string, content: string) => void;
 }
