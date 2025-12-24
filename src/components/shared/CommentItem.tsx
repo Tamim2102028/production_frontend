@@ -4,28 +4,10 @@ import { formatPostDateTime } from "../../utils/dateUtils";
 import { confirmDelete } from "../../utils/sweetAlert";
 import { DEFAULT_AVATAR_SM } from "../../constants/images";
 import SeparatorDot from "./SeparatorDot";
-
-export interface CommentData {
-  _id: string;
-  content: string;
-  post: string;
-  author: {
-    _id: string;
-    fullName: string;
-    userName: string;
-    avatar: string;
-  };
-  createdAt: string;
-  stats: {
-    likes: number;
-  };
-  isMine: boolean;
-  isLiked: boolean;
-  isEdited?: boolean;
-}
+import type { Comment } from "../../types/comment.types";
 
 interface CommentItemProps {
-  comment: CommentData;
+  comment: Comment;
   postOwnerId: string;
   currentUserId?: string;
   onLikeComment?: (commentId: string) => void;
