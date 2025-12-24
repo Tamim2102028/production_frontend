@@ -69,7 +69,12 @@ export const useUpdateComment = (postId: string) => {
       toast.success("Comment updated");
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to update comment");
+      const errorMessage = error.response?.data?.message || "Failed to update comment";
+      if (errorMessage.includes("maximum allowed length")) {
+        toast.error("Comment cannot exceed 1000 characters");
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 };

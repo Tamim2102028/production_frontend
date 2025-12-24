@@ -81,27 +81,35 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
           {isEditing ? (
             <div className="mt-2">
-              <textarea
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                rows={2}
-                autoFocus
-              />
-              <div className="mt-2 flex gap-2">
-                <button
-                  onClick={handleCancelEdit}
-                  className="rounded px-2 py-1 text-xs font-medium text-red-500 hover:bg-red-50 hover:text-red-600"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdate}
-                  className="rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
-                  disabled={!editContent.trim()}
-                >
-                  Save
-                </button>
+              <div className="relative">
+                <textarea
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  className="w-full rounded-md border border-gray-300 p-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                  rows={2}
+                  autoFocus
+                  maxLength={1000}
+                />
+              </div>
+              <div className="mt-2 flex justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleCancelEdit}
+                    className="rounded px-2 py-1 text-xs font-medium text-red-500 hover:bg-red-50 hover:text-red-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdate}
+                    className="rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
+                    disabled={!editContent.trim()}
+                  >
+                    Save
+                  </button>
+                </div>
+                <span className="text-xs font-medium text-gray-700">
+                  {editContent.length}/1000
+                </span>
               </div>
             </div>
           ) : (
