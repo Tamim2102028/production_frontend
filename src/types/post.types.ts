@@ -93,3 +93,11 @@ export interface CreatePostRequest {
   pollOptions: string[];
   tags: string[];
 }
+
+export interface PostContentProps {
+  content: string;
+  isEditing: boolean;
+  isUpdating: boolean;
+  onUpdate: (newContent: string) => void;
+  onCancel: () => void;
+}

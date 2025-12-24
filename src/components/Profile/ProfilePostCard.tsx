@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import {
   FaHeart,
@@ -18,6 +18,7 @@ import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem from "../shared/CommentItem";
 import CommentSkeleton from "../shared/skeletons/CommentSkeleton";
+import PostContent from "../shared/PostContent";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
 import type { Attachment, Post } from "../../types/post.types";
 import { useUser } from "../../hooks/useAuth";
@@ -47,22 +48,9 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const [isExpanded, setIsExpanded] = useState(false);
 
   // Edit Mode States
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(post.content);
-  const editTextAreaRef = React.useRef<HTMLTextAreaElement>(null);
-
-  // Focus on textarea when editing starts
-  useEffect(() => {
-    if (isEditing && editTextAreaRef.current) {
-      editTextAreaRef.current.focus();
-      // Move cursor to end
-      const length = editTextAreaRef.current.value.length;
-      editTextAreaRef.current.setSelectionRange(length, length);
-    }
-  }, [isEditing]);
 
   // Get current logged-in user
   const { user: currentUser } = useUser();
@@ -151,25 +139,9 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
     }
   };
 
-  const handleUpdatePost = () => {
-    if (!editContent.trim()) {
-      toast.error("Content cannot be empty");
-      return;
-    }
-
-    if (editContent.length > 5000) {
-      toast.error("Post cannot exceed 5000 characters");
-      return;
-    }
-
-    // If content hasn't changed, just exit edit mode without API call
-    if (editContent.trim() === post.content) {
-      setIsEditing(false);
-      return;
-    }
-
+  const handleUpdatePost = (newContent: string) => {
     updatePost(
-      { postId: post._id, data: { content: editContent } },
+      { postId: post._id, data: { content: newContent } },
       {
         onSuccess: () => {
           setIsEditing(false);
@@ -178,17 +150,9 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
     );
   };
 
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setEditContent(post.content);
-  };
-
   const images = post.attachments.filter(
     (attachment: Attachment) => attachment.type === ATTACHMENT_TYPES.IMAGE
   );
-
-  const isLongContent =
-    post.content.length > 300 || post.content.split("\n").length > 5;
 
   return (
     <div className="rounded-lg border border-gray-400 bg-white shadow">
@@ -306,60 +270,13 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
 
       {/* Post Content */}
       <div className="px-4 pb-3">
-        {isEditing ? (
-          <div className="space-y-3">
-            <div className="relative">
-              <textarea
-                ref={editTextAreaRef}
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-                className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                placeholder="Write something..."
-                rows={4}
-                maxLength={5000}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleCancelEdit}
-                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50"
-                  disabled={isUpdating}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdatePost}
-                  disabled={!editContent.trim() || isUpdating}
-                  className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isUpdating ? "Saving..." : "Save"}
-                </button>
-              </div>
-              <div className="text-xs font-medium text-gray-700">
-                {editContent.length}/5000
-              </div>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div
-              className={`whitespace-pre-wrap text-gray-900 ${
-                !isExpanded ? "line-clamp-5" : ""
-              }`}
-            >
-              {post.content}
-            </div>
-            {isLongContent && (
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="mt-1 cursor-pointer text-sm font-medium text-blue-500 hover:text-blue-700 hover:underline"
-              >
-                {isExpanded ? "See less" : "See more"}
-              </button>
-            )}
-          </>
-        )}
+        <PostContent
+          content={post.content}
+          isEditing={isEditing}
+          isUpdating={isUpdating}
+          onUpdate={handleUpdatePost}
+          onCancel={() => setIsEditing(false)}
+        />
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
