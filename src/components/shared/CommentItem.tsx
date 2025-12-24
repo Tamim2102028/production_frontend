@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { formatPostDate } from "../../utils/dateUtils";
+import { formatPostDateTime } from "../../utils/dateUtils";
 import { confirmDelete } from "../../utils/sweetAlert";
 import { DEFAULT_AVATAR_SM } from "../../constants/images";
 
@@ -74,45 +74,42 @@ const CommentItem: React.FC<CommentItemProps> = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 space-y-1">
+      <div className="flex-1">
         <div className="rounded-lg bg-gray-100 px-3 py-2">
-          <div className="mb-1 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span
-                className="cursor-pointer text-sm font-bold hover:underline"
-                onClick={handleProfileClick}
-              >
-                {comment.author.fullName}
-              </span>
-              <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
-                <button
-                  onClick={() => onLikeComment?.(comment._id)}
-                  className={`transition-colors hover:text-blue-600 ${
-                    isLiked ? "text-blue-600" : ""
-                  }`}
-                >
-                  Like{likesCount > 0 ? ` (${likesCount})` : ""}
-                </button>
-                {canDelete && (
-                  <button
-                    onClick={handleDelete}
-                    className="transition-colors hover:text-red-600"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-gray-500">
-                {formatPostDate(comment.createdAt)}
-              </span>
-              {comment.isEdited && (
-                <span className="text-[10px] text-gray-400 italic">Edited</span>
-              )}
-            </div>
+          <div className="mb-1 flex items-center gap-2">
+            <span
+              className="cursor-pointer text-sm font-bold hover:underline"
+              onClick={handleProfileClick}
+            >
+              {comment.author.fullName}
+            </span>
+            <span className="text-[10px] text-gray-500">
+              {formatPostDateTime(comment.createdAt)}
+            </span>
+            {comment.isEdited && (
+              <span className="text-[10px] text-gray-400 italic">Edited</span>
+            )}
           </div>
           <p className="text-sm text-gray-800">{comment.content}</p>
+        </div>
+
+        <div className="mt-1 ml-1 flex items-center gap-4 text-xs font-semibold text-gray-500">
+          <button
+            onClick={() => onLikeComment?.(comment._id)}
+            className={`transition-colors hover:text-blue-600 ${
+              isLiked ? "text-blue-600" : ""
+            }`}
+          >
+            Like{likesCount > 0 ? ` (${likesCount})` : ""}
+          </button>
+          {canDelete && (
+            <button
+              onClick={handleDelete}
+              className="transition-colors hover:text-red-600"
+            >
+              Delete
+            </button>
+          )}
         </div>
       </div>
     </div>
