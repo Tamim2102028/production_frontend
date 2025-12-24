@@ -104,6 +104,8 @@ export const useUnfriendUser = () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error.response?.data?.message || "Failed to unfriend user");
@@ -122,6 +124,8 @@ export const useBlockUser = () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error.response?.data?.message || "Failed to block user");
@@ -140,6 +144,8 @@ export const useUnblockUser = () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error.response?.data?.message || "Failed to unblock user");

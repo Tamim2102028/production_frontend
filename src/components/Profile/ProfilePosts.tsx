@@ -3,17 +3,33 @@ import ProfilePostCard from "./ProfilePostCard";
 import { useProfilePosts } from "../../hooks/usePost";
 import PageLoader from "../../pages/Fallbacks/PageLoader";
 import type { ProfilePostsProps } from "../../types/post.types";
+import type { AxiosError } from "axios";
+import type { ApiError } from "../../types/user.types";
 
 const ProfilePosts: React.FC<ProfilePostsProps> = ({
   username,
   isOwnProfile,
 }) => {
-  const { data: postsData, isLoading } = useProfilePosts(username);
+  const { data: postsData, isLoading, error } = useProfilePosts(username);
 
   const posts = postsData?.posts || [];
 
   if (isLoading) {
     return <PageLoader />;
+  }
+
+  if (error) {
+    const axiosError = error as AxiosError<ApiError>;
+    const errorMessage =
+      axiosError.response?.data?.message ||
+      error.message ||
+      "Could not load posts";
+
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-12 text-center shadow">
+        <p className="font-medium text-red-600">{errorMessage}</p>
+      </div>
+    );
   }
 
   return (
