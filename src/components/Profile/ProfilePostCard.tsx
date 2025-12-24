@@ -46,6 +46,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Get current logged-in user
   const { user: currentUser } = useUser();
@@ -136,6 +137,9 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const images = post.attachments.filter(
     (attachment: Attachment) => attachment.type === ATTACHMENT_TYPES.IMAGE
   );
+
+  const isLongContent =
+    post.content.length > 300 || post.content.split("\n").length > 5;
 
   return (
     <div className="rounded-lg border border-gray-400 bg-white shadow">
@@ -250,7 +254,21 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
 
       {/* Post Content */}
       <div className="px-4 pb-3">
-        <p className="whitespace-pre-wrap text-gray-900">{post.content}</p>
+        <div
+          className={`whitespace-pre-wrap text-gray-900 ${
+            !isExpanded ? "line-clamp-5" : ""
+          }`}
+        >
+          {post.content}
+        </div>
+        {isLongContent && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="mt-1 cursor-pointer text-sm font-medium text-blue-500 hover:text-blue-700 hover:underline"
+          >
+            {isExpanded ? "See less" : "See more"}
+          </button>
+        )}
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
@@ -396,9 +414,14 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
               <textarea
                 ref={textareaRef}
                 value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment... (max 1000 chars)"
-                className="flex-1 resize-none rounded-2xl border border-gray-300 px-3 py-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                onChange={(e) => {
+                  setCommentText(e.target.value);
+                  // Auto-resize
+                  e.target.style.height = "auto";
+                  e.target.style.height = e.target.scrollHeight + "px";
+                }}
+                placeholder="Write a comment (max 1000 chars)..."
+                className="max-h-32 flex-1 resize-none overflow-y-auto rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 rows={1}
                 style={{ minHeight: "38px" }}
                 onKeyDown={(e) => {
@@ -406,10 +429,6 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                     e.preventDefault();
                     handleAddComment(e);
                   }
-                  // Auto-resize
-                  e.currentTarget.style.height = "auto";
-                  e.currentTarget.style.height =
-                    e.currentTarget.scrollHeight + "px";
                 }}
                 maxLength={1000}
               />
