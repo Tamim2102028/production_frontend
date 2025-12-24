@@ -1,26 +1,9 @@
 import React from "react";
-import { HomePostCard, LoadingSkeleton } from "../components/Home";
-import type { Post } from "../types/post.types";
+import { LoadingSkeleton } from "../components/Home";
 
 const Home: React.FC = () => {
   // TODO: Replace with API call to fetch posts
-  const posts: Post[] = [];
   const loading = false;
-
-  // const handleCreatePost = (data: CreatePostData) => {
-  //   createPost(
-  //     {
-  //       content: data.content,
-  //       visibility: data.visibility,
-  //       targetModel: data.targetModel,
-  //       targetId: data.targetId,
-  //       attachments: data.attachments,
-  //     },
-  //     {
-  //       onSuccess: () => {},
-  //     }
-  //   );
-  // };
 
   // TODO: Fetch friends list from API for filtering
 
@@ -57,17 +40,7 @@ const Home: React.FC = () => {
 
       {/* Posts List */}
       {/* TODO: Filter posts by friends/allowed users when API is connected */}
-      <div className="space-y-5">
-        {posts
-          .sort(
-            (a, b) =>
-              // sort by createdAt descending (newest first)
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          )
-          .map((post) => (
-            <HomePostCard key={post._id} post={post} />
-          ))}
-      </div>
+      <div className="space-y-5">Pore home niye kaj kora hobe, ekhn na</div>
 
       {/* Load More Button */}
       {/* TODO: Implement pagination with API */}

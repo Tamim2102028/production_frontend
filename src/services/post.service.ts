@@ -42,4 +42,16 @@ export const postService = {
     const response = await api.delete(`/posts/${postId}`);
     return response.data;
   },
+
+  // Toggle Read Status
+  toggleReadStatus: async (postId: string) => {
+    const response = await api.post(`/posts/${postId}/toggle-read`);
+    return response.data;
+  },
+
+  // Toggle Bookmark (Save Post)
+  toggleBookmark: async (postId: string) => {
+    const response = await api.post(`/posts/${postId}/toggle-bookmark`);
+    return response.data;
+  },
 };

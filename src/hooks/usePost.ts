@@ -110,6 +110,108 @@ export const useToggleLikePost = () => {
   });
 };
 
+export const useToggleReadStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) => postService.toggleReadStatus(postId),
+
+    // Optimistic Update
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: ["profilePosts"] });
+
+      const previousProfilePosts = queryClient.getQueriesData({
+        queryKey: ["profilePosts"],
+      });
+
+      queryClient.setQueriesData(
+        { queryKey: ["profilePosts"] },
+        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+          if (!oldData || !oldData.posts) return oldData;
+
+          return {
+            ...oldData,
+            posts: oldData.posts.map((post: Post) => {
+              if (post._id === postId) {
+                return {
+                  ...post,
+                  context: {
+                    ...post.context,
+                    isRead: !post.context.isRead,
+                  },
+                };
+              }
+              return post;
+            }),
+          };
+        }
+      );
+
+      return { previousProfilePosts };
+    },
+
+    onError: (_error, _postId, context) => {
+      if (context?.previousProfilePosts) {
+        context.previousProfilePosts.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      toast.error("Failed to update read status");
+    },
+  });
+};
+
+export const useToggleBookmark = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) => postService.toggleBookmark(postId),
+
+    // Optimistic Update
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: ["profilePosts"] });
+
+      const previousProfilePosts = queryClient.getQueriesData({
+        queryKey: ["profilePosts"],
+      });
+
+      queryClient.setQueriesData(
+        { queryKey: ["profilePosts"] },
+        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+          if (!oldData || !oldData.posts) return oldData;
+
+          return {
+            ...oldData,
+            posts: oldData.posts.map((post: Post) => {
+              if (post._id === postId) {
+                return {
+                  ...post,
+                  context: {
+                    ...post.context,
+                    isSaved: !post.context.isSaved,
+                  },
+                };
+              }
+              return post;
+            }),
+          };
+        }
+      );
+
+      return { previousProfilePosts };
+    },
+
+    onError: (_error, _postId, context) => {
+      if (context?.previousProfilePosts) {
+        context.previousProfilePosts.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      toast.error("Failed to bookmark post");
+    },
+  });
+};
+
 /**
  * useCreateProfilePost Hook
  *

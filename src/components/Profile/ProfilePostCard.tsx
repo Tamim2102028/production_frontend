@@ -12,6 +12,7 @@ import {
   FaTrash,
   FaFlag,
   FaLink,
+  FaCheckDouble,
 } from "react-icons/fa";
 import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
@@ -19,7 +20,12 @@ import CommentItem, { type CommentData } from "../shared/CommentItem";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
 import type { Attachment, Post } from "../../types/post.types";
 import { useUser } from "../../hooks/useAuth";
-import { useToggleLikePost, useDeletePost } from "../../hooks/usePost";
+import {
+  useToggleLikePost,
+  useDeletePost,
+  useToggleReadStatus,
+  useToggleBookmark,
+} from "../../hooks/usePost";
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
 
@@ -32,8 +38,6 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15);
-  // TODO: Replace with API data
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const [commentText, setCommentText] = useState("");
 
   // Get current logged-in user
@@ -46,10 +50,17 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
   // আমাদের বানানো হুক কল করলাম
   const { mutate: likeMutate } = useToggleLikePost();
   const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
+  const { mutate: toggleReadStatus } = useToggleReadStatus();
+  const { mutate: toggleBookmark } = useToggleBookmark();
 
   const handleLike = () => {
-    // শুধু আইডি পাস করে দিলেই হবে, বাকি সব হুক সামলাবে
     likeMutate(post._id);
+    setShowMenu(false);
+  };
+
+  const handleToggleBookmark = () => {
+    toggleBookmark(post._id);
+    setShowMenu(false);
   };
 
   const handleDelete = async () => {
@@ -64,12 +75,6 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
     if (isConfirmed) {
       deletePost(post._id);
     }
-  };
-
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-    toast.success(isBookmarked ? "Post removed from saved" : "Post saved");
-    setShowMenu(false);
   };
 
   const handleCopyLink = async () => {
@@ -109,75 +114,92 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           </div>
         </div>
 
-        <div className="relative">
+        <div className="flex items-center space-x-2">
           <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-200"
-            title="More actions"
+            onClick={() => toggleReadStatus(post._id)}
+            className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
+              post.context?.isRead ? "text-blue-600" : "text-gray-500"
+            }`}
+            title={post.context?.isRead ? "Mark as unread" : "Mark as read"}
           >
-            <FaEllipsisH className="h-4 w-4" />
+            <FaCheckDouble className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              {post.context?.isRead ? "Read" : "Mark as read"}
+            </span>
           </button>
 
-          {showMenu && (
-            <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
-              <div className="py-1">
-                <button
-                  onClick={handleBookmark}
-                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${isBookmarked ? "text-blue-600" : "text-gray-700"}`}
-                >
-                  {isBookmarked ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-200"
+              title="More actions"
+            >
+              <FaEllipsisH className="h-4 w-4" />
+            </button>
+
+            {showMenu && (
+              <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
+                <div className="py-1">
+                  <button
+                    onClick={handleToggleBookmark}
+                    className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                      post.context?.isSaved ? "text-blue-600" : "text-gray-700"
+                    }`}
+                  >
+                    {post.context?.isSaved ? (
+                      <>
+                        <FaBookmark className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Remove from saved</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaRegBookmark className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Save post</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleCopyLink}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                  >
+                    <FaLink className="h-4 w-4 flex-shrink-0" />
+                    <span className="font-medium">Copy link</span>
+                  </button>
+
+                  {isOwnPost ? (
                     <>
-                      <FaBookmark className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Remove from saved</span>
+                      {/* edit button */}
+                      <button
+                        onClick={() => setShowMenu(false)}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                      >
+                        <FaEdit className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Edit post</span>
+                      </button>
+                      {/* delete button */}
+                      <button
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        <FaTrash className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">
+                          {isDeleting ? "Deleting..." : "Delete post"}
+                        </span>
+                      </button>
                     </>
                   ) : (
                     <>
-                      <FaRegBookmark className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Save post</span>
+                      <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50">
+                        <FaFlag className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Report post</span>
+                      </button>
                     </>
                   )}
-                </button>
-                <button
-                  onClick={handleCopyLink}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                >
-                  <FaLink className="h-4 w-4 flex-shrink-0" />
-                  <span className="font-medium">Copy link</span>
-                </button>
-
-                {isOwnPost ? (
-                  <>
-                    {/* edit button */}
-                    <button
-                      onClick={() => setShowMenu(false)}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                    >
-                      <FaEdit className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Edit post</span>
-                    </button>
-                    {/* delete button */}
-                    <button
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <FaTrash className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">
-                        {isDeleting ? "Deleting..." : "Delete post"}
-                      </span>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50">
-                      <FaFlag className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Report post</span>
-                    </button>
-                  </>
-                )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
