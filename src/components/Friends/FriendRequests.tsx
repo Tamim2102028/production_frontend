@@ -1,25 +1,34 @@
 import React from "react";
 import { FaUserPlus } from "react-icons/fa";
 import FriendCard from "../shared/friends/FriendCard";
+import { useReceivedRequests } from "../../hooks/useFriendship";
+import { toast } from "sonner";
 
-// TODO: Replace with API data
-interface FriendRequest {
-  id: string;
-  name: string;
-  avatar?: string;
-  [key: string]: unknown;
-}
+const FriendRequests: React.FC = () => {
+  const { data, isLoading, error } = useReceivedRequests();
 
-interface FriendRequestsProps {
-  requests?: FriendRequest[];
-}
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center text-gray-500">Loading requests...</div>
+    );
+  }
 
-const FriendRequests: React.FC<FriendRequestsProps> = ({ requests = [] }) => {
-  const friendRequests = requests;
+  if (error) {
+    console.error("Failed to fetch friend requests", error);
+    toast.error("Failed to fetch friend requests. Please try again.");
+    return (
+      <div className="p-8 text-center text-red-500">
+        Failed to fetch friend requests. Please try again.
+        <p>Error: {error.message}</p>
+      </div>
+    );
+  }
+
+  const requests = data?.users || [];
 
   return (
     <div>
-      {friendRequests.length === 0 ? (
+      {requests.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
           <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
             <FaUserPlus className="h-8 w-8 text-blue-500" />
@@ -33,8 +42,8 @@ const FriendRequests: React.FC<FriendRequestsProps> = ({ requests = [] }) => {
         </div>
       ) : (
         <div className="space-y-3">
-          {friendRequests.map((request) => (
-            <FriendCard key={request.id} friend={request} type="request" />
+          {requests.map((request) => (
+            <FriendCard key={request._id} friend={request} type="request" />
           ))}
         </div>
       )}

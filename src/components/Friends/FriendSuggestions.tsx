@@ -1,25 +1,34 @@
 import React from "react";
 import { FaMagic } from "react-icons/fa";
 import FriendCard from "../shared/friends/FriendCard";
+import { useFriendSuggestions } from "../../hooks/useFriendship";
+import { toast } from "sonner";
 
-// TODO: Replace with API data
-interface Suggestion {
-  id: string;
-  name: string;
-  avatar?: string;
-  [key: string]: unknown;
-}
+const FriendSuggestions: React.FC = () => {
+  const { data, isLoading, error } = useFriendSuggestions();
 
-interface FriendSuggestionsProps {
-  suggestions?: Suggestion[];
-}
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center text-gray-500">
+        Loading suggestions...
+      </div>
+    );
+  }
 
-const FriendSuggestions: React.FC<FriendSuggestionsProps> = ({
-  suggestions = [],
-}) => {
-  const friendSuggestions = suggestions;
+  if (error) {
+    console.error("Failed to fetch suggestions", error);
+    toast.error("Failed to fetch suggestions. Please try again.");
+    return (
+      <div className="p-8 text-center text-red-500">
+        Failed to fetch suggestions. Please try again.
+        <p>Error: {error.message}</p>
+      </div>
+    );
+  }
 
-  if (friendSuggestions.length === 0) {
+  const suggestions = data?.users || [];
+
+  if (suggestions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
         <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
@@ -37,8 +46,12 @@ const FriendSuggestions: React.FC<FriendSuggestionsProps> = ({
 
   return (
     <div className="space-y-3">
-      {friendSuggestions.map((suggestion) => (
-        <FriendCard key={suggestion.id} friend={suggestion} type="suggestion" />
+      {suggestions.map((suggestion) => (
+        <FriendCard
+          key={suggestion._id}
+          friend={suggestion}
+          type="suggestion"
+        />
       ))}
     </div>
   );

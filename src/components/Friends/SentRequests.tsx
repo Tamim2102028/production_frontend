@@ -1,25 +1,36 @@
 import React from "react";
 import { FaPaperPlane } from "react-icons/fa";
 import FriendCard from "../shared/friends/FriendCard";
+import { useSentRequests } from "../../hooks/useFriendship";
+import { toast } from "sonner";
 
-// TODO: Replace with API data
-interface SentRequest {
-  id: string;
-  name: string;
-  avatar?: string;
-  [key: string]: unknown;
-}
+const SentRequests: React.FC = () => {
+  const { data, isLoading, error } = useSentRequests();
 
-interface SentRequestsProps {
-  requests?: SentRequest[];
-}
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center text-gray-500">
+        Loading sent requests...
+      </div>
+    );
+  }
 
-const SentRequests: React.FC<SentRequestsProps> = ({ requests = [] }) => {
-  const sentRequests = requests;
+  if (error) {
+    console.error("Failed to fetch sent requests", error);
+    toast.error("Failed to fetch sent requests. Please try again.");
+    return (
+      <div className="p-8 text-center text-red-500">
+        Failed to fetch sent requests. Please try again.
+        <p>Error: {error.message}</p>
+      </div>
+    );
+  }
+
+  const requests = data?.users || [];
 
   return (
     <div className="space-y-3">
-      {sentRequests.length === 0 ? (
+      {requests.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
           <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
             <FaPaperPlane className="h-8 w-8 text-blue-500" />
@@ -32,8 +43,8 @@ const SentRequests: React.FC<SentRequestsProps> = ({ requests = [] }) => {
           </p>
         </div>
       ) : (
-        sentRequests.map((request) => (
-          <FriendCard key={request.id} friend={request} type="sent" />
+        requests.map((request) => (
+          <FriendCard key={request._id} friend={request} type="sent" />
         ))
       )}
     </div>

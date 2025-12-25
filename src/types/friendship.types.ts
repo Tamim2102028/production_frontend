@@ -1,5 +1,3 @@
-import type { AcademicInfo } from "./user.types";
-
 // ====================================
 // ACTION RESPONSE DATA TYPES
 // ====================================
@@ -47,30 +45,33 @@ export interface UnblockData {
 // LIST RESPONSE DATA TYPES
 // ====================================
 
-export interface Friend {
+export interface InstitutionBasic {
+  _id?: string;
+  name: string;
+}
+
+export interface DepartmentBasic {
+  _id?: string;
+  name: string;
+}
+
+export interface FriendUser {
   _id: string;
-  fullName: string;
   userName: string;
+  fullName: string;
   avatar: string;
-  academicInfo?: AcademicInfo;
-  friendshipId: string;
+  institution: InstitutionBasic | null;
+  userType: string;
+  department: DepartmentBasic | null;
+  friendshipStatus:
+    | "accepted"
+    | "incoming_request"
+    | "outgoing_request"
+    | "none";
+  friendshipId?: string;
 }
 
-export interface FriendsListResponseData {
-  friends: Friend[];
-}
-
-export interface FriendRequest {
-  requestId: string;
-  requester: {
-    _id: string;
-    fullName: string;
-    userName: string;
-    avatar: string;
-  };
-  createdAt: string;
-}
-
-export interface ReceivedRequestsResponseData {
-  requests: FriendRequest[];
+export interface FriendshipListData {
+  totalCount: number;
+  users: FriendUser[];
 }

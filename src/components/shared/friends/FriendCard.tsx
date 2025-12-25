@@ -10,25 +10,17 @@ import {
 } from "./FriendActions";
 import { BsThreeDots } from "react-icons/bs";
 import confirm from "../../../utils/sweetAlert";
-
-// TODO: Replace with API data
-export interface UserData {
-  id: string;
-  name: string;
-  avatar?: string;
-  educationLevel?: "UNIVERSITY" | "COLLEGE";
-  university?: {
-    name?: string;
-    department?: string;
-    section?: string;
-    subsection?: string;
-  };
-  college?: { name?: string };
-  [key: string]: unknown;
-}
+import type { FriendUser } from "../../../types/friendship.types";
+import {
+  useAcceptFriendRequest,
+  useCancelFriendRequest,
+  useRejectFriendRequest,
+  useSendFriendRequest,
+  useUnfriendUser,
+} from "../../../hooks/useFriendship";
 
 interface FriendCardProps {
-  friend: UserData;
+  friend: FriendUser;
   type: "friend" | "request" | "suggestion" | "sent";
   isOwner?: boolean;
   isAdmin?: boolean;
@@ -49,8 +41,12 @@ const FriendCard: React.FC<FriendCardProps> = ({
   handleMemberMenu,
 }) => {
   const navigate = useNavigate();
-  // TODO: Replace with actual user ID from API/context
-  const currentUserId = "current-user-id";
+  // Mutations
+  const { mutate: acceptRequest } = useAcceptFriendRequest();
+  const { mutate: rejectRequest } = useRejectFriendRequest();
+  const { mutate: sendRequest } = useSendFriendRequest();
+  const { mutate: cancelRequest } = useCancelFriendRequest();
+  const { mutate: unfriend } = useUnfriendUser();
 
   const handleMessage = (id: string) => {
     // TODO: Replace with API call to set selected conversation
@@ -58,24 +54,24 @@ const FriendCard: React.FC<FriendCardProps> = ({
     navigate("/messages");
   };
 
-  // Handle friend actions - TODO: Replace with API calls
+  // Handle friend actions
   const handleAccept = (senderId: string) => {
-    console.log("Accept friend request from:", senderId);
+    acceptRequest(senderId);
   };
 
   // Handle decline action
   const handleDecline = (senderId: string) => {
-    console.log("Decline friend request from:", senderId);
+    rejectRequest(senderId);
   };
 
   // Handle add friend action
   const handleAddFriend = (receiverId: string) => {
-    console.log("Send friend request to:", receiverId);
+    sendRequest(receiverId);
   };
 
   // Handle cancel request action
   const handleCancelRequest = (receiverId: string) => {
-    console.log("Cancel friend request to:", receiverId);
+    cancelRequest(receiverId);
   };
 
   // Handle unfriend action
@@ -88,7 +84,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
     });
 
     if (ok) {
-      console.log("Unfriend user:", friendId);
+      unfriend(friendId);
     }
   };
 
@@ -101,32 +97,34 @@ const FriendCard: React.FC<FriendCardProps> = ({
     roleLabel = " • Admin";
   }
 
-  const institutionName =
-    friend.educationLevel === "UNIVERSITY"
-      ? friend.university?.name + roleLabel
-      : friend.college?.name + roleLabel;
+  // Handle Institution Name safely
+  const institutionName = friend.institution
+    ? friend.institution.name + roleLabel
+    : "No Institution" + roleLabel;
 
   const renderActions = () => {
     if (type === "friend") {
       return (
         <div className="flex items-center space-x-2">
-          <MessageButton onClick={() => handleMessage(friend.id)} />
-          <UnfriendButton onClick={() => handleUnfriend(friend.id)} />
+          <MessageButton onClick={() => handleMessage(friend._id)} />
+          <UnfriendButton onClick={() => handleUnfriend(friend._id)} />
         </div>
       );
     } else if (type === "request") {
       return (
         <div className="flex space-x-2">
-          <AcceptButton onClick={() => handleAccept(friend.id)} />
-          <RejectButton onClick={() => handleDecline(friend.id)} />
+          <AcceptButton onClick={() => handleAccept(friend._id)} />
+          <RejectButton onClick={() => handleDecline(friend._id)} />
         </div>
       );
     } else if (type === "suggestion") {
-      return <AddFriendButton onClick={() => handleAddFriend(friend.id)} />;
+      return <AddFriendButton onClick={() => handleAddFriend(friend._id)} />;
     } else if (type === "sent") {
       return (
         <div className="flex">
-          <CancelRequestButton onClick={() => handleCancelRequest(friend.id)} />
+          <CancelRequestButton
+            onClick={() => handleCancelRequest(friend._id)}
+          />
         </div>
       );
     } else if (type === "search") {
@@ -138,29 +136,31 @@ const FriendCard: React.FC<FriendCardProps> = ({
 
   return (
     <div className="flex items-center space-x-3 rounded-lg border border-gray-300 bg-white p-3 shadow-sm">
-      <img
-        src={friend.avatar}
-        alt={friend.name}
-        className="h-12 w-12 rounded-full object-cover"
-      />
+      <NavLink to={`/profile/${friend.userName}`}>
+        <img
+          src={friend.avatar}
+          alt={friend.fullName}
+          className="h-12 w-12 rounded-full object-cover transition-opacity hover:opacity-80"
+        />
+      </NavLink>
       <div className="flex-1">
         <h3>
           <NavLink
-            to={`/profile/${friend.id}`}
+            to={`/profile/${friend.userName}`}
             className="font-semibold text-gray-900 transition-colors hover:text-blue-600 hover:underline"
           >
-            {friend.name}
+            {friend.fullName}
           </NavLink>
         </h3>
-        {institutionName && (
-          <p className="text-sm text-gray-500">{institutionName}</p>
-        )}
+        <p className="text-sm text-gray-500">{institutionName}</p>
       </div>
       <div className="flex items-center gap-2">
         {renderActions()}
         {canShowMenu && (
           <button
-            onClick={() => handleMemberMenu?.(friend.id, friend.name, isAdmin)}
+            onClick={() =>
+              handleMemberMenu?.(friend._id, friend.fullName, isAdmin)
+            }
             className="p-1 text-gray-500 hover:text-gray-800"
             aria-label="Member menu"
           >

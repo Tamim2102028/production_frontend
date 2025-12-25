@@ -1,20 +1,31 @@
 import React from "react";
 import { FaUserFriends } from "react-icons/fa";
 import FriendCard from "../shared/friends/FriendCard";
+import { useFriendsList } from "../../hooks/useFriendship";
+import { toast } from "sonner";
 
-// TODO: Replace with API data
-interface Friend {
-  id: string;
-  name: string;
-  avatar?: string;
-  [key: string]: unknown;
-}
+const FriendsList: React.FC = () => {
+  const { data, isLoading, error } = useFriendsList();
 
-interface FriendsListProps {
-  friends?: Friend[];
-}
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center text-gray-500">Loading friends...</div>
+    );
+  }
 
-const FriendsList: React.FC<FriendsListProps> = ({ friends = [] }) => {
+  if (error) {
+    console.error("Failed to fetch friends list", error);
+    toast.error("Failed to load friends list. Please try again.");
+    return (
+      <div className="p-8 text-center text-red-500">
+        Failed to load friends list. Please try again.
+        <p>Error: {error.message}</p>
+      </div>
+    );
+  }
+
+  const friends = data?.users || [];
+
   if (friends.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
@@ -34,7 +45,7 @@ const FriendsList: React.FC<FriendsListProps> = ({ friends = [] }) => {
   return (
     <div className="space-y-3">
       {friends.map((friend) => (
-        <FriendCard key={friend.id} friend={friend} type="friend" />
+        <FriendCard key={friend._id} friend={friend} type="friend" />
       ))}
     </div>
   );

@@ -8,18 +8,15 @@ import type {
   UnfriendData,
   BlockData,
   UnblockData,
-  FriendsListResponseData,
-  ReceivedRequestsResponseData,
+  FriendshipListData,
 } from "../types/friendship.types";
 
-/**
- * ====================================
- * FRIENDSHIP API SERVICE
- * ====================================
- */
-
 export const friendshipApi = {
-  // Send Friend Request
+  // ====================================
+  // Friendship Actions API Endpoints
+  // ====================================
+
+  // 1. Send Friend Request
   sendRequest: async (
     userId: string
   ): Promise<ApiResponse<SendFriendRequestData>> => {
@@ -27,7 +24,7 @@ export const friendshipApi = {
     return response.data;
   },
 
-  // Accept Friend Request
+  // 2. Accept Friend Request
   acceptRequest: async (
     requesterId: string
   ): Promise<ApiResponse<AcceptFriendRequestData>> => {
@@ -37,7 +34,7 @@ export const friendshipApi = {
     return response.data;
   },
 
-  // Reject Friend Request
+  // 3. Reject Friend Request
   rejectRequest: async (
     requesterId: string
   ): Promise<ApiResponse<RejectFriendRequestData>> => {
@@ -47,7 +44,7 @@ export const friendshipApi = {
     return response.data;
   },
 
-  // Cancel Sent Request
+  // 4. Cancel Sent Request
   cancelRequest: async (
     recipientId: string
   ): Promise<ApiResponse<CancelFriendRequestData>> => {
@@ -57,35 +54,49 @@ export const friendshipApi = {
     return response.data;
   },
 
-  // Unfriend User
+  // 5. Unfriend User
   unfriend: async (friendId: string): Promise<ApiResponse<UnfriendData>> => {
     const response = await api.delete(`/friendships/unfriend/${friendId}`);
     return response.data;
   },
 
-  // Get Friends List
-  getFriendsList: async (): Promise<ApiResponse<FriendsListResponseData>> => {
-    const response = await api.get("/friendships/list");
-    return response.data;
-  },
-
-  // Get Received Requests
-  getReceivedRequests: async (): Promise<
-    ApiResponse<ReceivedRequestsResponseData>
-  > => {
-    const response = await api.get("/friendships/requests/received");
-    return response.data;
-  },
-
-  // Block User
+  // 6. Block User
   block: async (userId: string): Promise<ApiResponse<BlockData>> => {
     const response = await api.post(`/friendships/block/${userId}`);
     return response.data;
   },
 
-  // Unblock User
+  // 7. Unblock User
   unblock: async (userId: string): Promise<ApiResponse<UnblockData>> => {
     const response = await api.delete(`/friendships/unblock/${userId}`);
+    return response.data;
+  },
+
+  // ====================================
+  // Friend Page API Endpoints
+  // ====================================
+
+  // 8. Get Friends List
+  getFriendsList: async (): Promise<ApiResponse<FriendshipListData>> => {
+    const response = await api.get("/friendships/list");
+    return response.data;
+  },
+
+  // 9. Get Received Requests
+  getReceivedRequests: async (): Promise<ApiResponse<FriendshipListData>> => {
+    const response = await api.get("/friendships/requests/received");
+    return response.data;
+  },
+
+  // 10. Get Sent Requests
+  getSentRequests: async (): Promise<ApiResponse<FriendshipListData>> => {
+    const response = await api.get("/friendships/requests/sent");
+    return response.data;
+  },
+
+  // 11. Get Suggestions
+  getSuggestions: async (): Promise<ApiResponse<FriendshipListData>> => {
+    const response = await api.get("/friendships/suggestions");
     return response.data;
   },
 };
