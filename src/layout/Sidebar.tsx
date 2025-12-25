@@ -14,6 +14,7 @@ import {
   FaBriefcase,
   FaSignOutAlt,
   FaBookOpen,
+  FaUserFriends,
 } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { prefetchRoute } from "../routes/prefetch";
@@ -33,6 +34,12 @@ const Sidebar: React.FC = () => {
       label: "Groups",
       path: "/groups",
       active: location.pathname === "/groups",
+    },
+    {
+      icon: FaUserFriends,
+      label: "Friends",
+      path: "/friends",
+      active: location.pathname === "/friends",
     },
     {
       icon: FaSchool,
