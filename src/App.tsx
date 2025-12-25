@@ -1,91 +1,73 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import Sidebar from "./layout/Sidebar";
 import SidebarRight from "./layout/SidebarRight";
 import MainContent from "./layout/MainContent";
-import { useAppDispatch } from "./store/store.hooks";
-import { useAuthCheck, useUser } from "./hooks/useAuth";
-import { clearUser } from "./store/slices/authSlice";
+import { useUser, AUTH_KEYS } from "./hooks/useAuth";
 
 /**
  * ====================================
  * APP COMPONENT - Main Entry Point
  * ====================================
  *
- * ✅ PROPER AUTH FLOW:
+ * ✅ PROPER AUTH FLOW (TanStack Query):
  *
  * 1. App Load (App.tsx mount):
- *    → useAuthCheck() call
- *    → isCheckingAuth = true
- *    → Loading spinner show করে
+ *    → useUser() call
+ *    → isCheckingAuth = true (isLoading)
+ *    → Loading spinner show
  *
  * 2. Auth Check (Background):
  *    → GET /users/current-user API call
- *    → Cookie থেকে accessToken/refreshToken automatically যায়
+ *    → Cookie sent automatically
  *
- * 3. Auth Check Success (User logged in):
- *    → User data পাওয়া গেছে
- *    → Redux এ setUser(userData)
+ * 3. Auth Check Success:
+ *    → User data cached in TanStack Query
  *    → isAuthenticated = true
  *    → isCheckingAuth = false
- *    → UI render হয়
- *    → ProtectedRoute allow করে
+ *    → UI render
  *
- * 4. Auth Check Failed (User not logged in):
+ * 4. Auth Check Failed:
  *    → 401/403 error
- *    → Redux এ clearUser()
+ *    → User data = null
  *    → isAuthenticated = false
- *    → isCheckingAuth = false
- *    → ProtectedRoute redirect করে /login এ
- *
- * 5. Login করার পর:
- *    → POST /users/login
- *    → Success → GET /users/current-user (fresh data)
- *    → Redux এ setUser(userData)
- *    → Navigate to "/"
- *
- * 6. Logout করার পর:
- *    → POST /users/logout
- *    → Redux এ clearUser()
- *    → Navigate to "/login"
+ *    → ProtectedRoute redirects to /login
  *
  * ⚠️ auth:logout Event:
- * Axios interceptor থেকে fire হয় যখন refresh token ও expire/invalid।
- * এটা listen করে automatically user logout করে দেয়।
+ * Axios interceptor fires this when token expires.
+ * We listen and clear the query cache to log the user out locally.
  */
 
 const App: React.FC = () => {
   const location = useLocation();
-  const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
 
-  // Redux থেকে auth state
+  // Auth state from TanStack Query
+  // ⚠️ CRITICAL: This call triggers the initial auth check
   const { isAuthenticated, isCheckingAuth } = useUser();
 
-  // ⚠️ CRITICAL: App load এ auth check
-  // Cookie valid কিনা check করে, valid হলে user data fetch করে Redux এ save করে
-  useAuthCheck();
-
   // 🔔 Global logout event listener
-  // Axios interceptor থেকে fire হয় যখন সব token expire
+  // Axios interceptor fires this when all tokens expire
   useEffect(() => {
     const handleLogout = () => {
       console.log("Global logout event received");
-      dispatch(clearUser());
+      // Clear user data in cache
+      queryClient.setQueryData(AUTH_KEYS.currentUser, null);
     };
 
     window.addEventListener("auth:logout", handleLogout);
     return () => {
       window.removeEventListener("auth:logout", handleLogout);
     };
-  }, [dispatch]);
+  }, [queryClient]);
 
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
   const isMessagesPage = location.pathname === "/messages";
   const isStudyHelperPage = location.pathname === "/study-helper";
 
-  // ⏳ Auth check চলছে - Loading দেখাও
-  // এটা না থাকলে logged in user ও flash এ /login দেখবে
+  // ⏳ Auth check running - Show Loading
   if (isCheckingAuth) {
     return (
       <>

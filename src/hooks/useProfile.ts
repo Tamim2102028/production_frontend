@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useAppDispatch } from "../store/store.hooks";
-import { setUser } from "../store/slices/authSlice";
+import { AUTH_KEYS } from "./useAuth";
 import profileApi from "../services/profile.service";
 import type {
   UpdateGeneralData,
@@ -15,28 +14,25 @@ import type { AxiosError } from "axios";
  * PROFILE HOOKS - TanStack Query
  * ====================================
  *
- * Profile related সব hooks এখানে।
+ * Profile related hooks.
+ * Uses TanStack Query for state management (formerly Redux).
  *
  * Hooks:
- * - useProfileHeader: Username দিয়ে profile header data fetch
- * - useUpdateGeneral: General info update (name, bio, etc.)
- * - useUpdateAcademic: Academic info update
- * - useUpdateAvatar: Avatar image update
- * - useUpdateCoverImage: Cover image update
- * - useChangePassword: Password change
+ * - useProfileHeader: Fetch profile header data by username
+ * - useUpdateGeneral: Update general info
+ * - useUpdateAcademic: Update academic info
+ * - useUpdateAvatar: Update avatar image
+ * - useUpdateCoverImage: Update cover image
+ * - useChangePassword: Change password
  */
 
 /**
  * useProfileHeader Hook
  *
- * User এর profile header data fetch করে (bio, stats, friendship status)।
- * Posts/files এর data এতে নেই - আলাদা hooks আছে।
+ * Fetches user profile header data (bio, stats, friendship status).
  *
  * @param username - User's unique username
  * @returns { data, isLoading, error, refetch }
- *
- * @example
- * const { data: headerData, isLoading } = useProfileHeader("tamim2102028");
  */
 export const useProfileHeader = (username: string | undefined) => {
   return useQuery({
@@ -55,28 +51,21 @@ export const useProfileHeader = (username: string | undefined) => {
 /**
  * useUpdateGeneral Hook
  *
- * General profile info update করে।
- * Success হলে profile cache এবং currentUser cache invalidate করে।
- *
- * @returns { mutate, isPending, isError, error }
- *
- * @example
- * const { mutate: updateProfile, isPending } = useUpdateGeneral();
- * updateProfile({ fullName: "New Name", bio: "New bio" });
+ * Updates general profile info.
+ * Updates currentUser cache on success.
  */
 export const useUpdateGeneral = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
 
   return useMutation({
     mutationFn: (data: UpdateGeneralData) => profileApi.updateGeneral(data),
     onSuccess: (response) => {
-      // ✅ Update Redux state (response.data is the user directly)
-      dispatch(setUser(response.data));
-      // ✅ Invalidate caches
+      // ✅ Update Current User Cache
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
+
+      // ✅ Invalidate profile cache
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      // ✅ Show toast
+
       toast.success("Profile updated successfully!");
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -88,20 +77,18 @@ export const useUpdateGeneral = () => {
 /**
  * useUpdateAcademic Hook
  *
- * Academic info update করে (session, section, rank, etc.)
- *
- * @returns { mutate, isPending, isError, error }
+ * Updates academic info (session, section, rank, etc.)
  */
 export const useUpdateAcademic = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
 
   return useMutation({
     mutationFn: (data: UpdateAcademicData) => profileApi.updateAcademic(data),
     onSuccess: (response) => {
-      dispatch(setUser(response.data));
+      // ✅ Update Current User Cache
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
+
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       toast.success("Academic info updated!");
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -115,27 +102,18 @@ export const useUpdateAcademic = () => {
 /**
  * useUpdateAvatar Hook
  *
- * Avatar image upload করে।
- * FormData নেয় 'avatar' field এ file সহ।
- *
- * @returns { mutate, isPending, isError, error }
- *
- * @example
- * const { mutate: updateAvatar } = useUpdateAvatar();
- * const formData = new FormData();
- * formData.append("avatar", file);
- * updateAvatar(formData);
+ * Uploads avatar image.
  */
 export const useUpdateAvatar = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
 
   return useMutation({
     mutationFn: (formData: FormData) => profileApi.updateAvatar(formData),
     onSuccess: (response) => {
-      dispatch(setUser(response.data));
+      // ✅ Update Current User Cache
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
+
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       toast.success("Avatar updated!");
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -147,21 +125,18 @@ export const useUpdateAvatar = () => {
 /**
  * useUpdateCoverImage Hook
  *
- * Cover image upload করে।
- * FormData নেয় 'coverImage' field এ file সহ।
- *
- * @returns { mutate, isPending, isError, error }
+ * Uploads cover image.
  */
 export const useUpdateCoverImage = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
 
   return useMutation({
     mutationFn: (formData: FormData) => profileApi.updateCoverImage(formData),
     onSuccess: (response) => {
-      dispatch(setUser(response.data));
+      // ✅ Update Current User Cache
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
+
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       toast.success("Cover image updated!");
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -175,13 +150,7 @@ export const useUpdateCoverImage = () => {
 /**
  * useChangePassword Hook
  *
- * Password change করে।
- *
- * @returns { mutate, isPending, isError, error }
- *
- * @example
- * const { mutate: changePassword } = useChangePassword();
- * changePassword({ oldPassword: "old123", newPassword: "new456" });
+ * Changes password.
  */
 export const useChangePassword = () => {
   return useMutation({
