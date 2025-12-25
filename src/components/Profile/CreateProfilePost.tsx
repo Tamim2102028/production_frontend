@@ -167,7 +167,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
           <img
             src={user?.avatar || DEFAULT_AVATAR_MD}
             alt={user?.fullName || "Your avatar"}
-            className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
+            className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300 object-cover"
           />
           <div className="flex-1">
             <div className="relative">

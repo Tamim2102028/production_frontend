@@ -56,7 +56,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
     <div className="flex gap-3 py-1">
       {/* Avatar */}
       <div
-        className="h-8 w-8 flex-shrink-0 cursor-pointer overflow-hidden rounded-full"
+        className="h-8 w-8 flex-shrink-0 cursor-pointer overflow-hidden rounded-full object-cover"
         onClick={handleProfileClick}
       >
         <img

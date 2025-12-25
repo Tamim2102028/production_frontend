@@ -171,7 +171,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           <img
             src={post.author.avatar || DEFAULT_AVATAR_MD}
             alt={post.author.fullName}
-            className="h-10 w-10 rounded-full bg-gray-300"
+            className="h-10 w-10 rounded-full bg-gray-300 object-cover"
           />
           <div>
             <h3 className="font-semibold text-gray-900">

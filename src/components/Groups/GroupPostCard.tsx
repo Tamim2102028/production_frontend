@@ -314,7 +314,7 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
             <div className="mt-3 flex items-center space-x-3">
               <img
                 src={currentUser.avatar || DEFAULT_AVATAR_SM}
-                alt="Your avatar"
+                alt={currentUser.name}
                 className="h-8 w-8 rounded-full bg-gray-300 object-cover"
               />
               <input

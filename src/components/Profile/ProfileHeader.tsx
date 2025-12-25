@@ -331,7 +331,7 @@ const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
           <img
             src={userData.avatar}
             alt={userData.fullName}
-            className="h-32 w-32 rounded-full border-4 border-white shadow-lg"
+            className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg"
           />
         </div>
 
