@@ -13,6 +13,7 @@ import {
   FaEllipsisH,
   FaBriefcase,
   FaSignOutAlt,
+  FaBookOpen,
 } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { prefetchRoute } from "../routes/prefetch";
@@ -57,6 +58,12 @@ const Sidebar: React.FC = () => {
       label: "Study Helper AI",
       path: "/study-helper",
       active: location.pathname === "/study-helper",
+    },
+    {
+      icon: FaBookOpen,
+      label: "Open Study",
+      path: "/open-study",
+      active: location.pathname === "/open-study",
     },
     {
       icon: FaBriefcase,
