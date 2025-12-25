@@ -17,9 +17,6 @@ export const useSendFriendRequest = () => {
     onSuccess: () => {
       toast.success("Friend request sent!");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -40,10 +37,7 @@ export const useAcceptFriendRequest = () => {
     onSuccess: () => {
       toast.success("Friend request accepted!");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(
@@ -63,10 +57,7 @@ export const useRejectFriendRequest = () => {
     onSuccess: () => {
       toast.info("Friend request rejected");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(
@@ -85,10 +76,7 @@ export const useCancelFriendRequest = () => {
     onSuccess: () => {
       toast.info("Friend request cancelled");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
       queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(
@@ -108,9 +96,6 @@ export const useUnfriendUser = () => {
       toast.info("Unfriended successfully");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error.response?.data?.message || "Failed to unfriend user");
@@ -127,10 +112,6 @@ export const useBlockUser = () => {
     onSuccess: () => {
       toast.success("User blocked successfully");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error.response?.data?.message || "Failed to block user");
@@ -147,10 +128,6 @@ export const useUnblockUser = () => {
     onSuccess: () => {
       toast.success("User unblocked successfully");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error.response?.data?.message || "Failed to unblock user");
