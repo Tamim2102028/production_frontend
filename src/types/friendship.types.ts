@@ -69,7 +69,16 @@ export interface FriendUser {
   friendshipId?: string;
 }
 
+export interface Pagination {
+  totalDocs: number;
+  limit: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 export interface FriendshipListData {
-  totalCount: number;
   users: FriendUser[];
+  pagination: Pagination;
 }

@@ -33,7 +33,7 @@ const FriendSuggestions: React.FC = () => {
   return (
     <div>
       <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        Suggestions ({data?.totalCount || 0})
+        Suggestions ({data?.pagination?.totalDocs || 0})
       </h2>
       {suggestions.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">

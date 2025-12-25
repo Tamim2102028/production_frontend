@@ -33,7 +33,7 @@ const SentRequests: React.FC = () => {
   return (
     <div>
       <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        Sent Requests ({data?.totalCount || 0})
+        Sent Requests ({data?.pagination?.totalDocs || 0})
       </h2>
       <div className="space-y-3">
         {requests.length === 0 ? (
