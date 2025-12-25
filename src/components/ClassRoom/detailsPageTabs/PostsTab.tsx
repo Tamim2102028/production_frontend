@@ -154,11 +154,13 @@ const PostsTab: React.FC<Props> = ({
             className="max-w-full overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
           >
             <div className="flex items-start gap-3">
-              <img
-                src={author?.avatar}
-                alt={author?.name}
-                className="h-10 w-10 rounded-full object-cover"
-              />
+              <Link to={`/profile/${author?.id}`}>
+                <img
+                  src={author?.avatar}
+                  alt={author?.name}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+              </Link>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <div>

@@ -147,7 +147,7 @@ const GroupDetail: React.FC = () => {
             <div className="rounded-2xl bg-white p-6 shadow-lg">
               <div className="flex flex-col items-start gap-6 md:flex-row">
                 {/* Avatar */}
-                <div>
+                <div className="flex-shrink-0">
                   {group.profileImage ? (
                     <img
                       src={group.profileImage}
@@ -453,7 +453,8 @@ const GroupDetail: React.FC = () => {
                         return (
                           <div
                             key={adminId}
-                            className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
+                            onClick={() => navigate(`/profile/${adminId}`)}
+                            className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-colors hover:bg-gray-100"
                           >
                             <img
                               src={admin.avatar}

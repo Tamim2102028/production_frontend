@@ -461,8 +461,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           )}
 
           {/* Create Comment Input */}
-          <div className="border-t border-gray-100 px-4 pb-4">
-            <div className="mt-3 flex items-center space-x-3">
+          <div className="border-t border-gray-100 p-4">
+            <div className="flex items-center space-x-3">
               <img
                 src={currentUser?.avatar || DEFAULT_AVATAR_SM}
                 alt="Your avatar"
