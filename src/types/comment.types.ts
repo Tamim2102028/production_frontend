@@ -5,17 +5,13 @@ export interface CommentAuthor {
   avatar: string;
 }
 
-export interface CommentStats {
-  likes: number;
-}
-
 export interface Comment {
   _id: string;
   content: string;
   post: string;
   author: CommentAuthor;
   createdAt: string;
-  stats: CommentStats;
+  stats: { likes: number };
   isMine: boolean;
   isLiked: boolean;
   updatedAt?: string;
