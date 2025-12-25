@@ -221,6 +221,17 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
             <span>{commentsCount} comments</span>
             <SeparatorDot />
             <span>{post.sharesBy?.length || 0} shares</span>
+
+            {post.isEdited && post.editedAt && (
+              <>
+                <SeparatorDot />
+                <span className="text-gray-400 italic">Edited</span>
+                <SeparatorDot ariaHidden />
+                <span className="text-gray-400 italic">
+                  {formatPostDateTime(post.editedAt)}
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>
