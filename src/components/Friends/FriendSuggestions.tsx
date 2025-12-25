@@ -1,6 +1,7 @@
 import React from "react";
 import { FaMagic } from "react-icons/fa";
 import FriendCard from "../shared/friends/FriendCard";
+import FriendCardSkeleton from "../shared/skeletons/FriendCardSkeleton";
 import { useFriendSuggestions } from "../../hooks/useFriendship";
 import { toast } from "sonner";
 
@@ -9,14 +10,15 @@ const FriendSuggestions: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center text-gray-500">
-        Loading suggestions...
+      <div className="space-y-3">
+        {[...Array(6)].map((_, i) => (
+          <FriendCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
 
   if (error) {
-    console.error("Failed to fetch suggestions", error);
     toast.error("Failed to fetch suggestions. Please try again.");
     return (
       <div className="p-8 text-center text-red-500">

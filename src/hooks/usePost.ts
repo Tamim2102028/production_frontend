@@ -241,7 +241,7 @@ export const useCreateProfilePost = () => {
       toast.success("Post created successfully!");
 
       // Profile Header Invalidate করা (যাতে Post Count বাড়ে)
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       console.error("Create post error:", error);

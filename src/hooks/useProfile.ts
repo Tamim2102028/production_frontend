@@ -36,7 +36,7 @@ import type { AxiosError } from "axios";
  */
 export const useProfileHeader = (username: string | undefined) => {
   return useQuery({
-    queryKey: ["profile", username],
+    queryKey: ["profile_header", username],
     queryFn: async () => {
       if (!username) throw new Error("Username is required");
       const response = await profileApi.getProfile(username);
@@ -64,7 +64,7 @@ export const useUpdateGeneral = () => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
 
       // ✅ Invalidate profile cache
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
 
       toast.success("Profile updated successfully!");
     },
@@ -88,7 +88,7 @@ export const useUpdateAcademic = () => {
       // ✅ Update Current User Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
 
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       toast.success("Academic info updated!");
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -113,7 +113,7 @@ export const useUpdateAvatar = () => {
       // ✅ Update Current User Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
 
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       toast.success("Avatar updated!");
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -136,7 +136,7 @@ export const useUpdateCoverImage = () => {
       // ✅ Update Current User Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
 
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       toast.success("Cover image updated!");
     },
     onError: (error: AxiosError<ApiError>) => {

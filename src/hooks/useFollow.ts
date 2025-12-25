@@ -21,7 +21,7 @@ export const useToggleFollow = () => {
       toast.success(
         isFollowing ? "Followed successfully" : "Unfollowed successfully"
       );
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error.response?.data?.message || "Failed to follow user");
