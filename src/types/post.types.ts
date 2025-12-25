@@ -43,6 +43,10 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
 
+  // Edit status
+  isEdited?: boolean;
+  editedAt?: string;
+
   // Flags
   isArchived?: boolean;
   isPinned?: boolean;

@@ -367,13 +367,13 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
             <SeparatorDot />
             <span>{post.stats.shares || 0} shares</span>
 
-            {post.createdAt !== post.updatedAt && (
+            {post.isEdited && post.editedAt && (
               <>
                 <SeparatorDot />
                 <span className="text-gray-400 italic">Edited</span>
                 <SeparatorDot ariaHidden />
                 <span className="text-gray-400 italic">
-                  {formatPostDateTime(post.updatedAt)}
+                  {formatPostDateTime(post.editedAt)}
                 </span>
               </>
             )}

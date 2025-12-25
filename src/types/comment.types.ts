@@ -19,6 +19,8 @@ export interface Comment {
   isMine: boolean;
   isLiked: boolean;
   updatedAt?: string;
+  isEdited?: boolean;
+  editedAt?: string;
 }
 
 export interface CommentsResponse {
