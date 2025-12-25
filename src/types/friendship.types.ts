@@ -1,3 +1,5 @@
+import { PROFILE_RELATION_STATUS } from "../constants";
+
 // ====================================
 // ACTION RESPONSE DATA TYPES
 // ====================================
@@ -63,11 +65,7 @@ export interface FriendUser {
   institution: InstitutionBasic | null;
   userType: string;
   department: DepartmentBasic | null;
-  friendshipStatus:
-    | "accepted"
-    | "incoming_request"
-    | "outgoing_request"
-    | "none";
+  friendshipStatus: (typeof PROFILE_RELATION_STATUS)[keyof typeof PROFILE_RELATION_STATUS];
   friendshipId?: string;
 }
 
