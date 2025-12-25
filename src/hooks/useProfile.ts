@@ -49,6 +49,29 @@ export const useProfileHeader = (username: string | undefined) => {
 };
 
 /**
+ * useProfileDetails Hook
+ *
+ * Fetches user profile details data.
+ * Uses a separate query key "profile_details" to differentiate from header data.
+ *
+ * @param username - User's unique username
+ * @returns { data, isLoading, error, refetch }
+ */
+export const useProfileDetails = (username: string | undefined) => {
+  return useQuery({
+    queryKey: ["profile_details", username],
+    queryFn: async () => {
+      if (!username) throw new Error("Username is required");
+      const response = await profileApi.getProfileDetails(username);
+      return response.data;
+    },
+    enabled: !!username, // Only fetch if username exists
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    retry: 1, // Retry once on failure
+  });
+};
+
+/**
  * useUpdateGeneral Hook
  *
  * Updates general profile info.

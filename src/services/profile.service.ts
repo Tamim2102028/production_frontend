@@ -42,6 +42,17 @@ export const profileApi = {
   },
 
   /**
+   * Get user details by username (Lightweight)
+   *
+   * @param username - User's unique username
+   * @returns User object without calculated stats/relations
+   */
+  getProfileDetails: async (username: string): Promise<ApiResponse<User>> => {
+    const response = await api.get<ApiResponse<User>>(`/users/details/${username}`);
+    return response.data;
+  },
+
+  /**
    * Update general profile info
    *
    * @param data - { fullName?, bio?, phoneNumber?, gender?, socialLinks?, skills?, interests? }

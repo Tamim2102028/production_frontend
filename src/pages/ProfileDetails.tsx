@@ -17,7 +17,7 @@ import {
   FaPray,
 } from "react-icons/fa";
 import { useUser } from "../hooks/useAuth";
-import { useProfileHeader } from "../hooks/useProfile";
+import { useProfileDetails } from "../hooks/useProfile";
 import PageLoader from "./Fallbacks/PageLoader";
 import { USER_TYPES } from "../constants";
 import type { Institution, Department } from "../types/user.types";
@@ -30,12 +30,12 @@ const ProfileDetails: React.FC = () => {
   // Determine which username to fetch
   const profileUsername = username || currentUser?.userName;
 
-  // Fetch profile data
+  // Fetch profile details
   const {
     data: userData,
     isLoading,
     error,
-  } = useProfileHeader(profileUsername);
+  } = useProfileDetails(profileUsername);
 
   if (isLoading) {
     return <PageLoader />;
@@ -150,7 +150,7 @@ const ProfileDetails: React.FC = () => {
           <img
             src={userData.avatar}
             alt={userData.fullName}
-            className="h-32 w-32 rounded-full border-4 border-white shadow-lg ring-2 ring-gray-100"
+            className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-100"
           />
           <div className="mt-4 md:mt-0 md:ml-8">
             <h1 className="text-3xl font-bold text-gray-900">
