@@ -135,24 +135,24 @@ const FriendCard: React.FC<FriendCardProps> = ({
   };
 
   return (
-    <div className="flex items-center space-x-3 rounded-lg border border-gray-300 bg-white p-3 shadow-sm">
+    <div className="flex items-center space-x-3 rounded-lg border border-gray-300 bg-white p-2 shadow-sm">
       <NavLink to={`/profile/${friend.userName}`}>
         <img
           src={friend.avatar}
           alt={friend.fullName}
-          className="h-12 w-12 rounded-full object-cover transition-opacity hover:opacity-80"
+          className="h-10 w-10 rounded-full object-cover transition-opacity hover:opacity-80"
         />
       </NavLink>
       <div className="flex-1">
         <h3>
           <NavLink
             to={`/profile/${friend.userName}`}
-            className="font-semibold text-gray-900 transition-colors hover:text-blue-600 hover:underline"
+            className="font-medium text-gray-800 transition-colors hover:text-blue-600 hover:underline"
           >
             {friend.fullName}
           </NavLink>
         </h3>
-        <p className="text-sm text-gray-500">{institutionName}</p>
+        <p className="text-sm font-medium text-gray-500">{institutionName}</p>
       </div>
       <div className="flex items-center gap-2">
         {renderActions()}
