@@ -30,6 +30,8 @@ interface GroupPost {
   tags?: string[];
   images?: string[];
   isPinned?: boolean;
+  isEdited?: boolean;
+  editedAt?: string;
 }
 
 interface Author {
