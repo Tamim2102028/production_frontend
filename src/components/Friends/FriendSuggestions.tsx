@@ -1,4 +1,5 @@
 import React from "react";
+import { FaMagic } from "react-icons/fa";
 import FriendCard from "../shared/friends/FriendCard";
 
 // TODO: Replace with API data
@@ -20,13 +21,15 @@ const FriendSuggestions: React.FC<FriendSuggestionsProps> = ({
 
   if (friendSuggestions.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900">
-          No suggestions available
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
+        <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
+          <FaMagic className="h-8 w-8 text-blue-500" />
+        </div>
+        <h3 className="mb-2 text-lg font-medium text-gray-900">
+          No Suggestions
         </h3>
-        <p className="mt-2 text-gray-600">
-          We don't have any friend suggestions for you right now. Check back
-          later!
+        <p className="text-sm font-medium text-gray-500">
+          We don't have any friend suggestions for you right now.
         </p>
       </div>
     );

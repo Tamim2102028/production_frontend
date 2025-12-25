@@ -121,7 +121,7 @@ const Friends: React.FC = () => {
                     : activeTab === "requests"
                       ? "request"
                       : activeTab === "sent"
-                        ? "search"
+                        ? "sent"
                         : "suggestion"
                 }
               />
