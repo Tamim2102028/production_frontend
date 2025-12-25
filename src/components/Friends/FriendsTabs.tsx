@@ -15,6 +15,7 @@ const FriendsTabs: React.FC = () => {
         <NavLink
           key={tab.path}
           to={tab.path}
+          replace
           end={tab.end}
           className={({ isActive }) =>
             `flex-1 rounded-md px-4 py-2 text-center text-sm font-medium transition-colors ${

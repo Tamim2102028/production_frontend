@@ -30,27 +30,30 @@ const FriendsList: React.FC = () => {
 
   const friends = data?.users || [];
 
-  if (friends.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
-        <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
-          <FaUserFriends className="h-8 w-8 text-blue-500" />
-        </div>
-        <h3 className="mb-2 text-lg font-medium text-gray-900">
-          No Friends Yet
-        </h3>
-        <p className="text-sm font-medium text-gray-500">
-          Start connecting with people from your university.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-3">
-      {friends.map((friend) => (
-        <FriendCard key={friend._id} friend={friend} type="friend" />
-      ))}
+    <div>
+      <h2 className="mb-4 text-lg font-semibold text-gray-900">
+        All Friends ({data?.totalCount || 0})
+      </h2>
+      {friends.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
+          <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
+            <FaUserFriends className="h-8 w-8 text-blue-500" />
+          </div>
+          <h3 className="mb-2 text-lg font-medium text-gray-900">
+            No Friends Yet
+          </h3>
+          <p className="text-sm font-medium text-gray-500">
+            Start connecting with people from your university.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {friends.map((friend) => (
+            <FriendCard key={friend._id} friend={friend} type="friend" />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

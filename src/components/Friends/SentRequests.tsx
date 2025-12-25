@@ -31,24 +31,29 @@ const SentRequests: React.FC = () => {
   const requests = data?.users || [];
 
   return (
-    <div className="space-y-3">
-      {requests.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
-          <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
-            <FaPaperPlane className="h-8 w-8 text-blue-500" />
+    <div>
+      <h2 className="mb-4 text-lg font-semibold text-gray-900">
+        Sent Requests ({data?.totalCount || 0})
+      </h2>
+      <div className="space-y-3">
+        {requests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
+            <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
+              <FaPaperPlane className="h-8 w-8 text-blue-500" />
+            </div>
+            <h3 className="mb-2 text-lg font-medium text-gray-900">
+              No Sent Requests
+            </h3>
+            <p className="text-sm font-medium text-gray-500">
+              You haven't sent any friend requests yet.
+            </p>
           </div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">
-            No Sent Requests
-          </h3>
-          <p className="text-sm font-medium text-gray-500">
-            You haven't sent any friend requests yet.
-          </p>
-        </div>
-      ) : (
-        requests.map((request) => (
-          <FriendCard key={request._id} friend={request} type="sent" />
-        ))
-      )}
+        ) : (
+          requests.map((request) => (
+            <FriendCard key={request._id} friend={request} type="sent" />
+          ))
+        )}
+      </div>
     </div>
   );
 };
