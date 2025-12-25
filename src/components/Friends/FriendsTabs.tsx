@@ -1,39 +1,31 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
-interface FriendsTabsProps {
-  activeTab: "all" | "requests" | "suggestions" | "sent";
-  onTabChange: (tab: "all" | "requests" | "suggestions" | "sent") => void;
-}
-
-const FriendsTabs: React.FC<FriendsTabsProps> = ({
-  activeTab,
-  onTabChange,
-}) => {
-  const handleTabClick = (tab: "all" | "requests" | "suggestions" | "sent") => {
-    onTabChange(tab);
-  };
-
+const FriendsTabs: React.FC = () => {
   const tabs = [
-    { id: "all", label: "All Friends" },
-    { id: "requests", label: "Friend Requests" },
-    { id: "suggestions", label: "Suggestions" },
-    { id: "sent", label: "Sent Requests" },
+    { path: "/friends", label: "All Friends", end: true },
+    { path: "/friends/requests", label: "Friend Requests", end: false },
+    { path: "/friends/suggestions", label: "Suggestions", end: false },
+    { path: "/friends/sent", label: "Sent Requests", end: false },
   ] as const;
 
   return (
     <div className="flex space-x-1 rounded-lg bg-gray-100">
       {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => handleTabClick(tab.id)}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-            activeTab === tab.id
-              ? "bg-white text-blue-600 shadow-sm"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
+        <NavLink
+          key={tab.path}
+          to={tab.path}
+          end={tab.end}
+          className={({ isActive }) =>
+            `flex-1 rounded-md px-4 py-2 text-center text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`
+          }
         >
           {tab.label}
-        </button>
+        </NavLink>
       ))}
     </div>
   );

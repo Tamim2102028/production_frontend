@@ -195,7 +195,7 @@ export const routes: RouteConfig[] = [
     meta: { description: "Your saved posts and content" },
   },
   {
-    path: "/friends",
+    path: "/friends/*",
     component: lazy(() => import("../pages/Friends")),
     requireAuth: true,
     title: "Friends",

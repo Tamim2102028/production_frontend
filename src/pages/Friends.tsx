@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import {
   FriendsHeader,
   FriendsTabs,
@@ -9,25 +10,7 @@ import {
 } from "../components/Friends";
 
 const Friends: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<
-    "all" | "requests" | "suggestions" | "sent"
-  >("all");
   const [searchQuery, setSearchQuery] = useState("");
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case "all":
-        return <FriendsList />;
-      case "requests":
-        return <FriendRequests />;
-      case "suggestions":
-        return <FriendSuggestions />;
-      case "sent":
-        return <SentRequests />;
-      default:
-        return <FriendsList />;
-    }
-  };
 
   return (
     <>
@@ -35,8 +18,15 @@ const Friends: React.FC = () => {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
-      <FriendsTabs activeTab={activeTab} onTabChange={setActiveTab} />
-      {renderContent()}
+      <FriendsTabs />
+      <Routes>
+        <Route index element={<FriendsList />} />
+        <Route path="requests" element={<FriendRequests />} />
+        <Route path="suggestions" element={<FriendSuggestions />} />
+        <Route path="sent" element={<SentRequests />} />
+        {/* Redirect unknown sub-routes to main list */}
+        <Route path="*" element={<Navigate to="." replace />} />
+      </Routes>
     </>
   );
 };
