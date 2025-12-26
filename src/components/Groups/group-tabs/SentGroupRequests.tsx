@@ -63,7 +63,7 @@ const SentGroupRequests = () => {
               <GroupCard
                 key={group._id}
                 group={group}
-                status={GROUP_MEMBERSHIP_STATUS.PENDING}
+                status={group.status || GROUP_MEMBERSHIP_STATUS.PENDING}
               />
             ))}
           </div>

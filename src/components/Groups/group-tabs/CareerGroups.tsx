@@ -64,7 +64,7 @@ const CareerGroups = () => {
               <GroupCard
                 key={group._id}
                 group={group}
-                status={GROUP_MEMBERSHIP_STATUS.NOT_JOINED}
+                status={group.status || GROUP_MEMBERSHIP_STATUS.NOT_JOINED}
               />
             ))}
           </div>

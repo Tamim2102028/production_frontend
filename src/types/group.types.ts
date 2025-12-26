@@ -15,6 +15,7 @@ export type GroupCard = {
   type: string;
   privacy?: string;
   memberCount?: number;
+  status?: string; // Status of the current user in this group
 };
 
 export type MyGroupsResponse = ApiResponse<{

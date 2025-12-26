@@ -64,7 +64,7 @@ const InvitedGroup = () => {
               <GroupCard
                 key={group._id}
                 group={group}
-                status={GROUP_MEMBERSHIP_STATUS.INVITED}
+                status={group.status || GROUP_MEMBERSHIP_STATUS.INVITED}
               />
             ))}
           </div>
