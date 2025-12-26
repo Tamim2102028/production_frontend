@@ -321,7 +321,7 @@ const GroupDetail: React.FC = () => {
           </div>
 
           {/* Tab content */}
-          <div className="p-5">
+          <div className="p-3">
             {activeTab === "posts" && (
               <div className="space-y-4">
                 {isMember && (
