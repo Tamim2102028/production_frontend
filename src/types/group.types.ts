@@ -30,6 +30,7 @@ export type Group = {
   slug: string;
   description?: string;
   coverImage?: string;
+  avatar?: string;
   institution?: string;
   type: string;
   privacy?: string;
@@ -51,3 +52,8 @@ export type GroupMeta = {
   isMember: boolean;
   isAdmin: boolean;
 };
+
+export type GroupDetailsResponse = ApiResponse<{
+  group: Group;
+  meta: GroupMeta;
+}>;

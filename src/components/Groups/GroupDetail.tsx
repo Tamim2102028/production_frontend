@@ -368,7 +368,9 @@ const GroupDetail: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <h3 className="mb-2 font-bold text-gray-900">Description</h3>
-                  <p className="text-gray-700">{group.description}</p>
+                  <p className="text-gray-700">
+                    {group.description || "No description provided"}
+                  </p>
                 </div>
 
                 <div>
@@ -408,7 +410,9 @@ const GroupDetail: React.FC = () => {
                 <div>
                   <h3 className="mb-2 font-bold text-gray-900">Created</h3>
                   <p className="text-gray-700">
-                    {new Date(group.createdAt).toLocaleDateString()}
+                    {group.createdAt
+                      ? new Date(group.createdAt).toLocaleDateString()
+                      : "N/A"}
                   </p>
                 </div>
               </div>

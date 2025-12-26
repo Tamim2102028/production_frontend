@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
 import type { ApiError } from "../types/user.types";
+import type { GroupDetailsResponse } from "../types/group.types";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
@@ -37,7 +38,7 @@ export const useCreateGroup = () => {
 };
 
 export const useGroupDetails = (slug: string) => {
-  return useQuery({
+  return useQuery<GroupDetailsResponse>({
     queryKey: ["group", slug],
     queryFn: () => groupService.getGroupDetails(slug),
     staleTime: 1000 * 60 * 10, // 10 minutes

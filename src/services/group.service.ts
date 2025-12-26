@@ -1,5 +1,8 @@
 import api from "../lib/axios";
-import type { MyGroupsResponse } from "../types/group.types";
+import type {
+  MyGroupsResponse,
+  GroupDetailsResponse,
+} from "../types/group.types";
 
 export const groupService = {
   // Create Group
@@ -13,8 +16,8 @@ export const groupService = {
   },
 
   // Get Group Details
-  getGroupDetails: async (slug: string) => {
-    const response = await api.get(`/groups/${slug}`);
+  getGroupDetails: async (slug: string): Promise<GroupDetailsResponse> => {
+    const response = await api.get<GroupDetailsResponse>(`/groups/${slug}`);
     return response.data;
   },
 
