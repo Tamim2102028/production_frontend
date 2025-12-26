@@ -123,28 +123,12 @@ export const routes: RouteConfig[] = [
 
   // Social features
   {
-    path: "/groups",
+    path: "/groups/*",
     component: lazy(() => import("../pages/Groups")),
     requireAuth: true,
     title: "Groups",
     category: "social",
     meta: { description: "Join and manage groups" },
-  },
-  {
-    path: "/groups/creategroup",
-    component: lazy(() => import("../components/Groups/CreateGroupPage")),
-    requireAuth: true,
-    title: "Create Group",
-    category: "social",
-    meta: { description: "Create a new group" },
-  },
-  {
-    path: "/groups/:slug",
-    component: lazy(() => import("../components/Groups/GroupDetail")),
-    requireAuth: true,
-    title: "Group Details",
-    category: "social",
-    meta: { description: "View group details and information" },
   },
   {
     path: "/notifications",

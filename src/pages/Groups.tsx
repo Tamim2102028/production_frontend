@@ -1,47 +1,75 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
+import { Routes, Route, NavLink, Navigate, Outlet } from "react-router-dom";
 import GroupsHeader from "../components/Groups/utils/GroupsHeader.tsx";
 import MyGroups from "../components/Groups/group-tabs/MyGroups.tsx";
 import SuggestedGroups from "../components/Groups/group-tabs/SuggestedGroups.tsx";
 import CareerGroups from "../components/Groups/group-tabs/CareerGroups.tsx";
 import UniversityGroups from "../components/Groups/group-tabs/UniversityGroups.tsx";
 import SentGroupRequests from "../components/Groups/group-tabs/SentGroupRequests.tsx";
+import InvitedGroup from "../components/Groups/group-tabs/InvitedGroup.tsx";
+import PageLoader from "./Fallbacks/PageLoader";
 
-const Groups: React.FC = () => {
-  // Static data for demonstration
+// Lazy load detail and create pages to avoid circular deps or large bundles
+const GroupDetail = lazy(() => import("../components/Groups/GroupDetail"));
+const CreateGroupPage = lazy(
+  () => import("../components/Groups/CreateGroupPage")
+);
 
-  const [activeTab, setActiveTab] = React.useState<
-    "my" | "university" | "career" | "suggested" | "requests"
-  >("my");
-
-  const tabs: { key: typeof activeTab; label: string }[] = [
-    { key: "my", label: "My Groups" },
-    { key: "university", label: "University Groups" },
-    { key: "career", label: "Career & Job Groups" },
-    { key: "suggested", label: "Suggested Groups" },
-    { key: "requests", label: "Sent Requests" },
+const GroupsLayout: React.FC = () => {
+  const tabs = [
+    { path: "/groups/my", label: "My Groups" },
+    { path: "/groups/university", label: "University" },
+    { path: "/groups/career", label: "Career & Job" },
+    { path: "/groups/suggested", label: "Suggested" },
+    { path: "/groups/requests", label: "Sent Requests" },
+    { path: "/groups/invited", label: "Invited" },
   ];
 
   return (
     <>
       <GroupsHeader />
-      <div className="flex justify-between border-b border-gray-200">
+      <div className="flex justify-between border-b border-gray-200 px-3">
         {tabs.map((t) => (
-          <button
-            key={t.key}
-            className={`py-1 font-medium transition-colors ${activeTab === t.key ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-600 hover:text-blue-600"}`}
-            onClick={() => setActiveTab(t.key)}
+          <NavLink
+            key={t.path}
+            to={t.path}
+            replace
+            className={({ isActive }) =>
+              `py-1 font-medium transition-colors ${
+                isActive
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-600 hover:text-blue-600"
+              }`
+            }
           >
             {t.label}
-          </button>
+          </NavLink>
         ))}
       </div>
-
-      {activeTab === "my" && <MyGroups />}
-      {activeTab === "requests" && <SentGroupRequests />}
-      {activeTab === "university" && <UniversityGroups />}
-      {activeTab === "career" && <CareerGroups />}
-      {activeTab === "suggested" && <SuggestedGroups />}
+      <Outlet />
     </>
+  );
+};
+
+const Groups: React.FC = () => {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route element={<GroupsLayout />}>
+          <Route path="/" element={<Navigate to="my" replace />} />
+          <Route path="my" element={<MyGroups />} />
+          <Route path="university" element={<UniversityGroups />} />
+          <Route path="career" element={<CareerGroups />} />
+          <Route path="suggested" element={<SuggestedGroups />} />
+          <Route path="requests" element={<SentGroupRequests />} />
+          <Route path="invited" element={<InvitedGroup />} />
+        </Route>
+
+        {/* Standalone Routes (No Header/Tabs) */}
+        <Route path="creategroup" element={<CreateGroupPage />} />
+        <Route path=":slug" element={<GroupDetail />} />
+      </Routes>
+    </Suspense>
   );
 };
 
