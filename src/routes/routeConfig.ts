@@ -139,7 +139,7 @@ export const routes: RouteConfig[] = [
     meta: { description: "Create a new group" },
   },
   {
-    path: "/groups/:groupId",
+    path: "/groups/:slug",
     component: lazy(() => import("../components/Groups/GroupDetail")),
     requireAuth: true,
     title: "Group Details",

@@ -47,14 +47,9 @@ export interface UnblockData {
 // LIST RESPONSE DATA TYPES
 // ====================================
 
-export interface InstitutionBasic {
-  _id?: string;
-  name: string;
-}
-
-export interface DepartmentBasic {
-  _id?: string;
-  name: string;
+export interface FriendshipListData {
+  users: FriendUser[];
+  pagination: Pagination;
 }
 
 export interface FriendUser {
@@ -69,6 +64,16 @@ export interface FriendUser {
   friendshipId?: string;
 }
 
+export interface InstitutionBasic {
+  _id?: string;
+  name: string;
+}
+
+export interface DepartmentBasic {
+  _id?: string;
+  name: string;
+}
+
 export interface Pagination {
   totalDocs: number;
   limit: number;
@@ -76,9 +81,4 @@ export interface Pagination {
   totalPages: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
-}
-
-export interface FriendshipListData {
-  users: FriendUser[];
-  pagination: Pagination;
 }

@@ -11,7 +11,7 @@ const FriendSuggestions: React.FC = () => {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[...Array(6)].map((_, i) => (
+        {[...Array(5)].map((_, i) => (
           <FriendCardSkeleton key={i} />
         ))}
       </div>
