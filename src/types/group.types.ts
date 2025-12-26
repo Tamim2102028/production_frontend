@@ -11,15 +11,19 @@ export type GroupCard = {
   slug: string;
   description?: string;
   coverImage?: string;
-  institution?: string;
   type: string;
   privacy?: string;
   membersCount?: number;
-  status?: string; // Status of the current user in this group
+  postsCount?: number;
+};
+
+export type GroupCardResponse = {
+  group: GroupCard;
+  meta: GroupMeta;
 };
 
 export type MyGroupsResponse = ApiResponse<{
-  groups: GroupCard[];
+  groups: GroupCardResponse[];
   pagination: Pagination;
 }>;
 

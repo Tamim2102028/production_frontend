@@ -5,10 +5,11 @@ import {
   GROUP_MEMBERSHIP_STATUS,
   GROUP_PRIVACY,
 } from "../../../constants/index";
-import type { GroupCardProps } from "../../../types/group.types";
+import type { GroupCardResponse } from "../../../types/group.types";
 
-const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
+const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
   const navigate = useNavigate();
+  const { status } = meta;
 
   const handleViewGroup = (e: React.MouseEvent) => {
     e.preventDefault();

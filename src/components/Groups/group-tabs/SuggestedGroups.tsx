@@ -3,8 +3,6 @@ import GroupCard from "../utils/GroupCard";
 import GroupEmptyState from "../utils/GroupEmptyState";
 import GroupErrorState from "../utils/GroupErrorState";
 import { useSuggestedGroups } from "../../../hooks/useGroup";
-import { GROUP_MEMBERSHIP_STATUS } from "../../../constants/group";
-import type { GroupCard as GroupCardType } from "../../../types/group.types";
 
 const SuggestedGroups = () => {
   const {
@@ -62,11 +60,11 @@ const SuggestedGroups = () => {
       ) : (
         <>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {groups.map((group: GroupCardType) => (
+            {groups.map((item) => (
               <GroupCard
-                key={group._id}
-                group={group}
-                status={group.status || GROUP_MEMBERSHIP_STATUS.NOT_JOINED}
+                key={item.group._id}
+                group={item.group}
+                meta={item.meta}
               />
             ))}
           </div>
