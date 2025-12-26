@@ -51,12 +51,12 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
 
         {/* Privacy Badge (closed / private / public) */}
         <div className="absolute top-3 right-3">
-          {group.privacy === "closed" ? (
+          {group.privacy === GROUP_PRIVACY.CLOSED ? (
             <div className="flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white">
               <FaBan size={10} />
               Closed
             </div>
-          ) : group.privacy === "private" ? (
+          ) : group.privacy === GROUP_PRIVACY.PRIVATE ? (
             <div className="flex items-center gap-1.5 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white">
               <FaLock size={10} />
               Private
