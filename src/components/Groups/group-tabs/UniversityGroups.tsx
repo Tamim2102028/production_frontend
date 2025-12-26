@@ -1,5 +1,7 @@
 import { FaUniversity } from "react-icons/fa";
 import GroupCard from "../utils/GroupCard";
+import GroupEmptyState from "../utils/GroupEmptyState";
+import GroupErrorState from "../utils/GroupErrorState";
 import { useUniversityGroups } from "../../../hooks/useGroup";
 import { GROUP_MEMBERSHIP_STATUS } from "../../../constants/group";
 import type { GroupCard as GroupCardType } from "../../../types/group.types";
@@ -12,6 +14,7 @@ const UniversityGroups = () => {
     isFetchingNextPage,
     isLoading,
     isError,
+    refetch,
   } = useUniversityGroups(9);
 
   const groups = data?.pages.flatMap((page) => page.data.groups) || [];
@@ -32,9 +35,10 @@ const UniversityGroups = () => {
 
   if (isError) {
     return (
-      <div className="flex min-h-[200px] items-center justify-center text-red-500">
-        Failed to load university groups. Please try again later.
-      </div>
+      <GroupErrorState
+        message="Failed to load university groups. Please check your connection."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -45,17 +49,11 @@ const UniversityGroups = () => {
       </h2>
 
       {groups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
-          <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
-            <FaUniversity className="h-8 w-8 text-purple-500" />
-          </div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">
-            No University Groups
-          </h3>
-          <p className="text-sm font-medium text-gray-500">
-            There are no official university groups available at the moment.
-          </p>
-        </div>
+        <GroupEmptyState
+          icon={FaUniversity}
+          title="No University Groups"
+          message="There are no official university groups available at the moment."
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">

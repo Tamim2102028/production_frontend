@@ -1,5 +1,7 @@
 import { FaEnvelope } from "react-icons/fa";
 import GroupCard from "../utils/GroupCard";
+import GroupEmptyState from "../utils/GroupEmptyState";
+import GroupErrorState from "../utils/GroupErrorState";
 import { useInvitedGroups } from "../../../hooks/useGroup";
 import { GROUP_MEMBERSHIP_STATUS } from "../../../constants/group";
 import type { GroupCard as GroupCardType } from "../../../types/group.types";
@@ -12,6 +14,7 @@ const InvitedGroup = () => {
     isFetchingNextPage,
     isLoading,
     isError,
+    refetch,
   } = useInvitedGroups(9);
 
   const groups = data?.pages.flatMap((page) => page.data.groups) || [];
@@ -32,9 +35,10 @@ const InvitedGroup = () => {
 
   if (isError) {
     return (
-      <div className="flex min-h-[200px] items-center justify-center text-red-500">
-        Failed to load invited groups. Please try again later.
-      </div>
+      <GroupErrorState
+        message="Failed to load invited groups. Please check your connection."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -45,18 +49,16 @@ const InvitedGroup = () => {
       </h2>
 
       {groups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
-          <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
-            <FaEnvelope className="h-8 w-8 text-blue-500" />
-          </div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">
-            No Group Invitations
-          </h3>
-          <p className="text-sm font-medium text-gray-500">
-            You haven't been invited to any groups yet. <br />
-            Check back later!
-          </p>
-        </div>
+        <GroupEmptyState
+          icon={FaEnvelope}
+          title="No Group Invitations"
+          message={
+            <>
+              You haven't been invited to any groups yet. <br />
+              Check back later!
+            </>
+          }
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">

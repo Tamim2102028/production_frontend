@@ -1,5 +1,7 @@
 import { FaBriefcase } from "react-icons/fa";
 import GroupCard from "../utils/GroupCard";
+import GroupEmptyState from "../utils/GroupEmptyState";
+import GroupErrorState from "../utils/GroupErrorState";
 import { useCareerGroups } from "../../../hooks/useGroup";
 import { GROUP_MEMBERSHIP_STATUS } from "../../../constants/group";
 import type { GroupCard as GroupCardType } from "../../../types/group.types";
@@ -12,6 +14,7 @@ const CareerGroups = () => {
     isFetchingNextPage,
     isLoading,
     isError,
+    refetch,
   } = useCareerGroups(9);
 
   const groups = data?.pages.flatMap((page) => page.data.groups) || [];
@@ -32,9 +35,10 @@ const CareerGroups = () => {
 
   if (isError) {
     return (
-      <div className="flex min-h-[200px] items-center justify-center text-red-500">
-        Failed to load career groups. Please try again later.
-      </div>
+      <GroupErrorState
+        message="Failed to load career groups. Please check your connection."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -45,18 +49,11 @@ const CareerGroups = () => {
       </h2>
 
       {groups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
-          <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
-            <FaBriefcase className="h-8 w-8 text-green-500" />
-          </div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">
-            No Career Groups
-          </h3>
-          <p className="text-sm font-medium text-gray-500">
-            No career-focused groups found. Start networking by creating a new
-            group.
-          </p>
-        </div>
+        <GroupEmptyState
+          icon={FaBriefcase}
+          title="No Career Groups"
+          message="No career-focused groups found. Start networking by creating a new group."
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
