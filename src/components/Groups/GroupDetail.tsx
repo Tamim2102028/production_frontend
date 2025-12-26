@@ -31,10 +31,7 @@ const GroupDetail: React.FC = () => {
 
   const { data: groupData, isLoading, error } = useGroupDetails(slug!);
   const group = groupData?.data?.group;
-  // TODO: Add membership status to groupData response or fetch separately
-  // For now assuming we have a way to know if user is member
-  // const isMember = group?.membershipStatus === GROUP_MEMBERSHIP_STATUS.JOINED;
-  // const isPrivateOrClosed = group?.privacy === GROUP_PRIVACY.PRIVATE || group?.privacy === GROUP_PRIVACY.CLOSED;
+  const meta = groupData?.data?.meta;
 
   const [activeTab, setActiveTab] = useState<
     "posts" | "pinned" | "members" | "media" | "about"
@@ -111,8 +108,8 @@ const GroupDetail: React.FC = () => {
   // Assuming 'status' field in group object tells us if user is joined
   // If status is undefined or NOT_JOINED or PENDING or INVITED, they are not a full member
   const isMember =
-    group.status === GROUP_MEMBERSHIP_STATUS.JOINED ||
-    group.status === GROUP_MEMBERSHIP_STATUS.BANNED ||
+    meta?.status === GROUP_MEMBERSHIP_STATUS.JOINED ||
+    meta?.status === GROUP_MEMBERSHIP_STATUS.BANNED ||
     currentUser?._id === group.owner ||
     currentUser?._id === group.creator;
 
@@ -128,10 +125,10 @@ const GroupDetail: React.FC = () => {
   }
 
   // Derived Access Rights
-  const isRequested = group.status === GROUP_MEMBERSHIP_STATUS.PENDING;
+  const isRequested = meta?.status === GROUP_MEMBERSHIP_STATUS.PENDING;
   const isOwner =
     group.creator === currentUser?._id || group.owner === currentUser?._id;
-  const isAdmin = group.isAdmin || isOwner;
+  const isAdmin = meta?.isAdmin || isOwner;
 
   return (
     <div className="space-y-5 overflow-hidden">

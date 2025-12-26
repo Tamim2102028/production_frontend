@@ -44,7 +44,10 @@ export type Group = {
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  status?: string;
-  isMember?: boolean;
-  isAdmin?: boolean;
+};
+
+export type GroupMeta = {
+  status: string;
+  isMember: boolean;
+  isAdmin: boolean;
 };
