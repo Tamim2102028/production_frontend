@@ -142,7 +142,7 @@ const GroupDetail: React.FC = () => {
                         {group.privacy === "PUBLIC"
                           ? "Public Group"
                           : "Private Group"}{" "}
-                        · {group.members?.length || 0} members
+                        · {group.membersCount || 0} members
                       </p>
                     </div>
 
@@ -365,7 +365,7 @@ const GroupDetail: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                       <p className="text-2xl font-bold text-gray-900">
-                        {group.members?.length || 0}
+                        {group.membersCount || 0}
                       </p>
                       <p className="text-sm text-gray-600">Members</p>
                     </div>

@@ -14,7 +14,7 @@ export type GroupCard = {
   institution?: string;
   type: string;
   privacy?: string;
-  memberCount?: number;
+  membersCount?: number;
   status?: string; // Status of the current user in this group
 };
 
@@ -37,7 +37,7 @@ export type Group = {
     allowComments?: boolean;
     allowPosts?: boolean;
   };
-  memberCount?: number;
+  membersCount?: number;
   postsCount?: number;
   creator?: string;
   owner?: string;

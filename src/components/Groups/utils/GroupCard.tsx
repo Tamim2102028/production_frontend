@@ -87,7 +87,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
         <div className="mb-3 flex items-center gap-2 text-sm text-gray-600">
           <FaUsers size={14} />
           <span className="font-medium">
-            {group.memberCount?.toLocaleString()} members
+            {group.membersCount?.toLocaleString()} members
           </span>
         </div>
 
@@ -160,7 +160,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
                 <button
                   type="button"
                   disabled
-                  className="w-full rounded-lg bg-red-300 px-4 py-2 text-sm font-semibold text-gray-700 cursor-not-allowed"
+                  className="w-full cursor-not-allowed rounded-lg bg-red-300 px-4 py-2 text-sm font-semibold text-gray-700"
                 >
                   You can't join this group
                 </button>

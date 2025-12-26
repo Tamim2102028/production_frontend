@@ -8,7 +8,7 @@ interface Group {
   description?: string;
   coverImage?: string;
   profileImage?: string;
-  memberCount?: number;
+  membersCount?: number;
   privacy?: string;
 }
 
