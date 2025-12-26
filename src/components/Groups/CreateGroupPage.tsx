@@ -81,6 +81,57 @@ const CreateGroupPage: React.FC = () => {
     createGroup(formData);
   };
 
+  const groupTypes = [
+    {
+      value: "GENERAL",
+      label: "General",
+      icon: FaUsers,
+      color: "text-blue-600",
+      description: "Connect with people who share your hobbies and interests.",
+    },
+    {
+      value: "JOBS_CAREERS",
+      label: "Careers",
+      icon: FaBriefcase,
+      color: "text-indigo-600",
+      description: "Network with professionals and find job opportunities.",
+    },
+    {
+      value: "OFFICIAL_INSTITUTION",
+      label: "Official",
+      icon: FaUniversity,
+      color: "text-purple-600",
+      description:
+        "Official group for schools, universities, or organizations.",
+    },
+  ];
+
+  const privacyOptions = [
+    {
+      value: "PUBLIC",
+      label: "Public",
+      icon: FaGlobe,
+      color: "text-blue-600",
+      description: "Anyone can see the group, its members and their posts.",
+    },
+    {
+      value: "PRIVATE",
+      label: "Private",
+      icon: FaLock,
+      color: "text-gray-700",
+      description:
+        "Only members can see who's in the group and what they post.",
+    },
+    {
+      value: "CLOSED",
+      label: "Closed",
+      icon: FaBan,
+      color: "text-red-600",
+      description:
+        "Hidden from search. Only members can find and join this group.",
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-3xl">
       {/* Header */}
@@ -137,277 +188,178 @@ const CreateGroupPage: React.FC = () => {
         className="space-y-6"
       >
         {/* Basic Information */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
-            Basic Information
-          </h2>
+        <div className="space-y-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          {/* Name */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              Group Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              {...register("name")}
+              type="text"
+              placeholder="e.g. Computer Science Class of 2025"
+              className={`w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 ${
+                errors.name
+                  ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                  : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+              }`}
+            />
+            {errors.name && (
+              <p className="mt-1.5 text-xs font-medium text-red-500">
+                {errors.name.message}
+              </p>
+            )}
+          </div>
 
-          <div className="space-y-5">
-            {/* Name */}
+          {/* Description */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <textarea
+              {...register("description")}
+              rows={4}
+              placeholder="Tell people what this group is about..."
+              className="w-full resize-none rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+          </div>
+
+          <div>
+            <label className="mb-3 block text-sm font-medium text-gray-700">
+              Group Type
+            </label>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {groupTypes.map((type) => (
+                <label
+                  key={type.value}
+                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
+                    typeValue === type.value
+                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value={type.value}
+                    {...register("type")}
+                    className="sr-only"
+                  />
+                  <div className={`mb-2 flex items-center gap-2 ${type.color}`}>
+                    <type.icon className="text-lg" />
+                    <span className="font-semibold">{type.label}</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    {type.description}
+                  </p>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Avatar */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Group Name <span className="text-red-500">*</span>
+                Group Avatar
               </label>
               <input
-                {...register("name")}
-                type="text"
-                placeholder="e.g. Computer Science Class of 2025"
-                className={`w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 ${
-                  errors.name
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-100"
-                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
-                }`}
+                {...register("avatar")}
+                type="file"
+                accept="image/*"
+                className="block w-full text-sm text-gray-500 transition-colors file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
               />
-              {errors.name && (
-                <p className="mt-1.5 text-xs font-medium text-red-500">
-                  {errors.name.message}
-                </p>
-              )}
+              <p className="mt-1.5 text-xs text-gray-500">
+                Recommended: Square image, max 2MB
+              </p>
             </div>
 
-            {/* Description */}
+            {/* Cover Image */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Description
+                Cover Image
               </label>
-              <textarea
-                {...register("description")}
-                rows={4}
-                placeholder="Tell people what this group is about..."
-                className="w-full resize-none rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              <input
+                {...register("coverImage")}
+                type="file"
+                accept="image/*"
+                className="block w-full text-sm text-gray-500 transition-colors file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
               />
-            </div>
-
-            <div>
-              <label className="mb-3 block text-sm font-medium text-gray-700">
-                Group Type
-              </label>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {/* General */}
-                <label
-                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
-                    typeValue === "GENERAL"
-                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    value="GENERAL"
-                    {...register("type")}
-                    className="sr-only"
-                  />
-                  <div className="mb-2 flex items-center gap-2 text-blue-600">
-                    <FaUsers className="text-lg" />
-                    <span className="font-semibold">General</span>
-                  </div>
-                  <p className="text-xs leading-relaxed text-gray-500">
-                    Connect with people who share your hobbies and interests.
-                  </p>
-                </label>
-
-                {/* Jobs & Careers */}
-                <label
-                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
-                    typeValue === "JOBS_CAREERS"
-                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    value="JOBS_CAREERS"
-                    {...register("type")}
-                    className="sr-only"
-                  />
-                  <div className="mb-2 flex items-center gap-2 text-indigo-600">
-                    <FaBriefcase className="text-lg" />
-                    <span className="font-semibold">Careers</span>
-                  </div>
-                  <p className="text-xs leading-relaxed text-gray-500">
-                    Network with professionals and find job opportunities.
-                  </p>
-                </label>
-
-                {/* Official Institution */}
-                <label
-                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
-                    typeValue === "OFFICIAL_INSTITUTION"
-                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    value="OFFICIAL_INSTITUTION"
-                    {...register("type")}
-                    className="sr-only"
-                  />
-                  <div className="mb-2 flex items-center gap-2 text-purple-600">
-                    <FaUniversity className="text-lg" />
-                    <span className="font-semibold">Official</span>
-                  </div>
-                  <p className="text-xs leading-relaxed text-gray-500">
-                    Official group for schools, universities, or organizations.
-                  </p>
-                </label>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              {/* Avatar */}
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Group Avatar
-                </label>
-                <input
-                  {...register("avatar")}
-                  type="file"
-                  accept="image/*"
-                  className="block w-full text-sm text-gray-500 transition-colors file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
-                />
-                <p className="mt-1.5 text-xs text-gray-500">
-                  Recommended: Square image, max 2MB
-                </p>
-              </div>
-
-              {/* Cover Image */}
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Cover Image
-                </label>
-                <input
-                  {...register("coverImage")}
-                  type="file"
-                  accept="image/*"
-                  className="block w-full text-sm text-gray-500 transition-colors file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
-                />
-                <p className="mt-1.5 text-xs text-gray-500">
-                  Recommended: 1200x400px, max 5MB
-                </p>
-              </div>
+              <p className="mt-1.5 text-xs text-gray-500">
+                Recommended: 1200x400px, max 5MB
+              </p>
             </div>
           </div>
         </div>
 
         {/* Privacy & Settings */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
-            Privacy & Settings
-          </h2>
-
-          <div className="space-y-6">
-            <div>
-              <label className="mb-3 block text-sm font-medium text-gray-700">
-                Privacy Level
-              </label>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {/* Public */}
+        <div className="space-y-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div>
+            <label className="mb-3 block text-sm font-medium text-gray-700">
+              Privacy Level
+            </label>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {privacyOptions.map((option) => (
                 <label
+                  key={option.value}
                   className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
-                    privacyValue === "PUBLIC"
+                    privacyValue === option.value
                       ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
                       : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
                   }`}
                 >
                   <input
                     type="radio"
-                    value="PUBLIC"
+                    value={option.value}
                     {...register("privacy")}
                     className="sr-only"
                   />
-                  <div className="mb-2 flex items-center gap-2 text-blue-600">
-                    <FaGlobe className="text-lg" />
-                    <span className="font-semibold">Public</span>
+                  <div
+                    className={`mb-2 flex items-center gap-2 ${option.color}`}
+                  >
+                    <option.icon className="text-lg" />
+                    <span className="font-semibold">{option.label}</span>
                   </div>
                   <p className="text-xs leading-relaxed text-gray-500">
-                    Anyone can see the group, its members and their posts.
+                    {option.description}
                   </p>
                 </label>
+              ))}
+            </div>
+          </div>
 
-                {/* Private */}
-                <label
-                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
-                    privacyValue === "PRIVATE"
-                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    value="PRIVATE"
-                    {...register("privacy")}
-                    className="sr-only"
-                  />
-                  <div className="mb-2 flex items-center gap-2 text-gray-700">
-                    <FaLock className="text-lg" />
-                    <span className="font-semibold">Private</span>
-                  </div>
-                  <p className="text-xs leading-relaxed text-gray-500">
-                    Only members can see who's in the group and what they post.
-                  </p>
-                </label>
-
-                {/* Closed */}
-                <label
-                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
-                    privacyValue === "CLOSED"
-                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    value="CLOSED"
-                    {...register("privacy")}
-                    className="sr-only"
-                  />
-                  <div className="mb-2 flex items-center gap-2 text-red-600">
-                    <FaBan className="text-lg" />
-                    <span className="font-semibold">Closed</span>
-                  </div>
-                  <p className="text-xs leading-relaxed text-gray-500">
-                    Hidden from search. Only members can find and join this
-                    group.
-                  </p>
-                </label>
+          <div className="space-y-3 pt-2">
+            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50">
+              <input
+                type="checkbox"
+                {...register("settings.allowMemberPosting")}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  Allow members to post
+                </p>
+                <p className="text-xs text-gray-500">
+                  If unchecked, only admins and moderators can create posts.
+                </p>
               </div>
-            </div>
+            </label>
 
-            <div className="space-y-3 pt-2">
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50">
-                <input
-                  type="checkbox"
-                  {...register("settings.allowMemberPosting")}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Allow members to post
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    If unchecked, only admins and moderators can create posts.
-                  </p>
-                </div>
-              </label>
-
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50">
-                <input
-                  type="checkbox"
-                  {...register("settings.requirePostApproval")}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Require post approval
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Posts by members must be approved by an admin before
-                    appearing.
-                  </p>
-                </div>
-              </label>
-            </div>
+            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50">
+              <input
+                type="checkbox"
+                {...register("settings.requirePostApproval")}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  Require post approval
+                </p>
+                <p className="text-xs text-gray-500">
+                  Posts by members must be approved by an admin before
+                  appearing.
+                </p>
+              </div>
+            </label>
           </div>
         </div>
       </form>
