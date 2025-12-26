@@ -105,13 +105,8 @@ const GroupDetail: React.FC = () => {
   // Logic: If group is (Private OR Closed) AND User is NOT a member/owner/admin
   // Then show Access Denied screen
 
-  // Assuming 'status' field in group object tells us if user is joined
-  // If status is undefined or NOT_JOINED or PENDING or INVITED, they are not a full member
-  const isMember =
-    meta?.status === GROUP_MEMBERSHIP_STATUS.JOINED ||
-    meta?.status === GROUP_MEMBERSHIP_STATUS.BANNED ||
-    currentUser?._id === group.owner ||
-    currentUser?._id === group.creator;
+  const isMember = meta?.isMember;
+  const isAdmin = meta?.isAdmin;
 
   const isRestricted =
     (group.privacy === GROUP_PRIVACY.PRIVATE ||
@@ -126,9 +121,6 @@ const GroupDetail: React.FC = () => {
 
   // Derived Access Rights
   const isRequested = meta?.status === GROUP_MEMBERSHIP_STATUS.PENDING;
-  const isOwner =
-    group.creator === currentUser?._id || group.owner === currentUser?._id;
-  const isAdmin = meta?.isAdmin || isOwner;
 
   return (
     <div className="space-y-5 overflow-hidden">
