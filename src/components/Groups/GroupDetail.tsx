@@ -20,6 +20,8 @@ import { BsPostcard } from "react-icons/bs";
 import { confirm, showSuccess } from "../../utils/sweetAlert";
 import GroupMembersTab from "./group-tabs/GroupMembersTab";
 import { useGroupDetails } from "../../hooks/useGroup";
+import GroupAccessDenied from "./utils/GroupAccessDenied";
+import { GROUP_PRIVACY, GROUP_MEMBERSHIP_STATUS } from "../../constants/group";
 import { useUser } from "../../hooks/useAuth";
 
 const GroupDetail: React.FC = () => {
@@ -29,6 +31,10 @@ const GroupDetail: React.FC = () => {
 
   const { data: groupData, isLoading, error } = useGroupDetails(slug!);
   const group = groupData?.data?.group;
+  // TODO: Add membership status to groupData response or fetch separately
+  // For now assuming we have a way to know if user is member
+  // const isMember = group?.membershipStatus === GROUP_MEMBERSHIP_STATUS.JOINED;
+  // const isPrivateOrClosed = group?.privacy === GROUP_PRIVACY.PRIVATE || group?.privacy === GROUP_PRIVACY.CLOSED;
 
   const [activeTab, setActiveTab] = useState<
     "posts" | "pinned" | "members" | "media" | "about"
@@ -98,11 +104,34 @@ const GroupDetail: React.FC = () => {
     );
   }
 
-  // Derived Access Rights (Mocked for now until backend sends relation info)
-  const isMember = false; // TODO: Check if currentUser is in group.members
-  const isRequested = false; // TODO: Check if currentUser is in group.joinRequests
-  const isOwner = group.creatorId === currentUser?._id;
-  const isAdmin = false; // TODO: Check if currentUser is in group.admins
+  // Access Control Check
+  // Logic: If group is (Private OR Closed) AND User is NOT a member/owner/admin
+  // Then show Access Denied screen
+
+  // Assuming 'status' field in group object tells us if user is joined
+  // If status is undefined or NOT_JOINED or PENDING or INVITED, they are not a full member
+  const isMember =
+    group.status === GROUP_MEMBERSHIP_STATUS.JOINED ||
+    group.status === GROUP_MEMBERSHIP_STATUS.BANNED ||
+    currentUser?._id === group.owner ||
+    currentUser?._id === group.creator;
+
+  const isRestricted =
+    (group.privacy === GROUP_PRIVACY.PRIVATE ||
+      group.privacy === GROUP_PRIVACY.CLOSED) &&
+    !isMember;
+
+  if (isRestricted) {
+    return (
+      <GroupAccessDenied groupName={group.name} privacyType={group.privacy} />
+    );
+  }
+
+  // Derived Access Rights
+  const isRequested = group.status === GROUP_MEMBERSHIP_STATUS.PENDING;
+  const isOwner =
+    group.creator === currentUser?._id || group.owner === currentUser?._id;
+  const isAdmin = group.isAdmin || isOwner;
 
   return (
     <div className="space-y-5 overflow-hidden">
@@ -371,7 +400,7 @@ const GroupDetail: React.FC = () => {
                     </div>
                     <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                       <p className="text-2xl font-bold text-gray-900">
-                        {group.postCount || 0}
+                        {group.postsCount || 0}
                       </p>
                       <p className="text-sm text-gray-600">Posts</p>
                     </div>
