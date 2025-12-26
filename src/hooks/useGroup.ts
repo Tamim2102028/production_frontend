@@ -58,3 +58,73 @@ export const useMyGroups = (limit = 10) => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
+
+export const useUniversityGroups = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["universityGroups", "infinite"],
+    queryFn: ({ pageParam = 1 }) =>
+      groupService.getUniversityGroups(pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useCareerGroups = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["careerGroups", "infinite"],
+    queryFn: ({ pageParam = 1 }) =>
+      groupService.getCareerGroups(pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useSuggestedGroups = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["suggestedGroups", "infinite"],
+    queryFn: ({ pageParam = 1 }) =>
+      groupService.getSuggestedGroups(pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useSentGroupRequests = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["sentGroupRequests", "infinite"],
+    queryFn: ({ pageParam = 1 }) =>
+      groupService.getSentRequests(pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useInvitedGroups = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["invitedGroups", "infinite"],
+    queryFn: ({ pageParam = 1 }) =>
+      groupService.getInvitedGroups(pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
