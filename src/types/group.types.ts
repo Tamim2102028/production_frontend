@@ -1,3 +1,5 @@
+import type { ApiResponse, Pagination } from "./common.types";
+
 // Group Card Type
 export type GroupCardProps = {
   group: GroupCard;
@@ -9,10 +11,16 @@ export type GroupCard = {
   slug: string;
   description?: string;
   coverImage?: string;
+  institution?: string;
   type: string;
   privacy?: string;
   memberCount?: number;
 };
+
+export type MyGroupsResponse = ApiResponse<{
+  groups: GroupCard[];
+  pagination: Pagination;
+}>;
 
 // Group Type
 export type Group = {

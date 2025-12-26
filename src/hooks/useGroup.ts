@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { groupService } from "../services/group.service";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -38,5 +43,18 @@ export const useGroupDetails = (slug: string) => {
     staleTime: 1000 * 60 * 10, // 10 minutes
     enabled: !!slug,
     retry: 1,
+  });
+};
+
+export const useMyGroups = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["myGroups", "infinite"],
+    queryFn: ({ pageParam = 1 }) => groupService.getMyGroups(pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
