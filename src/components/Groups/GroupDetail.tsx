@@ -13,81 +13,46 @@ import {
   FaFlag,
   FaCog,
   FaLink,
+  FaCheck,
 } from "react-icons/fa";
 import GroupPostList from "./GroupPostList";
 import { BsPostcard } from "react-icons/bs";
 import { confirm, showSuccess } from "../../utils/sweetAlert";
 import GroupMembersTab from "./group-tabs/GroupMembersTab";
-
-// TODO: Replace with API data
-interface Group {
-  id: string;
-  name: string;
-  description?: string;
-  coverImage?: string;
-  profileImage?: string;
-  privacy?: string;
-  memberCount?: number;
-}
+import { useGroupDetails } from "../../hooks/useGroup";
+import { useUser } from "../../hooks/useAuth";
 
 const GroupDetail: React.FC = () => {
-  const { groupId } = useParams<{ groupId: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { user: currentUser } = useUser();
 
-  // TODO: Replace with API call to get group data
-  const group: Group | undefined = groupId
-    ? {
-        id: groupId,
-        name: "Sample Group",
-        description: "Sample group description",
-        coverImage: undefined,
-        profileImage: undefined,
-        privacy: "public",
-        memberCount: 0,
-      }
-    : undefined;
-
-  // TODO: Replace with API data
-  const isRequested = false;
-  const isMember = false;
-  const memberCount = group?.memberCount || 0;
-  const groupOwner = undefined;
-  const groupAdmins: string[] = [];
+  const { data: groupData, isLoading, error } = useGroupDetails(slug!);
+  const group = groupData?.data?.group;
 
   const [activeTab, setActiveTab] = useState<
     "posts" | "pinned" | "members" | "media" | "about"
   >("posts");
   const [showMenu, setShowMenu] = useState(false);
 
+  // TODO: Implement Join/Leave logic with API
   const handleJoin = () => {
-    if (!groupId) return;
-    // TODO: Replace with API call
-    console.log("Join group:", groupId);
+    console.log("Join group:", group?._id);
   };
 
   const handleCancel = () => {
-    if (!groupId) return;
-    // TODO: Replace with API call
-    console.log("Cancel join request:", groupId);
+    console.log("Cancel join request:", group?._id);
   };
 
-  // TODO: Replace with actual current user data
-  const currentUser = { id: "current-user-id", name: "Current User" };
-
-  // Group member management handlers - TODO: Replace with API calls
   const handleMakeAdmin = (userId: string) => {
-    if (!groupId) return;
     console.log("Make admin:", userId);
   };
 
   const handleRemoveAdmin = (userId: string) => {
-    if (!groupId) return;
     console.log("Remove admin:", userId);
   };
 
   const handleRemoveMember = async (userId: string) => {
-    if (!groupId) return;
-
     if (
       await confirm({
         title: "Are you sure?",
@@ -95,7 +60,6 @@ const GroupDetail: React.FC = () => {
         confirmButtonText: "Yes, remove member!",
       })
     ) {
-      // TODO: Replace with API call
       console.log("Remove member:", userId);
       showSuccess({
         title: "Removed!",
@@ -104,29 +68,41 @@ const GroupDetail: React.FC = () => {
     }
   };
 
-  // cancel handler removed (not used in this layout)
+  // Loading State
+  if (isLoading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+      </div>
+    );
+  }
 
-  // If the group wasn't found, show a small placeholder and back button.
-  if (!group) {
+  // Error State or Not Found
+  if (error || !group) {
     return (
       <div className="space-y-4 rounded-lg bg-white p-4">
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate(-1)}
-            aria-label="Back"
-            title="Back"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-lg text-gray-700 shadow-md transition-colors hover:bg-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-lg text-gray-700 shadow-md transition-colors hover:bg-gray-300"
           >
             <FaArrowLeft />
           </button>
           <h2 className="text-lg font-medium text-gray-900">Group not found</h2>
         </div>
         <p className="text-sm text-gray-600">
-          The group you requested does not exist.
+          The group you requested does not exist or you don't have permission to
+          view it.
         </p>
       </div>
     );
   }
+
+  // Derived Access Rights (Mocked for now until backend sends relation info)
+  const isMember = false; // TODO: Check if currentUser is in group.members
+  const isRequested = false; // TODO: Check if currentUser is in group.joinRequests
+  const isOwner = group.creatorId === currentUser?._id;
+  const isAdmin = false; // TODO: Check if currentUser is in group.admins
 
   return (
     <div className="space-y-5 overflow-hidden">
@@ -148,23 +124,11 @@ const GroupDetail: React.FC = () => {
               <div className="flex flex-col items-start gap-6 md:flex-row">
                 {/* Avatar */}
                 <div className="flex-shrink-0">
-                  {group.profileImage ? (
-                    <img
-                      src={group.profileImage}
-                      alt={group.name}
-                      className="h-32 w-32 rounded-2xl object-cover shadow-xl"
-                    />
-                  ) : (
-                    <div className="flex h-32 w-32 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 text-4xl font-bold text-white shadow-xl">
-                      {group.name
-                        ? group.name
-                            .split(" ")
-                            .slice(0, 2)
-                            .map((n) => n[0])
-                            .join("")
-                        : "G"}
-                    </div>
-                  )}
+                  <img
+                    src={group.avatar}
+                    alt={group.name}
+                    className="h-32 w-32 rounded-2xl object-cover shadow-xl"
+                  />
                 </div>
 
                 {/* Info */}
@@ -175,7 +139,10 @@ const GroupDetail: React.FC = () => {
                         {group.name}
                       </h1>
                       <p className="mt-1 text-gray-600">
-                        Public Group · {memberCount} members
+                        {group.privacy === "PUBLIC"
+                          ? "Public Group"
+                          : "Private Group"}{" "}
+                        · {group.members?.length || 0} members
                       </p>
                     </div>
 
@@ -217,7 +184,7 @@ const GroupDetail: React.FC = () => {
                                       confirmButtonText: "Yes, leave",
                                     })
                                   ) {
-                                    dispatch(leaveGroup(group.id));
+                                    // dispatch(leaveGroup(group.id));
                                   }
                                 }}
                                 className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
@@ -265,26 +232,13 @@ const GroupDetail: React.FC = () => {
                     )}
 
                     {isMember &&
-                      (group.privacy === "closed" ? (
+                      (group.privacy === "CLOSED" ? (
                         <div className="rounded-lg bg-gray-100 px-6 py-2.5 font-semibold text-gray-700">
                           Closed
                         </div>
                       ) : (
-                        <button
-                          onClick={async () => {
-                            if (
-                              await confirm({
-                                title: "Are you sure?",
-                                text: "You will leave this group and will need to join again.",
-                                confirmButtonText: "Yes, leave group!",
-                              })
-                            ) {
-                              dispatch(leaveGroup(group.id));
-                            }
-                          }}
-                          className="rounded-lg bg-gray-200 px-6 py-2.5 font-semibold text-gray-700 transition hover:bg-gray-300"
-                        >
-                          Joined
+                        <button className="flex items-center gap-2 rounded-lg bg-gray-200 px-6 py-2.5 font-semibold text-gray-700 transition hover:bg-gray-300">
+                          <FaCheck /> Joined
                         </button>
                       ))}
 
@@ -354,21 +308,19 @@ const GroupDetail: React.FC = () => {
                   </div>
                 )}
 
-                {/* Use existing GroupPostList for posts */}
-                <GroupPostList groupId={group.id} mode={"posts"} />
+                <GroupPostList groupId={group._id} mode={"posts"} />
               </div>
             )}
 
             {activeTab === "pinned" && (
-              <GroupPostList groupId={group.id} mode={"pinned"} />
+              <GroupPostList groupId={group._id} mode={"pinned"} />
             )}
 
             {activeTab === "members" && (
               <GroupMembersTab
-                groupId={group.id}
-                users={usersData}
-                currentUserId={currentUser?.id}
-                currentUser={currentUser}
+                groupId={group._id}
+                users={[]} // TODO: Pass real members
+                currentUserId={currentUser?._id}
                 onMakeAdmin={handleMakeAdmin}
                 onRemoveAdmin={handleRemoveAdmin}
                 onRemoveMember={handleRemoveMember}
@@ -405,86 +357,7 @@ const GroupDetail: React.FC = () => {
                 </div>
 
                 {/* Creator/Owner Section */}
-                <div>
-                  <h3 className="mb-3 font-bold text-gray-900">Creator</h3>
-                  {(() => {
-                    const owner = usersData.find((u) => u.id === groupOwner);
-                    if (!owner)
-                      return (
-                        <p className="text-sm text-gray-500">Owner not found</p>
-                      );
-
-                    return (
-                      <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
-                        <img
-                          src={owner.avatar}
-                          alt={owner.name}
-                          className="h-12 w-12 rounded-full object-cover"
-                        />
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-900">
-                            {owner.name}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {/* username hidden */}
-                          </p>
-                        </div>
-                        <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
-                          Owner
-                        </span>
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                {/* Admins Section */}
-                {groupAdmins && groupAdmins.length > 0 && (
-                  <div>
-                    <h3 className="mb-3 font-bold text-gray-900">
-                      Admins ({groupAdmins.length})
-                    </h3>
-                    <div className="space-y-2">
-                      {groupAdmins.map((adminId) => {
-                        const admin = usersData.find((u) => u.id === adminId);
-                        if (!admin) return null;
-
-                        const isOwner = adminId === groupOwner;
-
-                        return (
-                          <div
-                            key={adminId}
-                            onClick={() => navigate(`/profile/${adminId}`)}
-                            className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-colors hover:bg-gray-100"
-                          >
-                            <img
-                              src={admin.avatar}
-                              alt={admin.name}
-                              className="h-12 w-12 rounded-full object-cover"
-                            />
-                            <div className="flex-1">
-                              <p className="font-semibold text-gray-900">
-                                {admin.name}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                {/* username hidden */}
-                              </p>
-                            </div>
-                            <div className="flex gap-2">
-                              {isOwner && (
-                                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
-                                  Owner
-                                </span>
-                              )}
-                              <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
-                                Admin
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                {/* TODO: Fetch Owner Details */}
 
                 {/* Group Stats */}
                 <div>
@@ -492,7 +365,7 @@ const GroupDetail: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                       <p className="text-2xl font-bold text-gray-900">
-                        {memberCount}
+                        {group.members?.length || 0}
                       </p>
                       <p className="text-sm text-gray-600">Members</p>
                     </div>
@@ -509,11 +382,7 @@ const GroupDetail: React.FC = () => {
                 <div>
                   <h3 className="mb-2 font-bold text-gray-900">Created</h3>
                   <p className="text-gray-700">
-                    {new Date(group.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {new Date(group.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>

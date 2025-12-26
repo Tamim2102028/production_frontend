@@ -1,66 +1,50 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import { FaUsers, FaLock, FaGlobe, FaBan } from "react-icons/fa";
+import {
+  GROUP_MEMBERSHIP_STATUS,
+  GROUP_PRIVACY,
+} from "../../../constants/index";
+import type { GroupCardProps } from "../../../types/group.types";
 
-// Accepts group with 'id' property instead of 'groupId'.
-type SmallGroup = {
-  id: string;
-  name: string;
-  description?: string;
-  coverImage?: string;
-  profileImage?: string;
-  memberCount?: number;
-  privacy?: string;
-  category?: string;
-};
-
-type GroupCardProps = {
-  group: SmallGroup;
-  showJoinButton?: boolean;
-  showCancelButton?: boolean;
-  isRequested?: boolean;
-  isMember?: boolean;
-};
-
-const GroupCard: React.FC<GroupCardProps> = ({
-  group,
-  showJoinButton = false,
-  showCancelButton = false,
-  isRequested: propIsRequested = false,
-  isMember: propIsMember = false,
-}) => {
-  // TODO: Replace with actual state from API
-  const [isRequested, setIsRequested] = useState(propIsRequested);
-  const isMember = propIsMember;
-  const effectiveMember = isMember;
-
+const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
   const handleJoin = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // TODO: Replace with API call
-    console.log("Join group:", group.id);
-    setIsRequested(true);
+    console.log("Join group:", group._id);
   };
 
   const handleCancel = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // TODO: Replace with API call
-    console.log("Cancel join request:", group.id);
-    setIsRequested(false);
+    console.log("Cancel join request:", group._id);
   };
+
+  const handleAccept = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // TODO: Replace with API call
+    console.log("Accept join request:", group._id);
+  };
+
+  const handleReject = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // TODO: Replace with API call
+    console.log("Reject join request:", group._id);
+  };
+
   return (
     <NavLink
-      to={`/groups/${group.id}`}
+      to={`/groups/${group.slug}`}
       className="cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
     >
+      {/* Group Card Content */}
       <div className="relative overflow-hidden">
         <img
-          src={
-            group.profileImage ||
-            group.coverImage ||
-            "/images/default-group-cover.jpg"
-          }
+          src={group.coverImage || "/images/default-group-cover.jpg"}
           alt={group.name}
           className="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-110"
         />
@@ -86,9 +70,12 @@ const GroupCard: React.FC<GroupCardProps> = ({
         </div>
       </div>
 
+      {/*  */}
       <div className="p-3">
+        {/* Group Name */}
         <h3 className="mb-2 text-lg font-bold text-gray-900">{group.name}</h3>
 
+        {/* Group Members Count */}
         <div className="mb-3 flex items-center gap-2 text-sm text-gray-600">
           <FaUsers size={14} />
           <span className="font-medium">
@@ -96,42 +83,55 @@ const GroupCard: React.FC<GroupCardProps> = ({
           </span>
         </div>
 
-        {showJoinButton &&
-          !isRequested &&
-          !effectiveMember &&
-          group.privacy !== "closed" && (
-            <button
-              type="button"
-              onClick={handleJoin}
-              className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-            >
-              Join Group
-            </button>
+        {/* Join / Cancel / Accept / Reject - Buttons */}
+        <div>
+          {/* Join */}
+          {status === GROUP_MEMBERSHIP_STATUS.NOT_JOINED &&
+            status !== GROUP_MEMBERSHIP_STATUS.BANNED &&
+            group.privacy !== GROUP_PRIVACY.CLOSED && (
+              <button
+                type="button"
+                onClick={handleJoin}
+                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+              >
+                Join Group
+              </button>
+            )}
+
+          {/* Cancel Join Request */}
+          {status === GROUP_MEMBERSHIP_STATUS.PENDING &&
+            status !== GROUP_MEMBERSHIP_STATUS.BANNED && (
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+              >
+                Cancel Request
+              </button>
+            )}
+
+          {/* Accept / Reject Invitation */}
+          {status === GROUP_MEMBERSHIP_STATUS.INVITED && (
+            <>
+              <button
+                type="button"
+                onClick={handleAccept}
+                className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700"
+                disabled
+              >
+                Accept
+              </button>
+              <button
+                type="button"
+                onClick={handleReject}
+                className="w-full rounded-lg bg-gray-300 px-4 py-2 text-sm font-semibold text-gray-700"
+                disabled
+              >
+                Reject
+              </button>
+            </>
           )}
-
-        {isRequested && showCancelButton && (
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
-          >
-            Cancel Request
-          </button>
-        )}
-
-        {isRequested && !showCancelButton && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            className="w-full rounded-lg bg-gray-300 px-4 py-2 text-sm font-semibold text-gray-700"
-            disabled
-          >
-            Requested
-          </button>
-        )}
+        </div>
       </div>
     </NavLink>
   );

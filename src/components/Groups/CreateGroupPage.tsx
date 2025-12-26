@@ -1,858 +1,414 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
-  FaImage,
-  FaUsers,
-  FaGraduationCap,
-  FaBook,
   FaArrowLeft,
+  FaLock,
+  FaGlobe,
+  FaBan,
+  FaCheck,
+  FaUsers,
+  FaBriefcase,
+  FaUniversity,
 } from "react-icons/fa";
-import { showSuccess, showError } from "../../utils/sweetAlert";
+import { useNavigate } from "react-router-dom";
+import { useCreateGroup } from "../../hooks/useGroup";
 
-// TODO: Replace with API data
-interface Group {
-  id: string;
-  name: string;
-  description: string;
-  groupFor?: "students" | "teachers" | "both";
-  gender?: ("male" | "female")[];
-  type?: "academic" | "hall" | "jobs" | "others";
-  privacy?: "public" | "private" | "closed";
-  educationLevel?: string;
-  coverImage?: string;
-  profileImage?: string;
-  tags?: string[];
-  rules?: string[];
-  university?: Record<string, unknown>;
-  college?: Record<string, unknown>;
-  systemCreated?: boolean;
-  postCount?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-  status?: string;
-}
+// Zod Schema
+const createGroupSchema = z.object({
+  name: z.string().min(3, "Group name must be at least 3 characters"),
+  description: z.string().optional(),
+  type: z.enum(["GENERAL", "JOBS_CAREERS", "OFFICIAL_INSTITUTION"]),
+  avatar: z.any().optional(),
+  coverImage: z.any().optional(),
+  privacy: z.enum(["PUBLIC", "PRIVATE", "CLOSED"]),
+  settings: z.object({
+    allowMemberPosting: z.boolean(),
+    requirePostApproval: z.boolean(),
+  }),
+});
+
+type CreateGroupFormInputs = z.infer<typeof createGroupSchema>;
 
 const CreateGroupPage: React.FC = () => {
   const navigate = useNavigate();
+  const { mutate: createGroup, isPending } = useCreateGroup();
 
-  // TODO: Replace with actual user ID from API/context
-  const currentUserId = "current-user-id";
-
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    groupFor: "students" as "students" | "teachers" | "both",
-    gender: [] as ("male" | "female")[],
-    type: "academic" as "academic" | "hall" | "jobs" | "others",
-    privacy: "public" as "public" | "private" | "closed",
-    educationLevel: "" as
-      | ""
-      | "UNIVERSITY"
-      | "MEDICAL_COLLEGE"
-      | "NATIONAL_UNIVERSITY"
-      | "COLLEGE"
-      | "POLYTECHNIC"
-      | "SCHOOL",
-    tags: "",
-    rules: "",
-    // University fields
-    universityName: "" as "" | "BUET" | "DU" | "RUET" | "CUET" | "KUET",
-    department: "" as "" | "CSE" | "EEE" | "ME" | "CE" | "CHE",
-    section: "" as "" | "A" | "B" | "C",
-    subsection: "" as "" | "1" | "2",
-    year: "" as "" | "1" | "2" | "3" | "4" | "5",
-    semester: "" as "" | "1" | "2",
-    // College fields
-    collegeName: "" as
-      | ""
-      | "Notre Dame College"
-      | "Holy Cross College"
-      | "Dhaka College"
-      | "Rajuk College",
-    collegeDepartment: "" as "" | "science" | "commerce" | "arts",
-    collegeYear: "" as "" | "1" | "2" | "admission",
-    boardType: "" as "" | "madrasah" | "general",
-    board: "" as "" | "dhaka" | "chittagong",
-    version: "" as "" | "bangla" | "english",
-    medium: "" as "" | "bangla" | "english",
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<CreateGroupFormInputs>({
+    resolver: zodResolver(createGroupSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      type: "GENERAL",
+      avatar: "",
+      coverImage: "",
+      privacy: "PUBLIC",
+      settings: {
+        allowMemberPosting: true,
+        requirePostApproval: false,
+      },
+    },
   });
 
-  const [coverPreview, setCoverPreview] = useState<string>("");
-  const [profilePreview, setProfilePreview] = useState<string>("");
+  const privacyValue = watch("privacy");
+  const typeValue = watch("type");
 
-  // Handle input changes
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const onSubmit = (data: CreateGroupFormInputs) => {
+    const formData = new FormData();
 
-  // Handle checkbox for gender
-  const handleGenderChange = (gender: "male" | "female") => {
-    setFormData((prev) => ({
-      ...prev,
-      gender: prev.gender.includes(gender)
-        ? prev.gender.filter((g) => g !== gender)
-        : [...prev.gender, gender],
-    }));
-  };
+    formData.append("name", data.name);
+    formData.append("type", data.type);
 
-  // Handle image upload
-  const handleImageUpload = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: "cover" | "profile"
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (type === "cover") {
-          setCoverPreview(reader.result as string);
-        } else {
-          setProfilePreview(reader.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+    if (data.description) formData.append("description", data.description);
+    formData.append("privacy", data.privacy);
+
+    // Append settings as individual fields or JSON string based on backend expectation
+    formData.append("settings", JSON.stringify(data.settings));
+
+    if (data.coverImage && data.coverImage[0]) {
+      formData.append("coverImage", data.coverImage[0]);
     }
-  };
-
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validation
-    if (!formData.name.trim()) {
-      showError({ title: "Oops...", text: "Group name is required!" });
-      return;
+    if (data.avatar && data.avatar[0]) {
+      formData.append("avatar", data.avatar[0]);
     }
 
-    if (!formData.description.trim()) {
-      showError({ title: "Oops...", text: "Group description is required!" });
-      return;
-    }
-
-    if (!currentUserId) {
-      showError({
-        title: "Oops...",
-        text: "You must be logged in to create a group!",
-      });
-      return;
-    }
-
-    // Create new group object
-    const newGroupId = `g${Date.now()}`;
-    const newGroup: Partial<Group> = {
-      id: newGroupId,
-      name: formData.name,
-      description: formData.description,
-      groupFor: formData.groupFor,
-      gender: formData.gender.length > 0 ? formData.gender : undefined,
-      type: formData.type,
-      privacy: formData.privacy,
-      educationLevel: formData.educationLevel || undefined,
-      coverImage: coverPreview || undefined,
-      profileImage: profilePreview || undefined,
-      tags: formData.tags
-        ? formData.tags.split(",").map((tag) => tag.trim())
-        : undefined,
-      rules: formData.rules
-        ? formData.rules.split("\n").filter((rule) => rule.trim())
-        : undefined,
-      systemCreated: false,
-      postCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: "active",
-    };
-
-    // Add university data if applicable
-    if (formData.educationLevel === "UNIVERSITY" && formData.universityName) {
-      newGroup.university = {
-        name: formData.universityName,
-        department: formData.department || undefined,
-        section: formData.section || undefined,
-        subsection: formData.subsection || undefined,
-        year: formData.year
-          ? (parseInt(formData.year) as 1 | 2 | 3 | 4 | 5)
-          : undefined,
-        semester: formData.semester
-          ? (parseInt(formData.semester) as 1 | 2)
-          : undefined,
-      };
-    }
-
-    // Add college data if applicable
-    if (formData.educationLevel === "COLLEGE" && formData.collegeName) {
-      newGroup.college = {
-        name: formData.collegeName,
-        department: formData.collegeDepartment || undefined,
-        year: formData.collegeYear || undefined,
-        boardType: formData.boardType || undefined,
-        board: formData.board || undefined,
-        version: formData.version || undefined,
-        medium: formData.medium || undefined,
-      };
-    }
-
-    // TODO: Replace with API call to add member to group
-    console.log("Adding owner to group:", currentUserId, newGroupId);
-
-    // TODO: Replace with API call to create group
-    console.log("Creating group:", newGroup);
-
-    // Show success message
-    showSuccess({
-      title: "Group Created!",
-      text: `${formData.name} has been created successfully.`,
-    });
-
-    console.log("New Group:", newGroup);
-    console.log("Owner added to groupMembers with ID:", currentUserId);
-    navigate("/groups");
+    createGroup(formData);
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-4">
+    <div className="mx-auto max-w-3xl">
       {/* Header */}
-      <div className="flex items-center gap-4 rounded-xl bg-white p-6 shadow-md">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition hover:bg-gray-200"
-          aria-label="Go back"
-        >
-          <FaArrowLeft />
-        </button>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Create New Group</h1>
-          <p className="text-gray-600">
-            Build a community and connect with like-minded people
-          </p>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Information */}
-        <div className="rounded-xl bg-white p-6 shadow-md">
-          <div className="mb-4 flex items-center gap-2">
-            <FaUsers className="text-2xl text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">
-              Basic Information
-            </h2>
-          </div>
-
-          <div className="space-y-4">
-            {/* Group Name */}
-            <div>
-              <label
-                htmlFor="name"
-                className="mb-2 block font-semibold text-gray-700"
-              >
-                Group Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="Enter group name"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                required
-              />
-            </div>
-
-            {/* Description */}
-            <div>
-              <label
-                htmlFor="description"
-                className="mb-2 block font-semibold text-gray-700"
-              >
-                Description <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Describe what your group is about"
-                rows={4}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                required
-              />
-            </div>
-
-            {/* Tags */}
-            <div>
-              <label
-                htmlFor="tags"
-                className="mb-2 block font-semibold text-gray-700"
-              >
-                Tags (comma separated)
-              </label>
-              <input
-                type="text"
-                id="tags"
-                name="tags"
-                value={formData.tags}
-                onChange={handleInputChange}
-                placeholder="e.g., programming, study, projects"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-
-            {/* Rules */}
-            <div>
-              <label
-                htmlFor="rules"
-                className="mb-2 block font-semibold text-gray-700"
-              >
-                Group Rules (one per line)
-              </label>
-              <textarea
-                id="rules"
-                name="rules"
-                value={formData.rules}
-                onChange={handleInputChange}
-                placeholder="Enter group rules, one per line"
-                rows={4}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="group flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-all hover:border-blue-500 hover:text-blue-600"
+          >
+            <FaArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Create New Group
+            </h1>
+            <p className="text-sm font-medium text-gray-500">
+              Start a community for people with shared interests
+            </p>
           </div>
         </div>
 
-        {/* Group Settings */}
-        <div className="rounded-xl bg-white p-6 shadow-md">
-          <div className="mb-4 flex items-center gap-2">
-            <FaBook className="text-2xl text-purple-600" />
-            <h2 className="text-xl font-bold text-gray-900">Group Settings</h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Group For */}
-            <div>
-              <label
-                htmlFor="groupFor"
-                className="mb-2 block font-semibold text-gray-700"
-              >
-                Group For
-              </label>
-              <select
-                id="groupFor"
-                name="groupFor"
-                value={formData.groupFor}
-                onChange={handleInputChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <option value="students">Students</option>
-                <option value="teachers">Teachers</option>
-                <option value="both">Both</option>
-              </select>
-            </div>
-
-            {/* Type */}
-            <div>
-              <label
-                htmlFor="type"
-                className="mb-2 block font-semibold text-gray-700"
-              >
-                Group Type
-              </label>
-              <select
-                id="type"
-                name="type"
-                value={formData.type}
-                onChange={handleInputChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <option value="academic">Academic</option>
-                <option value="hall">Hall</option>
-                <option value="jobs">Jobs</option>
-                <option value="others">Others</option>
-              </select>
-            </div>
-
-            {/* Privacy */}
-            <div>
-              <label
-                htmlFor="privacy"
-                className="mb-2 block font-semibold text-gray-700"
-              >
-                Privacy
-              </label>
-              <select
-                id="privacy"
-                name="privacy"
-                value={formData.privacy}
-                onChange={handleInputChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <option value="public">Public - Anyone can join</option>
-                <option value="private">Private - Approval needed</option>
-                <option value="closed">Closed - Invitation only</option>
-              </select>
-            </div>
-
-            {/* Education Level */}
-            <div>
-              <label
-                htmlFor="educationLevel"
-                className="mb-2 block font-semibold text-gray-700"
-              >
-                Education Level
-              </label>
-              <select
-                id="educationLevel"
-                name="educationLevel"
-                value={formData.educationLevel}
-                onChange={handleInputChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <option value="">Select level</option>
-                <option value="UNIVERSITY">University</option>
-                <option value="MEDICAL_COLLEGE">Medical College</option>
-                <option value="NATIONAL_UNIVERSITY">National University</option>
-                <option value="COLLEGE">College</option>
-                <option value="POLYTECHNIC">Polytechnic</option>
-                <option value="SCHOOL">School</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Gender Selection */}
-          <div className="mt-4">
-            <label className="mb-2 block font-semibold text-gray-700">
-              Gender (optional)
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.gender.includes("male")}
-                  onChange={() => handleGenderChange("male")}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span>Male</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.gender.includes("female")}
-                  onChange={() => handleGenderChange("female")}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span>Female</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* University Details (Conditional) */}
-        {formData.educationLevel === "UNIVERSITY" && (
-          <div className="rounded-xl bg-white p-6 shadow-md">
-            <div className="mb-4 flex items-center gap-2">
-              <FaGraduationCap className="text-2xl text-green-600" />
-              <h2 className="text-xl font-bold text-gray-900">
-                University Details
-              </h2>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              {/* University Name */}
-              <div>
-                <label
-                  htmlFor="universityName"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  University
-                </label>
-                <select
-                  id="universityName"
-                  name="universityName"
-                  value={formData.universityName}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select university</option>
-                  <option value="BUET">BUET</option>
-                  <option value="DU">DU</option>
-                  <option value="RUET">RUET</option>
-                  <option value="CUET">CUET</option>
-                  <option value="KUET">KUET</option>
-                </select>
-              </div>
-
-              {/* Department */}
-              <div>
-                <label
-                  htmlFor="department"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Department
-                </label>
-                <select
-                  id="department"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select department</option>
-                  <option value="CSE">CSE</option>
-                  <option value="EEE">EEE</option>
-                  <option value="ME">ME</option>
-                  <option value="CE">CE</option>
-                  <option value="CHE">CHE</option>
-                </select>
-              </div>
-
-              {/* Section */}
-              <div>
-                <label
-                  htmlFor="section"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Section
-                </label>
-                <select
-                  id="section"
-                  name="section"
-                  value={formData.section}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select section</option>
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                  <option value="C">C</option>
-                </select>
-              </div>
-
-              {/* Subsection */}
-              <div>
-                <label
-                  htmlFor="subsection"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Subsection
-                </label>
-                <select
-                  id="subsection"
-                  name="subsection"
-                  value={formData.subsection}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select subsection</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                </select>
-              </div>
-
-              {/* Year */}
-              <div>
-                <label
-                  htmlFor="year"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Year
-                </label>
-                <select
-                  id="year"
-                  name="year"
-                  value={formData.year}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select year</option>
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="3">3rd Year</option>
-                  <option value="4">4th Year</option>
-                  <option value="5">5th Year</option>
-                </select>
-              </div>
-
-              {/* Semester */}
-              <div>
-                <label
-                  htmlFor="semester"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Semester
-                </label>
-                <select
-                  id="semester"
-                  name="semester"
-                  value={formData.semester}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select semester</option>
-                  <option value="1">1st Semester</option>
-                  <option value="2">2nd Semester</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* College Details (Conditional) */}
-        {formData.educationLevel === "COLLEGE" && (
-          <div className="rounded-xl bg-white p-6 shadow-md">
-            <div className="mb-4 flex items-center gap-2">
-              <FaGraduationCap className="text-2xl text-green-600" />
-              <h2 className="text-xl font-bold text-gray-900">
-                College Details
-              </h2>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              {/* College Name */}
-              <div>
-                <label
-                  htmlFor="collegeName"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  College
-                </label>
-                <select
-                  id="collegeName"
-                  name="collegeName"
-                  value={formData.collegeName}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select college</option>
-                  <option value="Notre Dame College">Notre Dame College</option>
-                  <option value="Holy Cross College">Holy Cross College</option>
-                  <option value="Dhaka College">Dhaka College</option>
-                  <option value="Rajuk College">Rajuk College</option>
-                </select>
-              </div>
-
-              {/* Department */}
-              <div>
-                <label
-                  htmlFor="collegeDepartment"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Department
-                </label>
-                <select
-                  id="collegeDepartment"
-                  name="collegeDepartment"
-                  value={formData.collegeDepartment}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select department</option>
-                  <option value="science">Science</option>
-                  <option value="commerce">Commerce</option>
-                  <option value="arts">Arts</option>
-                </select>
-              </div>
-
-              {/* Year */}
-              <div>
-                <label
-                  htmlFor="collegeYear"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Year
-                </label>
-                <select
-                  id="collegeYear"
-                  name="collegeYear"
-                  value={formData.collegeYear}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select year</option>
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="admission">Admission</option>
-                </select>
-              </div>
-
-              {/* Board Type */}
-              <div>
-                <label
-                  htmlFor="boardType"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Board Type
-                </label>
-                <select
-                  id="boardType"
-                  name="boardType"
-                  value={formData.boardType}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select board type</option>
-                  <option value="madrasah">Madrasah</option>
-                  <option value="general">General</option>
-                </select>
-              </div>
-
-              {/* Board */}
-              <div>
-                <label
-                  htmlFor="board"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Board
-                </label>
-                <select
-                  id="board"
-                  name="board"
-                  value={formData.board}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select board</option>
-                  <option value="dhaka">Dhaka</option>
-                  <option value="chittagong">Chittagong</option>
-                </select>
-              </div>
-
-              {/* Version */}
-              <div>
-                <label
-                  htmlFor="version"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Version
-                </label>
-                <select
-                  id="version"
-                  name="version"
-                  value={formData.version}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select version</option>
-                  <option value="bangla">Bangla</option>
-                  <option value="english">English</option>
-                </select>
-              </div>
-
-              {/* Medium */}
-              <div>
-                <label
-                  htmlFor="medium"
-                  className="mb-2 block font-semibold text-gray-700"
-                >
-                  Medium
-                </label>
-                <select
-                  id="medium"
-                  name="medium"
-                  value={formData.medium}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">Select medium</option>
-                  <option value="bangla">Bangla</option>
-                  <option value="english">English</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Images */}
-        <div className="rounded-xl bg-white p-6 shadow-md">
-          <div className="mb-4 flex items-center gap-2">
-            <FaImage className="text-2xl text-pink-600" />
-            <h2 className="text-xl font-bold text-gray-900">Group Images</h2>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Cover Image */}
-            <div>
-              <label className="mb-2 block font-semibold text-gray-700">
-                Cover Image
-              </label>
-              <div className="relative">
-                {coverPreview ? (
-                  <img
-                    src={coverPreview}
-                    alt="Cover preview"
-                    className="h-40 w-full rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="flex h-40 w-full items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
-                    <div className="text-center">
-                      <FaImage className="mx-auto mb-2 text-4xl text-gray-400" />
-                      <p className="text-sm text-gray-500">
-                        Upload cover image
-                      </p>
-                    </div>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, "cover")}
-                  className="absolute inset-0 cursor-pointer opacity-0"
-                />
-              </div>
-            </div>
-
-            {/* Profile Image */}
-            <div>
-              <label className="mb-2 block font-semibold text-gray-700">
-                Profile Image
-              </label>
-              <div className="relative">
-                {profilePreview ? (
-                  <img
-                    src={profilePreview}
-                    alt="Profile preview"
-                    className="h-40 w-full rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="flex h-40 w-full items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
-                    <div className="text-center">
-                      <FaImage className="mx-auto mb-2 text-4xl text-gray-400" />
-                      <p className="text-sm text-gray-500">
-                        Upload profile image
-                      </p>
-                    </div>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, "profile")}
-                  className="absolute inset-0 cursor-pointer opacity-0"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Submit Buttons */}
-        <div className="flex gap-4">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="flex-1 rounded-lg border-2 border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+            className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:text-gray-900"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="flex-1 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+            form="create-group-form"
+            disabled={isPending}
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:opacity-70 disabled:shadow-none"
           >
-            Create Group
+            {isPending ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Creating...
+              </>
+            ) : (
+              <>
+                Create Group
+                <FaCheck />
+              </>
+            )}
           </button>
+        </div>
+      </div>
+
+      <form
+        id="create-group-form"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6"
+      >
+        {/* Basic Information */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-5 border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+            Basic Information
+          </h2>
+
+          <div className="space-y-5">
+            {/* Name */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                Group Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                {...register("name")}
+                type="text"
+                placeholder="e.g. Computer Science Class of 2025"
+                className={`w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:ring-2 ${
+                  errors.name
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-100"
+                }`}
+              />
+              {errors.name && (
+                <p className="mt-1.5 text-xs font-medium text-red-500">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                {...register("description")}
+                rows={4}
+                placeholder="Tell people what this group is about..."
+                className="w-full resize-none rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
+
+            <div>
+              <label className="mb-3 block text-sm font-medium text-gray-700">
+                Group Type
+              </label>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {/* General */}
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
+                    typeValue === "GENERAL"
+                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value="GENERAL"
+                    {...register("type")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center gap-2 text-blue-600">
+                    <FaUsers className="text-lg" />
+                    <span className="font-semibold">General</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    Connect with people who share your hobbies and interests.
+                  </p>
+                </label>
+
+                {/* Jobs & Careers */}
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
+                    typeValue === "JOBS_CAREERS"
+                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value="JOBS_CAREERS"
+                    {...register("type")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center gap-2 text-indigo-600">
+                    <FaBriefcase className="text-lg" />
+                    <span className="font-semibold">Careers</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    Network with professionals and find job opportunities.
+                  </p>
+                </label>
+
+                {/* Official Institution */}
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
+                    typeValue === "OFFICIAL_INSTITUTION"
+                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value="OFFICIAL_INSTITUTION"
+                    {...register("type")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center gap-2 text-purple-600">
+                    <FaUniversity className="text-lg" />
+                    <span className="font-semibold">Official</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    Official group for schools, universities, or organizations.
+                  </p>
+                </label>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {/* Avatar */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                  Group Avatar
+                </label>
+                <input
+                  {...register("avatar")}
+                  type="file"
+                  accept="image/*"
+                  className="block w-full text-sm text-gray-500 transition-colors file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                />
+                <p className="mt-1.5 text-xs text-gray-500">
+                  Recommended: Square image, max 2MB
+                </p>
+              </div>
+
+              {/* Cover Image */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                  Cover Image
+                </label>
+                <input
+                  {...register("coverImage")}
+                  type="file"
+                  accept="image/*"
+                  className="block w-full text-sm text-gray-500 transition-colors file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                />
+                <p className="mt-1.5 text-xs text-gray-500">
+                  Recommended: 1200x400px, max 5MB
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Privacy & Settings */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-5 border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+            Privacy & Settings
+          </h2>
+
+          <div className="space-y-6">
+            <div>
+              <label className="mb-3 block text-sm font-medium text-gray-700">
+                Privacy Level
+              </label>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {/* Public */}
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
+                    privacyValue === "PUBLIC"
+                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value="PUBLIC"
+                    {...register("privacy")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center gap-2 text-blue-600">
+                    <FaGlobe className="text-lg" />
+                    <span className="font-semibold">Public</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    Anyone can see the group, its members and their posts.
+                  </p>
+                </label>
+
+                {/* Private */}
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
+                    privacyValue === "PRIVATE"
+                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value="PRIVATE"
+                    {...register("privacy")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center gap-2 text-gray-700">
+                    <FaLock className="text-lg" />
+                    <span className="font-semibold">Private</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    Only members can see who's in the group and what they post.
+                  </p>
+                </label>
+
+                {/* Closed */}
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border p-4 transition-all hover:shadow-md ${
+                    privacyValue === "CLOSED"
+                      ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value="CLOSED"
+                    {...register("privacy")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center gap-2 text-red-600">
+                    <FaBan className="text-lg" />
+                    <span className="font-semibold">Closed</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    Hidden from search. Only members can find and join this
+                    group.
+                  </p>
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  {...register("settings.allowMemberPosting")}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Allow members to post
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    If unchecked, only admins and moderators can create posts.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  {...register("settings.requirePostApproval")}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Require post approval
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Posts by members must be approved by an admin before
+                    appearing.
+                  </p>
+                </div>
+              </label>
+            </div>
+          </div>
         </div>
       </form>
     </div>
