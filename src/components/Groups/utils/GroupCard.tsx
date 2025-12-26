@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUsers, FaLock, FaGlobe, FaBan } from "react-icons/fa";
 import {
   GROUP_MEMBERSHIP_STATUS,
@@ -8,6 +8,14 @@ import {
 import type { GroupCardProps } from "../../../types/group.types";
 
 const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
+  const navigate = useNavigate();
+
+  const handleViewGroup = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/groups/${group.slug}`);
+  };
+
   const handleJoin = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -37,7 +45,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
   };
 
   return (
-    <NavLink
+    <Link
       to={`/groups/${group.slug}`}
       className="cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
     >
@@ -85,6 +93,17 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
 
         {/* Join / Cancel / Accept / Reject - Buttons */}
         <div>
+          {/* view group button */}
+          {status === GROUP_MEMBERSHIP_STATUS.JOINED && (
+            <button
+              type="button"
+              onClick={handleViewGroup}
+              className="w-full rounded-lg bg-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-400"
+            >
+              View Group
+            </button>
+          )}
+
           {/* Join */}
           {status === GROUP_MEMBERSHIP_STATUS.NOT_JOINED &&
             status !== GROUP_MEMBERSHIP_STATUS.BANNED &&
@@ -131,9 +150,25 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, status }) => {
               </button>
             </div>
           )}
+
+          {/* closed groups */}
+          {group.privacy === GROUP_PRIVACY.CLOSED &&
+            status !== GROUP_MEMBERSHIP_STATUS.JOINED &&
+            status !== GROUP_MEMBERSHIP_STATUS.INVITED &&
+            status !== GROUP_MEMBERSHIP_STATUS.PENDING && (
+              <div className="mt-2 flex justify-center">
+                <button
+                  type="button"
+                  disabled
+                  className="w-full rounded-lg bg-red-300 px-4 py-2 text-sm font-semibold text-gray-700 cursor-not-allowed"
+                >
+                  You can't join this group
+                </button>
+              </div>
+            )}
         </div>
       </div>
-    </NavLink>
+    </Link>
   );
 };
 
