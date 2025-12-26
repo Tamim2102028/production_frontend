@@ -188,7 +188,7 @@ const GroupDetail: React.FC = () => {
                       {showMenu && (
                         <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
                           <div className="py-1">
-                            {isMember && (
+                            {isAdmin && (
                               <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50">
                                 <FaCog className="h-4 w-4 flex-shrink-0" />
                                 <span className="font-medium">
