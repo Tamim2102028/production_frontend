@@ -1,3 +1,5 @@
+import type { Pagination } from "./common.types";
+
 export interface CommentAuthor {
   _id: string;
   fullName: string;
@@ -23,12 +25,7 @@ export interface CommentsResponse {
   success: boolean;
   data: {
     comments: Comment[];
-    pagination: {
-      totalComments: number;
-      totalPages: number;
-      currentPage: number;
-      limit: number;
-    };
+    pagination: Pagination;
   };
   message: string;
 }

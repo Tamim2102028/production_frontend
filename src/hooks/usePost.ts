@@ -4,29 +4,8 @@ import { type CreatePostRequest, type Post } from "../types/post.types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import type { ApiError } from "../types/user.types";
+import type { Pagination } from "../types/common.types";
 
-/**
- * ====================================
- * POST HOOKS - TanStack Query
- * ====================================
- *
- * Post related সব hooks এখানে।
- */
-
-/**
- * useProfilePosts Hook
- *
- * একটি user এর profile posts fetch করে।
- * Own profile হলে mixed privacy posts আসবে, অন্যের হলে শুধু public posts।
- *
- * @param username - User's unique username
- * @returns { data: { posts, isOwnProfile }, isLoading, error }
- *
- * @example
- * const { data, isLoading } = useProfilePosts("tamim2102028");
- * // data.posts → Post array
- * // data.isOwnProfile → boolean
- */
 export const useProfilePosts = (username: string | undefined) => {
   return useQuery({
     queryKey: ["profilePosts", username],
@@ -59,7 +38,11 @@ export const useToggleLikePost = () => {
       // মেমোরিতে ডেটা ম্যানুয়ালি আপডেট করা (Optimistic Update for all profile posts)
       queryClient.setQueriesData(
         { queryKey: ["profilePosts"] },
-        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+        (
+          oldData:
+            | { posts: Post[]; pagination: Pagination; isOwnProfile: boolean }
+            | undefined
+        ) => {
           if (!oldData || !oldData.posts) return oldData;
 
           return {

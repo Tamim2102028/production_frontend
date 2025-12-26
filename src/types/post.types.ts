@@ -3,6 +3,7 @@ import {
   POST_TARGET_MODELS,
   POST_VISIBILITY,
 } from "../constants/post";
+import type { Pagination } from "./common.types";
 
 export interface Attachment {
   type: "IMAGE" | "VIDEO" | "PDF" | "DOC" | "LINK";
@@ -60,9 +61,7 @@ export interface FeedResponse {
   statusCode: number;
   data: {
     posts: Post[];
-    hasNextPage: boolean;
-    nextPage: number | null;
-    totalDocs: number;
+    pagination: Pagination;
   };
   message: string;
   success: boolean;
@@ -72,6 +71,7 @@ export interface ProfilePostsResponse {
   statusCode: number;
   data: {
     posts: Post[];
+    pagination: Pagination;
     isOwnProfile: boolean;
   };
   message: string;

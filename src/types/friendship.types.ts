@@ -1,4 +1,5 @@
 import { PROFILE_RELATION_STATUS } from "../constants";
+import type { Pagination } from "./common.types";
 
 // ====================================
 // ACTION RESPONSE DATA TYPES
@@ -72,13 +73,4 @@ export interface InstitutionBasic {
 export interface DepartmentBasic {
   _id?: string;
   name: string;
-}
-
-export interface Pagination {
-  totalDocs: number;
-  limit: number;
-  page: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
 }
