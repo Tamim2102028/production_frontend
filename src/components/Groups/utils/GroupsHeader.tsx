@@ -21,7 +21,7 @@ const GroupsHeader: React.FC = () => {
         onClick={handleCreateGroupClick}
         className="flex cursor-pointer items-center gap-2 rounded-lg border px-5 py-3 text-black transition-colors hover:bg-[#333] hover:text-white"
       >
-        <FaPlus size={16} />
+        <FaPlus size={15} />
         Create Group
       </button>
     </div>
