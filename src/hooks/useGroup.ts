@@ -23,6 +23,7 @@ export const useCreateGroup = () => {
     onSuccess: (data) => {
       toast.success("Group created successfully!");
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
 
       const groupSlug = data.data.group?.slug;
       if (groupSlug) {
@@ -40,20 +41,10 @@ export const useCreateGroup = () => {
   });
 };
 
-export const useGroupDetails = (slug: string) => {
-  return useQuery<GroupDetailsResponse>({
-    queryKey: ["group", slug],
-    queryFn: () => groupService.getGroupDetails(slug),
-    staleTime: 1000 * 60 * 10, // 10 minutes
-    enabled: !!slug,
-    retry: 1,
-  });
-};
-
-export const useMyGroups = (limit = 10) => {
+export const useMyGroups = () => {
   return useInfiniteQuery({
     queryKey: ["myGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) => groupService.getMyGroups(pageParam, limit),
+    queryFn: ({ pageParam = 1 }) => groupService.getMyGroups(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -63,11 +54,10 @@ export const useMyGroups = (limit = 10) => {
   });
 };
 
-export const useUniversityGroups = (limit = 10) => {
+export const useUniversityGroups = () => {
   return useInfiniteQuery({
     queryKey: ["universityGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) =>
-      groupService.getUniversityGroups(pageParam, limit),
+    queryFn: ({ pageParam = 1 }) => groupService.getUniversityGroups(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -77,11 +67,10 @@ export const useUniversityGroups = (limit = 10) => {
   });
 };
 
-export const useCareerGroups = (limit = 10) => {
+export const useCareerGroups = () => {
   return useInfiniteQuery({
     queryKey: ["careerGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) =>
-      groupService.getCareerGroups(pageParam, limit),
+    queryFn: ({ pageParam = 1 }) => groupService.getCareerGroups(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -91,11 +80,10 @@ export const useCareerGroups = (limit = 10) => {
   });
 };
 
-export const useSuggestedGroups = (limit = 10) => {
+export const useSuggestedGroups = () => {
   return useInfiniteQuery({
     queryKey: ["suggestedGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) =>
-      groupService.getSuggestedGroups(pageParam, limit),
+    queryFn: ({ pageParam = 1 }) => groupService.getSuggestedGroups(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -105,11 +93,10 @@ export const useSuggestedGroups = (limit = 10) => {
   });
 };
 
-export const useSentGroupRequests = (limit = 10) => {
+export const useSentGroupRequests = () => {
   return useInfiniteQuery({
     queryKey: ["sentGroupRequests", "infinite"],
-    queryFn: ({ pageParam = 1 }) =>
-      groupService.getSentRequests(pageParam, limit),
+    queryFn: ({ pageParam = 1 }) => groupService.getSentRequests(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -119,17 +106,67 @@ export const useSentGroupRequests = (limit = 10) => {
   });
 };
 
-export const useInvitedGroups = (limit = 10) => {
+export const useInvitedGroups = () => {
   return useInfiniteQuery({
     queryKey: ["invitedGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) =>
-      groupService.getInvitedGroups(pageParam, limit),
+    queryFn: ({ pageParam = 1 }) => groupService.getInvitedGroups(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
       return page < totalPages ? page + 1 : undefined;
     },
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useGroupDetails = (slug: string) => {
+  return useQuery<GroupDetailsResponse>({
+    queryKey: ["groupDetails", slug],
+    queryFn: () => groupService.getGroupDetails(slug),
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    enabled: !!slug,
+    retry: 1,
+  });
+};
+
+export const useGroupMembers = (slug: string) => {
+  return useInfiniteQuery<GroupMembersResponse>({
+    queryKey: ["groupMembers", slug],
+    queryFn: ({ pageParam = 1 }) =>
+      groupService.getGroupMembers(slug, pageParam as number),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+// ====================================
+// Action Button Hooks
+// ====================================
+
+export const useJoinGroup = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (slug: string) => groupService.joinGroup(slug),
+    onSuccess: () => {
+      toast.success("Request sent / Joined successfully!");
+      queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
+      queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["careerGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message || "Failed to join group";
+      toast.error(message);
+    },
   });
 };
 
@@ -143,30 +180,11 @@ export const useLeaveGroup = () => {
 
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
-      queryClient.invalidateQueries({ queryKey: ["group"] });
+      queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message || "Failed to leave group";
-      toast.error(message);
-    },
-  });
-};
-
-export const useJoinGroup = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (slug: string) => groupService.joinGroup(slug),
-    onSuccess: () => {
-      toast.success("Request sent / Joined successfully!");
-      queryClient.invalidateQueries({ queryKey: ["group"] });
-      queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
-      queryClient.invalidateQueries({ queryKey: ["myGroups"] });
-      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message || "Failed to join group";
       toast.error(message);
     },
   });
@@ -179,8 +197,13 @@ export const useCancelJoinRequest = () => {
     mutationFn: (slug: string) => groupService.cancelJoinRequest(slug),
     onSuccess: () => {
       toast.success("Join request cancelled");
-      queryClient.invalidateQueries({ queryKey: ["group"] });
+      queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
       queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["careerGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["myGroups"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message =
@@ -198,6 +221,12 @@ export const useDeleteGroup = () => {
     mutationFn: (slug: string) => groupService.deleteGroup(slug),
     onSuccess: () => {
       toast.success("Group deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
+      queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["careerGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
       navigate("/groups");
     },
@@ -218,11 +247,11 @@ export const useInviteMembers = () => {
       targetUserIds,
     }: {
       slug: string;
-      targetUserIds: string[];
+      targetUserIds: string | string[];
     }) => groupService.inviteMembers(slug, targetUserIds),
     onSuccess: () => {
       toast.success("Invitations sent successfully");
-      queryClient.invalidateQueries({ queryKey: ["groupMembers"] });
+      queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message =
@@ -283,20 +312,5 @@ export const useRevokeGroupAdmin = () => {
         error?.response?.data?.message || "Failed to revoke admin";
       toast.error(message);
     },
-  });
-};
-
-export const useGroupMembers = (slug: string, limit = 10) => {
-  return useInfiniteQuery<GroupMembersResponse>({
-    queryKey: ["groupMembers", slug],
-    queryFn: ({ pageParam = 1 }) =>
-      groupService.getGroupMembers(slug, pageParam as number, limit),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      const { page, totalPages } = lastPage.data.pagination;
-      return page < totalPages ? page + 1 : undefined;
-    },
-    enabled: !!slug,
-    staleTime: 1000 * 60 * 5,
   });
 };

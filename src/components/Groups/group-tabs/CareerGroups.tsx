@@ -13,7 +13,7 @@ const CareerGroups = () => {
     isLoading,
     isError,
     refetch,
-  } = useCareerGroups(9);
+  } = useCareerGroups();
 
   const groups = data?.pages.flatMap((page) => page.data.groups) || [];
   const totalDocs = data?.pages[0]?.data.pagination.totalDocs || 0;

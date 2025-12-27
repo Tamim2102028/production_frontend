@@ -13,7 +13,7 @@ const InvitedGroup = () => {
     isLoading,
     isError,
     refetch,
-  } = useInvitedGroups(9);
+  } = useInvitedGroups();
 
   const groups = data?.pages.flatMap((page) => page.data.groups) || [];
   const totalDocs = data?.pages[0]?.data.pagination.totalDocs || 0;

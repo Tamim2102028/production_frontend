@@ -129,17 +129,16 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
             )}
 
           {/* Cancel Join Request */}
-          {status === GROUP_MEMBERSHIP_STATUS.PENDING &&
-            status !== GROUP_MEMBERSHIP_STATUS.BANNED && (
-              <button
-                type="button"
-                onClick={handleCancel}
-                disabled={isLoading}
-                className="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-400"
-              >
-                {isCancelling ? "Cancelling..." : "Cancel Request"}
-              </button>
-            )}
+          {status === GROUP_MEMBERSHIP_STATUS.PENDING && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={isLoading}
+              className="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-400"
+            >
+              {isCancelling ? "Cancelling..." : "Cancel Request"}
+            </button>
+          )}
 
           {/* Accept / Reject Invitation */}
           {status === GROUP_MEMBERSHIP_STATUS.INVITED && (

@@ -3,6 +3,7 @@ import GroupCard from "../utils/GroupCard";
 import GroupEmptyState from "../utils/GroupEmptyState";
 import GroupErrorState from "../utils/GroupErrorState";
 import { useSentGroupRequests } from "../../../hooks/useGroup";
+import { GROUP_LIMIT } from "../../../constants";
 
 const SentGroupRequests = () => {
   const {
@@ -13,7 +14,7 @@ const SentGroupRequests = () => {
     isLoading,
     isError,
     refetch,
-  } = useSentGroupRequests(9);
+  } = useSentGroupRequests();
 
   const groups = data?.pages.flatMap((page) => page.data.groups) || [];
   const totalDocs = data?.pages[0]?.data.pagination.totalDocs || 0;
@@ -21,7 +22,7 @@ const SentGroupRequests = () => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {[...Array(6)].map((_, i) => (
+        {[...Array(GROUP_LIMIT)].map((_, i) => (
           <div
             key={i}
             className="h-64 animate-pulse rounded-xl bg-gray-200"

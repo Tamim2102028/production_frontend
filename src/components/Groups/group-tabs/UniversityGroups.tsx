@@ -13,7 +13,7 @@ const UniversityGroups = () => {
     isLoading,
     isError,
     refetch,
-  } = useUniversityGroups(9);
+  } = useUniversityGroups();
 
   const groups = data?.pages.flatMap((page) => page.data.groups) || [];
   const totalDocs = data?.pages[0]?.data.pagination.totalDocs || 0;

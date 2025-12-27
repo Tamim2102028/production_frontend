@@ -13,7 +13,7 @@ const MyGroups = () => {
     isLoading,
     isError,
     refetch,
-  } = useMyGroups(9); // Limit 9
+  } = useMyGroups(); // Limit handled in service
 
   const groups = data?.pages.flatMap((page) => page.data.groups) || [];
   const totalDocs = data?.pages[0]?.data.pagination.totalDocs || 0;
