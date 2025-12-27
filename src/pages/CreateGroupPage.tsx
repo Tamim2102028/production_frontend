@@ -13,7 +13,7 @@ import {
   FaUniversity,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useCreateGroup } from "../../hooks/useGroup";
+import { useCreateGroup } from "../hooks/useGroup";
 
 // Zod Schema
 const createGroupSchema = z.object({
@@ -133,9 +133,9 @@ const CreateGroupPage: React.FC = () => {
   ];
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-3xl space-y-5">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -165,7 +165,7 @@ const CreateGroupPage: React.FC = () => {
             type="submit"
             form="create-group-form"
             disabled={isPending}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:opacity-70 disabled:shadow-none"
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:opacity-70 disabled:shadow-none"
           >
             {isPending ? (
               <>
@@ -183,9 +183,9 @@ const CreateGroupPage: React.FC = () => {
       </div>
 
       <form
+        className="space-y-5"
         id="create-group-form"
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6"
       >
         {/* Basic Information */}
         <div className="space-y-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">

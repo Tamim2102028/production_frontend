@@ -11,9 +11,7 @@ import PageLoader from "./Fallbacks/PageLoader";
 
 // Lazy load detail and create pages to avoid circular deps or large bundles
 const GroupDetail = lazy(() => import("../components/Groups/GroupDetail"));
-const CreateGroupPage = lazy(
-  () => import("../components/Groups/CreateGroupPage")
-);
+const CreateGroupPage = lazy(() => import("./CreateGroupPage.tsx"));
 
 const GroupsLayout: React.FC = () => {
   const tabs = [
