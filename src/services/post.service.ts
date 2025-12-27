@@ -61,14 +61,10 @@ export const postService = {
   },
 
   // Get Profile Posts
-  getProfilePosts: async (
-    username: string,
-    page: number = 1,
-    limit: number = 10
-  ) => {
+  getProfilePosts: async (username: string, page: number) => {
     const response = await api.get<ProfilePostsResponse>(
       `/profile/${username}/posts`,
-      { params: { page, limit } }
+      { params: { page, limit: 10 } }
     );
     return response.data;
   },

@@ -9,9 +9,16 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
   username,
   isOwnProfile,
 }) => {
-  const { data: postsData, isLoading, error } = useProfilePosts(username);
+  const {
+    data: postsData,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useProfilePosts(username);
 
-  const posts = postsData?.posts || [];
+  const posts = postsData?.pages.flatMap((page) => page.data.posts) || [];
 
   if (isLoading) {
     return (
@@ -59,6 +66,16 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
               : "No posts to show."}
           </p>
         </div>
+      )}
+      {/* Load More Button */}
+      {hasNextPage && (
+        <button
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+          className="inline-block w-full rounded-lg bg-blue-500 px-6 py-3 text-center text-white transition-colors duration-300 hover:bg-blue-600"
+        >
+          {isFetchingNextPage ? "Loading..." : "Load More"}
+        </button>
       )}
     </>
   );

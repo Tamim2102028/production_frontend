@@ -75,29 +75,34 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = usePostComments(post._id, post.postOnModel, showCommentBox);
-  const { mutate: addComment, isPending: isAddingComment } = useAddComment(
-    post._id,
-    post.postOnModel
-  );
-  const { mutate: deleteComment } = useDeleteComment(
-    post._id,
-    post.postOnModel
-  );
-  const { mutate: toggleLikeComment } = useToggleLikeComment(
-    post._id,
-    post.postOnModel
-  );
-  const { mutate: updateComment } = useUpdateComment(
-    post._id,
-    post.postOnModel
-  );
+  } = usePostComments({
+    postId: post._id,
+    targetModel: post.postOnModel,
+    enabled: showCommentBox,
+  });
+
+  const { mutate: addComment, isPending: isAddingComment } = useAddComment({
+    postId: post._id,
+    targetModel: post.postOnModel,
+  });
+  const { mutate: deleteComment } = useDeleteComment({
+    postId: post._id,
+    targetModel: post.postOnModel,
+  });
+  const { mutate: toggleLikeComment } = useToggleLikeComment({
+    postId: post._id,
+    targetModel: post.postOnModel,
+  });
+  const { mutate: updateComment } = useUpdateComment({
+    postId: post._id,
+    targetModel: post.postOnModel,
+  });
 
   const postComments =
     commentsData?.pages.flatMap((page) => page.data.comments) || [];
 
   const handleLike = () => {
-    likeMutate(post._id);
+    likeMutate({ postId: post._id, targetModel: post.postOnModel });
     setShowMenu(false);
   };
 
@@ -143,7 +148,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     });
 
     if (isConfirmed) {
-      deletePost(post._id);
+      deletePost({ postId: post._id, targetModel: post.postOnModel });
     }
   };
 
@@ -164,7 +169,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     visibility: string;
   }) => {
     updatePost(
-      { postId: post._id, data },
+      { postId: post._id, data, targetModel: post.postOnModel },
       {
         onSuccess: () => {
           setIsEditing(false);
@@ -201,7 +206,12 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => toggleReadStatus(post._id)}
+            onClick={() =>
+              toggleReadStatus({
+                postId: post._id,
+                targetModel: post.postOnModel,
+              })
+            }
             className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
               meta.isRead ? "text-blue-600" : "text-gray-500"
             }`}
@@ -470,7 +480,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
                   <button
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
-                    className="mt-2 w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50"
+                    className="w-full rounded-lg border border-blue-600 p-2 text-center text-sm font-medium text-blue-600 transition-colors hover:bg-blue-600 hover:text-white disabled:opacity-50"
                   >
                     {isFetchingNextPage
                       ? "Loading more..."
