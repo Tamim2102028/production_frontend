@@ -1,4 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useInfiniteQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { commentService } from "../services/comment.service";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -8,13 +12,19 @@ export const usePostComments = (
   postId: string,
   targetModel: string,
   enabled = false,
-  page = 1,
-  limit = 50
+  limit = 10
 ) => {
-  return useQuery({
-    queryKey: ["comments", postId, targetModel, page, limit],
-    queryFn: () =>
-      commentService.getPostComments(postId, targetModel, page, limit),
+  return useInfiniteQuery({
+    queryKey: ["comments", postId, targetModel, limit],
+    queryFn: ({ pageParam = 1 }) =>
+      commentService.getPostComments(postId, targetModel, pageParam, limit),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.pagination.hasNextPage) {
+        return lastPage.data.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
     enabled: !!postId && enabled,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });

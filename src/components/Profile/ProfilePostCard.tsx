@@ -69,11 +69,13 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const { mutate: toggleBookmark } = useToggleBookmark();
 
   // Comment hooks
-  const { data: commentsData, isLoading: isLoadingComments } = usePostComments(
-    post._id,
-    post.postOnModel,
-    showCommentBox
-  );
+  const {
+    data: commentsData,
+    isLoading: isLoadingComments,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePostComments(post._id, post.postOnModel, showCommentBox);
   const { mutate: addComment, isPending: isAddingComment } = useAddComment(
     post._id,
     post.postOnModel
@@ -91,7 +93,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     post.postOnModel
   );
 
-  const postComments = commentsData?.data?.comments || [];
+  const postComments =
+    commentsData?.pages.flatMap((page) => page.data.comments) || [];
 
   const handleLike = () => {
     likeMutate(post._id);
@@ -462,7 +465,18 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
                     }
                   />
                 ))}
-                {/* TODO: Implement 'Load More' button for pagination */}
+                {/* Load More Button */}
+                {hasNextPage && (
+                  <button
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                    className="mt-2 w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50"
+                  >
+                    {isFetchingNextPage
+                      ? "Loading more..."
+                      : "Load more comments"}
+                  </button>
+                )}
               </div>
             </div>
           )}
