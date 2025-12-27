@@ -6,14 +6,15 @@ export const commentService = {
   // Get comments for a post
   getPostComments: async (
     postId: string,
-    context: string,
+    targetModel: string,
     page: number = 1,
     limit: number = 10
   ) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const response = await api.get<CommentsResponse>(
@@ -26,11 +27,12 @@ export const commentService = {
   },
 
   // Add a comment to a post
-  addComment: async (postId: string, content: string, context: string) => {
+  addComment: async (postId: string, content: string, targetModel: string) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const response = await api.post<AddCommentResponse>(
@@ -43,11 +45,12 @@ export const commentService = {
   },
 
   // Delete a comment
-  deleteComment: async (commentId: string, context: string) => {
+  deleteComment: async (commentId: string, targetModel: string) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const response = await api.delete(`/${routeSegment}/comments/${commentId}`);
@@ -58,12 +61,13 @@ export const commentService = {
   updateComment: async (
     commentId: string,
     content: string,
-    context: string
+    targetModel: string
   ) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const response = await api.patch(`/${routeSegment}/comments/${commentId}`, {
@@ -73,11 +77,12 @@ export const commentService = {
   },
 
   // Toggle like comment
-  toggleLikeComment: async (commentId: string, context: string) => {
+  toggleLikeComment: async (commentId: string, targetModel: string) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const response = await api.post(

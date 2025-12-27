@@ -6,25 +6,26 @@ import type { ApiError } from "../types";
 
 export const usePostComments = (
   postId: string,
-  context: string,
+  targetModel: string,
   enabled = false,
   page = 1,
   limit = 50
 ) => {
   return useQuery({
-    queryKey: ["comments", postId, context, page, limit],
-    queryFn: () => commentService.getPostComments(postId, context, page, limit),
+    queryKey: ["comments", postId, targetModel, page, limit],
+    queryFn: () =>
+      commentService.getPostComments(postId, targetModel, page, limit),
     enabled: !!postId && enabled,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 };
 
-export const useAddComment = (postId: string, context: string) => {
+export const useAddComment = (postId: string, targetModel: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ content }: { content: string }) =>
-      commentService.addComment(postId, content, context),
+      commentService.addComment(postId, content, targetModel),
     onSuccess: () => {
       // Invalidate comments for this post
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
@@ -40,12 +41,12 @@ export const useAddComment = (postId: string, context: string) => {
   });
 };
 
-export const useDeleteComment = (postId: string, context: string) => {
+export const useDeleteComment = (postId: string, targetModel: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (commentId: string) =>
-      commentService.deleteComment(commentId, context),
+      commentService.deleteComment(commentId, targetModel),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
       queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
@@ -57,7 +58,7 @@ export const useDeleteComment = (postId: string, context: string) => {
   });
 };
 
-export const useUpdateComment = (postId: string, context: string) => {
+export const useUpdateComment = (postId: string, targetModel: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -67,7 +68,7 @@ export const useUpdateComment = (postId: string, context: string) => {
     }: {
       commentId: string;
       content: string;
-    }) => commentService.updateComment(commentId, content, context),
+    }) => commentService.updateComment(commentId, content, targetModel),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
       toast.success("Comment updated");
@@ -84,12 +85,12 @@ export const useUpdateComment = (postId: string, context: string) => {
   });
 };
 
-export const useToggleLikeComment = (postId: string, context: string) => {
+export const useToggleLikeComment = (postId: string, targetModel: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (commentId: string) =>
-      commentService.toggleLikeComment(commentId, context),
+      commentService.toggleLikeComment(commentId, targetModel),
     onSuccess: () => {
       // Invalidate comments for this post to refresh like count and status
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
