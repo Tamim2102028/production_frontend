@@ -49,7 +49,7 @@ const GroupDetail: React.FC = () => {
   const group = groupData?.data?.group;
   const meta = groupData?.data?.meta;
 
-  const { data: membersData } = useGroupMembers(group?._id || "");
+  const { data: membersData } = useGroupMembers(group?.slug || "");
   const membersList =
     membersData?.pages.flatMap((page) => page.data.members) || [];
 
@@ -74,26 +74,26 @@ const GroupDetail: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleJoin = () => {
-    if (group?._id) {
-      joinGroup(group._id);
+    if (group?.slug) {
+      joinGroup(group.slug);
     }
   };
 
   const handleCancel = () => {
-    if (group?._id) {
-      cancelJoinRequest(group._id);
+    if (group?.slug) {
+      cancelJoinRequest(group.slug);
     }
   };
 
   const handleMakeAdmin = (userId: string) => {
-    if (group?._id) {
-      assignAdmin({ groupId: group._id, userId });
+    if (group?.slug) {
+      assignAdmin({ slug: group.slug, userId });
     }
   };
 
   const handleRemoveAdmin = (userId: string) => {
-    if (group?._id) {
-      revokeAdmin({ groupId: group._id, userId });
+    if (group?.slug) {
+      revokeAdmin({ slug: group.slug, userId });
     }
   };
 
@@ -105,8 +105,8 @@ const GroupDetail: React.FC = () => {
         confirmButtonText: "Yes, remove member!",
       })
     ) {
-      if (group?._id) {
-        removeMember({ groupId: group._id, userId });
+      if (group?.slug) {
+        removeMember({ slug: group.slug, userId });
       }
     }
   };
@@ -243,8 +243,12 @@ const GroupDetail: React.FC = () => {
                                       confirmButtonText: "Yes, leave",
                                     })
                                   ) {
-                                    if (group) {
-                                      leaveGroup(group._id);
+                                    if (group?.slug) {
+                                      leaveGroup(group.slug, {
+                                        onSuccess: () => {
+                                          navigate("/groups");
+                                        },
+                                      });
                                     }
                                   }
                                 }}

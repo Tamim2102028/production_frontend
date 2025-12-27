@@ -6,10 +6,20 @@ import {
   GROUP_PRIVACY,
 } from "../../../constants/index";
 import type { GroupCardResponse } from "../../../types";
+import {
+  useJoinGroup,
+  useLeaveGroup,
+  useCancelJoinRequest,
+} from "../../../hooks/useGroup";
 
 const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
   const navigate = useNavigate();
   const { status } = meta;
+
+  const { mutate: joinGroup, isPending: isJoining } = useJoinGroup();
+  const { mutate: leaveGroup, isPending: isLeaving } = useLeaveGroup();
+  const { mutate: cancelJoin, isPending: isCancelling } =
+    useCancelJoinRequest();
 
   const handleViewGroup = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -20,30 +30,30 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
   const handleJoin = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // TODO: Replace with API call
-    console.log("Join group:", group._id);
+    joinGroup(group.slug);
   };
 
   const handleCancel = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // TODO: Replace with API call
-    console.log("Cancel join request:", group._id);
+    cancelJoin(group.slug);
   };
 
   const handleAccept = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // TODO: Replace with API call
-    console.log("Accept join request:", group._id);
+    // Accepting an invite is effectively joining the group
+    joinGroup(group.slug);
   };
 
   const handleReject = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // TODO: Replace with API call
-    console.log("Reject join request:", group._id);
+    // Rejecting an invite is effectively leaving the potential relationship
+    leaveGroup(group.slug);
   };
+
+  const isLoading = isJoining || isLeaving || isCancelling;
 
   return (
     <Link
@@ -112,9 +122,10 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
               <button
                 type="button"
                 onClick={handleJoin}
-                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                disabled={isLoading}
+                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
               >
-                Join Group
+                {isJoining ? "Joining..." : "Join Group"}
               </button>
             )}
 
@@ -124,9 +135,10 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+                disabled={isLoading}
+                className="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-400"
               >
-                Cancel Request
+                {isCancelling ? "Cancelling..." : "Cancel Request"}
               </button>
             )}
 
@@ -136,18 +148,18 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
               <button
                 type="button"
                 onClick={handleAccept}
-                className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700"
-                disabled
+                disabled={isLoading}
+                className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-400"
               >
-                Accept
+                {isJoining ? "Accepting..." : "Accept"}
               </button>
               <button
                 type="button"
                 onClick={handleReject}
-                className="w-full rounded-lg bg-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-400"
-                disabled
+                disabled={isLoading}
+                className="w-full rounded-lg bg-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-400 disabled:cursor-not-allowed disabled:bg-gray-200"
               >
-                Reject
+                {isLeaving ? "Rejecting..." : "Reject"}
               </button>
             </div>
           )}

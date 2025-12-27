@@ -135,10 +135,9 @@ export const useInvitedGroups = (limit = 10) => {
 
 export const useLeaveGroup = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (groupId: string) => groupService.leaveGroup(groupId),
+    mutationFn: (slug: string) => groupService.leaveGroup(slug),
     onSuccess: () => {
       toast.success("You have left the group");
 
@@ -146,13 +145,6 @@ export const useLeaveGroup = () => {
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
       queryClient.invalidateQueries({ queryKey: ["group"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
-
-      // Navigate to groups list or stay?
-      // If we are on the group detail page, we might want to stay or go to list.
-      // Usually if you leave a private group you can't see it anymore.
-      // For now, let's not force navigation, let the component handle it or user decide.
-      // But commonly, redirecting to /groups is safe.
-      navigate("/groups");
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message || "Failed to leave group";
@@ -165,12 +157,13 @@ export const useJoinGroup = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (groupId: string) => groupService.joinGroup(groupId),
+    mutationFn: (slug: string) => groupService.joinGroup(slug),
     onSuccess: () => {
-      toast.success("Group join request sent!");
+      toast.success("Request sent / Joined successfully!");
       queryClient.invalidateQueries({ queryKey: ["group"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message || "Failed to join group";
@@ -183,7 +176,7 @@ export const useCancelJoinRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (groupId: string) => groupService.cancelJoinRequest(groupId),
+    mutationFn: (slug: string) => groupService.cancelJoinRequest(slug),
     onSuccess: () => {
       toast.success("Join request cancelled");
       queryClient.invalidateQueries({ queryKey: ["group"] });
@@ -197,37 +190,43 @@ export const useCancelJoinRequest = () => {
   });
 };
 
-export const useAcceptGroupInvite = () => {
+export const useDeleteGroup = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (groupId: string) => groupService.acceptInvite(groupId),
+    mutationFn: (slug: string) => groupService.deleteGroup(slug),
     onSuccess: () => {
-      toast.success("Invitation accepted!");
-      queryClient.invalidateQueries({ queryKey: ["group"] });
-      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
+      toast.success("Group deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+      navigate("/groups");
     },
     onError: (error: AxiosError<ApiError>) => {
       const message =
-        error?.response?.data?.message || "Failed to accept invitation";
+        error?.response?.data?.message || "Failed to delete group";
       toast.error(message);
     },
   });
 };
 
-export const useRejectGroupInvite = () => {
+export const useInviteMembers = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (groupId: string) => groupService.rejectInvite(groupId),
+    mutationFn: ({
+      slug,
+      targetUserIds,
+    }: {
+      slug: string;
+      targetUserIds: string[];
+    }) => groupService.inviteMembers(slug, targetUserIds),
     onSuccess: () => {
-      toast.success("Invitation rejected");
-      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
+      toast.success("Invitations sent successfully");
+      queryClient.invalidateQueries({ queryKey: ["groupMembers"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message =
-        error?.response?.data?.message || "Failed to reject invitation";
+        error?.response?.data?.message || "Failed to send invitations";
       toast.error(message);
     },
   });
@@ -237,11 +236,11 @@ export const useRemoveGroupMember = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
-      groupService.removeMember(groupId, userId),
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.removeMember(slug, userId),
     onSuccess: () => {
       toast.success("Member removed successfully");
-      queryClient.invalidateQueries({ queryKey: ["group"] });
+      queryClient.invalidateQueries({ queryKey: ["groupMembers"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message =
@@ -255,11 +254,11 @@ export const useAssignGroupAdmin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
-      groupService.assignAdmin(groupId, userId),
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.assignAdmin(slug, userId),
     onSuccess: () => {
       toast.success("Admin assigned successfully");
-      queryClient.invalidateQueries({ queryKey: ["group"] });
+      queryClient.invalidateQueries({ queryKey: ["groupMembers"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message =
@@ -273,11 +272,11 @@ export const useRevokeGroupAdmin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
-      groupService.revokeAdmin(groupId, userId),
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.revokeAdmin(slug, userId),
     onSuccess: () => {
       toast.success("Admin access revoked");
-      queryClient.invalidateQueries({ queryKey: ["group"] });
+      queryClient.invalidateQueries({ queryKey: ["groupMembers"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message =
@@ -287,17 +286,17 @@ export const useRevokeGroupAdmin = () => {
   });
 };
 
-export const useGroupMembers = (groupId: string, limit = 10) => {
+export const useGroupMembers = (slug: string, limit = 10) => {
   return useInfiniteQuery<GroupMembersResponse>({
-    queryKey: ["groupMembers", groupId],
+    queryKey: ["groupMembers", slug],
     queryFn: ({ pageParam = 1 }) =>
-      groupService.getGroupMembers(groupId, pageParam as number, limit),
+      groupService.getGroupMembers(slug, pageParam as number, limit),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
       return page < totalPages ? page + 1 : undefined;
     },
-    enabled: !!groupId,
+    enabled: !!slug,
     staleTime: 1000 * 60 * 5,
   });
 };
