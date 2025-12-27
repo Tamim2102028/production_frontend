@@ -15,7 +15,8 @@ import {
   FaLink,
   FaCheck,
 } from "react-icons/fa";
-import GroupPostList from "./GroupPostList";
+import CreateGroupPost from "./CreateGroupPost";
+import GroupPosts from "./GroupPosts";
 import { BsPostcard } from "react-icons/bs";
 import { confirm } from "../../utils/sweetAlert";
 import GroupMembersTab from "./group-tabs/GroupMembersTab";
@@ -49,7 +50,7 @@ const GroupDetail: React.FC = () => {
   const group = groupData?.data?.group;
   const meta = groupData?.data?.meta;
 
-  const { data: membersData } = useGroupMembers(group?.slug || "");
+  const { data: membersData } = useGroupMembers(group?._id || "");
   const membersList =
     membersData?.pages.flatMap((page) => page.data.members) || [];
 
@@ -74,26 +75,26 @@ const GroupDetail: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleJoin = () => {
-    if (group?.slug) {
-      joinGroup(group.slug);
+    if (group?._id) {
+      joinGroup(group._id);
     }
   };
 
   const handleCancel = () => {
-    if (group?.slug) {
-      cancelJoinRequest(group.slug);
+    if (group?._id) {
+      cancelJoinRequest(group._id);
     }
   };
 
   const handleMakeAdmin = (userId: string) => {
-    if (group?.slug) {
-      assignAdmin({ slug: group.slug, userId });
+    if (group?._id) {
+      assignAdmin({ groupId: group._id, userId });
     }
   };
 
   const handleRemoveAdmin = (userId: string) => {
-    if (group?.slug) {
-      revokeAdmin({ slug: group.slug, userId });
+    if (group?._id) {
+      revokeAdmin({ groupId: group._id, userId });
     }
   };
 
@@ -105,8 +106,8 @@ const GroupDetail: React.FC = () => {
         confirmButtonText: "Yes, remove member!",
       })
     ) {
-      if (group?.slug) {
-        removeMember({ slug: group.slug, userId });
+      if (group?._id) {
+        removeMember({ groupId: group._id, userId });
       }
     }
   };
@@ -243,8 +244,8 @@ const GroupDetail: React.FC = () => {
                                       confirmButtonText: "Yes, leave",
                                     })
                                   ) {
-                                    if (group?.slug) {
-                                      leaveGroup(group.slug, {
+                                    if (group?._id) {
+                                      leaveGroup(group._id, {
                                         onSuccess: () => {
                                           navigate("/groups");
                                         },
@@ -368,22 +369,13 @@ const GroupDetail: React.FC = () => {
           <div className="p-3">
             {activeTab === "posts" && (
               <div className="space-y-4">
-                {isMember && (
-                  <div className="mb-6 rounded-xl bg-gray-50 p-4">
-                    <input
-                      type="text"
-                      placeholder="Share something with the group..."
-                      className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                  </div>
-                )}
-
-                <GroupPostList groupId={group._id} mode={"posts"} />
+                {isMember && <CreateGroupPost groupId={group._id} />}
+                <GroupPosts groupId={group._id} mode={"posts"} />
               </div>
             )}
 
             {activeTab === "pinned" && (
-              <GroupPostList groupId={group._id} mode={"pinned"} />
+              <GroupPosts groupId={group._id} mode={"pinned"} />
             )}
 
             {activeTab === "members" && (

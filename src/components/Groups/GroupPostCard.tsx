@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   FaHeart,
   FaShare,
@@ -8,10 +8,11 @@ import {
   FaRegComment,
   FaBookmark,
   FaRegBookmark,
-  FaLink,
-  FaFlag,
   FaEdit,
   FaTrash,
+  FaFlag,
+  FaLink,
+  FaCheckDouble,
 } from "react-icons/fa";
 import {
   formatPostDate,
@@ -20,66 +21,166 @@ import {
 } from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem from "../shared/CommentItem";
-import { DEFAULT_AVATAR_SM } from "../../constants/images";
-import type { CommentResponseItem } from "../../types";
+import CommentSkeleton from "../shared/skeletons/CommentSkeleton";
+import PostContent from "../shared/PostContent";
+import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
+import type { Attachment, Post, PostMeta } from "../../types";
+import { useUser } from "../../hooks/useAuth";
+import {
+  useToggleLikePost,
+  useDeletePost,
+  useToggleReadStatus,
+  useToggleBookmark,
+  useUpdatePost,
+} from "../../hooks/usePost";
+import {
+  usePostComments,
+  useAddComment,
+  useDeleteComment,
+  useToggleLikeComment,
+  useUpdateComment,
+} from "../../hooks/useComment";
+import { ATTACHMENT_TYPES } from "../../constants";
+import confirm from "../../utils/sweetAlert";
 
-// TODO: Replace with API data
-interface GroupPost {
-  postId: string;
-  content: string;
-  createdBy: string;
-  createdAt: string;
-  likedBy?: string[];
-  sharesBy?: string[];
-  comments?: number;
-  tags?: string[];
-  images?: string[];
-  isPinned?: boolean;
-  isEdited?: boolean;
-  editedAt?: string;
+interface ProfilePostCardProps {
+  post: Post;
+  meta: PostMeta;
 }
 
-interface Author {
-  id: string;
-  name: string;
-  avatar?: string;
-}
-
-type Props = {
-  post: GroupPost;
-  author?: Author;
-};
-
-const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
-  const navigate = useNavigate();
-  // TODO: Replace with actual current user data
-  const currentUser = {
-    id: "current-user-id",
-    name: "Current User",
-    avatar: "",
-  };
-  const isOwnPost = post.createdBy === currentUser.id;
-  // TODO: Replace with API data for comments
-  const postComments: CommentResponseItem[] = [];
+const GroupPostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.likedBy?.length || 0);
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const [displayedCommentsCount, setDisplayedCommentsCount] = useState(15);
 
-  const commentsCount = post.comments || postComments.length;
+  // Edit Mode States
+  const [isEditing, setIsEditing] = useState(false);
+  const [showAllTags, setShowAllTags] = useState(false);
+
+  // Get current logged-in user
+  const { user: currentUser } = useUser();
+  const isOwnPost = meta.isMine;
+
+  // Post hooks
+  const { mutate: likeMutate } = useToggleLikePost();
+  const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
+  const { mutate: updatePost, isPending: isUpdating } = useUpdatePost();
+  const { mutate: toggleReadStatus } = useToggleReadStatus();
+  const { mutate: toggleBookmark } = useToggleBookmark();
+
+  // Comment hooks
+  const {
+    data: commentsData,
+    isLoading: isLoadingComments,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePostComments({
+    postId: post._id,
+    targetModel: post.postOnModel,
+    enabled: showCommentBox,
+  });
+
+  const { mutate: addComment, isPending: isAddingComment } = useAddComment({
+    postId: post._id,
+    targetModel: post.postOnModel,
+  });
+  const { mutate: deleteComment } = useDeleteComment({
+    postId: post._id,
+    targetModel: post.postOnModel,
+  });
+  const { mutate: toggleLikeComment } = useToggleLikeComment({
+    postId: post._id,
+    targetModel: post.postOnModel,
+  });
+  const { mutate: updateComment } = useUpdateComment({
+    postId: post._id,
+    targetModel: post.postOnModel,
+  });
+
+  const postComments =
+    commentsData?.pages.flatMap((page) => page.data.comments) || [];
 
   const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-  };
-
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
+    likeMutate({ postId: post._id, targetModel: post.postOnModel });
     setShowMenu(false);
   };
+
+  const handleToggleCommentBox = () => {
+    setShowCommentBox(!showCommentBox);
+  };
+
+  // Ref for textarea
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const handleAddComment = (
+    e?: React.FormEvent | React.KeyboardEvent | React.MouseEvent
+  ) => {
+    if (e) e.preventDefault();
+    if (!commentText.trim() || isAddingComment) return;
+
+    addComment(
+      { content: commentText },
+      {
+        onSuccess: () => {
+          setCommentText("");
+          // Reset textarea height
+          if (textareaRef.current) {
+            textareaRef.current.style.height = "auto";
+          }
+        },
+      }
+    );
+  };
+
+  const handleToggleBookmark = () => {
+    toggleBookmark(post._id);
+    setShowMenu(false);
+  };
+
+  const handleDelete = async () => {
+    setShowMenu(false);
+    const isConfirmed = await confirm({
+      title: "Delete Post?",
+      text: "This action cannot be undone.",
+      confirmButtonText: "Yes, delete it",
+      icon: "warning",
+    });
+
+    if (isConfirmed) {
+      deletePost({ postId: post._id, targetModel: post.postOnModel });
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const link = `${window.location.origin}/post/${post._id}`;
+      await navigator.clipboard.writeText(link);
+      toast.success("Post link copied to clipboard");
+      setShowMenu(false);
+    } catch {
+      toast.error("Failed to copy link");
+    }
+  };
+
+  const handleUpdatePost = (data: {
+    content: string;
+    tags: string[];
+    visibility: string;
+  }) => {
+    updatePost(
+      { postId: post._id, data, targetModel: post.postOnModel },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+        },
+      }
+    );
+  };
+
+  const images = post.attachments.filter(
+    (attachment: Attachment) => attachment.type === ATTACHMENT_TYPES.IMAGE
+  );
 
   return (
     <div className="rounded-lg border border-gray-400 bg-white shadow">
@@ -87,19 +188,15 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-3">
           <img
-            src={author?.avatar}
-            alt={author?.name}
-            className="h-10 w-10 cursor-pointer rounded-full bg-gray-300 transition-all hover:ring-2 hover:ring-blue-300"
-            onClick={() => navigate(`/profile/${post.createdBy}`)}
+            src={post.author.avatar || DEFAULT_AVATAR_MD}
+            alt={post.author.fullName}
+            className="h-10 w-10 rounded-full bg-gray-300 object-cover"
           />
           <div>
-            <h3
-              className="cursor-pointer font-semibold text-gray-900 transition-colors hover:text-blue-600 hover:underline"
-              onClick={() => navigate(`/profile/${post.createdBy}`)}
-            >
-              {author?.name || post.createdBy}
+            <h3 className="font-semibold text-gray-900">
+              {post.author.fullName}
             </h3>
-            <p className="flex items-center gap-2 text-sm text-gray-500">
+            <p className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               <span>{formatPostDate(post.createdAt)}</span>
               <SeparatorDot ariaHidden />
               <span>{formatPostClock(post.createdAt)}</span>
@@ -107,108 +204,175 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
           </div>
         </div>
 
-        <div className="relative">
+        <div className="flex items-center space-x-2">
           <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-200"
-            title="More actions"
+            onClick={() =>
+              toggleReadStatus({
+                postId: post._id,
+                targetModel: post.postOnModel,
+              })
+            }
+            className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
+              meta.isRead ? "text-blue-600" : "text-gray-500"
+            }`}
+            title={meta.isRead ? "Mark as unread" : "Mark as read"}
           >
-            <FaEllipsisH className="h-4 w-4" />
+            <FaCheckDouble className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              {meta.isRead ? "Read" : "Mark as read"}
+            </span>
           </button>
 
-          {showMenu && (
-            <div className="absolute top-full right-0 z-50 mt-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg">
-              <div className="py-1">
-                <button
-                  onClick={handleBookmark}
-                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${isBookmarked ? "text-blue-600" : "text-gray-700"}`}
-                >
-                  {isBookmarked ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-200"
+              title="More actions"
+            >
+              <FaEllipsisH className="h-4 w-4" />
+            </button>
+
+            {showMenu && (
+              <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
+                <div className="py-1">
+                  <button
+                    onClick={handleToggleBookmark}
+                    className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                      meta.isSaved ? "text-blue-600" : "text-gray-700"
+                    }`}
+                  >
+                    {meta.isSaved ? (
+                      <>
+                        <FaBookmark className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Remove from saved</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaRegBookmark className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Save post</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleCopyLink}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                  >
+                    <FaLink className="h-4 w-4 flex-shrink-0" />
+                    <span className="font-medium">Copy link</span>
+                  </button>
+
+                  {isOwnPost ? (
                     <>
-                      <FaBookmark className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Remove bookmark</span>
+                      {/* edit button */}
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          setIsEditing(true);
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                      >
+                        <FaEdit className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Edit post</span>
+                      </button>
+                      {/* delete button */}
+                      <button
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        <FaTrash className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">
+                          {isDeleting ? "Deleting..." : "Delete post"}
+                        </span>
+                      </button>
                     </>
                   ) : (
                     <>
-                      <FaRegBookmark className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Save post</span>
+                      <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50">
+                        <FaFlag className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Report post</span>
+                      </button>
                     </>
                   )}
-                </button>
-                <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50">
-                  <FaLink className="h-4 w-4 flex-shrink-0" />
-                  <span className="font-medium">Copy link</span>
-                </button>
-                {isOwnPost ? (
-                  <>
-                    <button
-                      onClick={() => setShowMenu(false)}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                    >
-                      <FaEdit className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Edit post</span>
-                    </button>
-                    <button
-                      onClick={() => setShowMenu(false)}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
-                    >
-                      <FaTrash className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Delete post</span>
-                    </button>
-                  </>
-                ) : (
-                  <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50">
-                    <FaFlag className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Report post</span>
-                  </button>
-                )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
       {/* Post Content */}
       <div className="px-4 pb-3">
-        <p className="whitespace-pre-wrap text-gray-900">{post.content}</p>
+        <PostContent
+          content={post.content}
+          tags={post.tags}
+          visibility={post.visibility}
+          isEditing={isEditing}
+          isUpdating={isUpdating}
+          onUpdate={handleUpdatePost}
+          onCancel={() => setIsEditing(false)}
+        />
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {post.tags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-block cursor-pointer rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
-              >
-                #{tag}
-              </span>
-            ))}
+          <div className="mt-3">
+            <div className="flex flex-wrap gap-2">
+              {(showAllTags || isEditing
+                ? post.tags
+                : post.tags.slice(0, 5)
+              ).map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-block cursor-pointer rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                >
+                  #{tag}
+                </span>
+              ))}
+              {/* Show "See more" if truncated */}
+              {!isEditing && !showAllTags && post.tags.length > 5 && (
+                <button
+                  onClick={() => setShowAllTags(true)}
+                  className="inline-block cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 hover:underline"
+                >
+                  +{post.tags.length - 5} more
+                </button>
+              )}
+              {/* Show "See less" if expanded */}
+              {!isEditing && showAllTags && post.tags.length > 5 && (
+                <button
+                  onClick={() => setShowAllTags(false)}
+                  className="inline-block cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 hover:underline"
+                >
+                  Show less
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
 
       {/* Post Images */}
-      {post.images && post.images.length > 0 && (
+      {images && images.length > 0 && (
         <div className="px-4 pb-3">
-          {post.images.length === 1 ? (
+          {images.length === 1 ? (
             <img
-              src={post.images[0]}
+              src={images[0].url}
               alt="Post content"
               className="h-auto max-h-96 w-full rounded-lg object-cover"
             />
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {post.images.slice(0, 4).map((image, index) => (
+              {images.slice(0, 4).map((image, index) => (
                 <div key={index} className="relative">
                   <img
-                    src={image}
+                    src={image.url}
                     alt={`Post content ${index + 1}`}
                     className="h-48 w-full rounded-lg object-cover"
                   />
-                  {index === 3 && post.images && post.images.length > 4 && (
+                  {index === 3 && images.length > 4 && (
                     <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center rounded-lg bg-black">
                       <span className="text-lg font-semibold text-white">
-                        +{post.images!.length - 4}
+                        +{images.length - 4}
                       </span>
                     </div>
                   )}
@@ -218,16 +382,14 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
           )}
         </div>
       )}
-
-      {/* Post Stats */}
       <div className="border-t border-gray-100 px-4 py-2">
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-3">
-            <span>{likesCount} likes</span>
+            <span>{post.likesCount || 0} likes</span>
             <SeparatorDot />
-            <span>{commentsCount} comments</span>
+            <span>{post.commentsCount || 0} comments</span>
             <SeparatorDot />
-            <span>{post.sharesBy?.length || 0} shares</span>
+            <span>{post.sharesCount || 0} shares</span>
 
             {post.isEdited && post.editedAt && (
               <>
@@ -243,23 +405,25 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* like/comment/share - Buttons */}
       <div className="border-t border-gray-100 px-4 py-3">
         <div className="grid grid-cols-3 gap-2">
+          {/* like button */}
           <button
             onClick={handleLike}
             className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
-              isLiked
+              meta.isLiked
                 ? "bg-red-50 text-red-600 hover:bg-red-100"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {isLiked ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
+            {meta.isLiked ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
             <span className="text-sm font-medium">Like</span>
           </button>
 
+          {/* comment button */}
           <button
-            onClick={() => setShowCommentBox(!showCommentBox)}
+            onClick={handleToggleCommentBox}
             className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
               showCommentBox
                 ? "bg-blue-50 text-blue-600"
@@ -270,7 +434,11 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
             <span className="text-sm font-medium">Comment</span>
           </button>
 
-          <button className="flex items-center justify-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100">
+          {/* share button */}
+          <button
+            onClick={handleCopyLink}
+            className="flex items-center justify-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
+          >
             <FaShare size={18} />
             <span className="text-sm font-medium">Share</span>
           </button>
@@ -280,75 +448,84 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
       {/* Comments Section & Input - Show only when comment button is clicked */}
       {showCommentBox && (
         <div className="border-t border-gray-100">
-          {/* Comments List - Scrollable */}
-          {postComments.length > 0 && (
-            <div className="px-2.5 py-3">
-              <div className="max-h-[400px] space-y-3 overflow-y-auto">
-                {/* Display limited comments based on displayedCommentsCount - Newest first */}
-                {[...postComments]
-                  .reverse()
-                  .slice(0, displayedCommentsCount)
-                  .map((item) => (
-                    <CommentItem
-                      key={item.comment._id}
-                      comment={item.comment}
-                      meta={item.meta}
-                      currentUserId={currentUser.id}
-                    />
-                  ))}
+          {/* Loading State */}
+          {isLoadingComments && (
+            <div className="space-y-1 px-2.5 py-2">
+              <CommentSkeleton />
+              <CommentSkeleton />
+              <CommentSkeleton />
+            </div>
+          )}
 
-                {/* Show More Comments Button - Inside scrollable area */}
-                {postComments.length > displayedCommentsCount && (
-                  <div className="flex justify-center pt-2">
-                    <button
-                      onClick={() =>
-                        setDisplayedCommentsCount((prev) => prev + 15)
-                      }
-                      className="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50"
-                    >
-                      Show more comments (
-                      {postComments.length - displayedCommentsCount} remaining)
-                    </button>
-                  </div>
+          {/* Comments List - Scrollable */}
+          {!isLoadingComments && postComments.length > 0 && (
+            <div className="px-2.5 py-2">
+              <div className="max-h-[400px] space-y-1 overflow-y-auto">
+                {/* Display all comments - Newest first */}
+                {postComments.map((item) => (
+                  <CommentItem
+                    key={item.comment._id}
+                    comment={item.comment}
+                    meta={item.meta}
+                    currentUserId={currentUser?._id}
+                    onDeleteComment={(commentId) => deleteComment(commentId)}
+                    onLikeComment={(commentId) => toggleLikeComment(commentId)}
+                    onUpdateComment={(commentId, content) =>
+                      updateComment({ commentId, content })
+                    }
+                  />
+                ))}
+                {/* Load More Button */}
+                {hasNextPage && (
+                  <button
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                    className="w-full rounded-lg border border-blue-600 p-2 text-center text-sm font-medium text-blue-600 transition-colors hover:bg-blue-600 hover:text-white disabled:opacity-50"
+                  >
+                    {isFetchingNextPage
+                      ? "Loading more..."
+                      : "Load more comments"}
+                  </button>
                 )}
               </div>
             </div>
           )}
 
           {/* Create Comment Input */}
-          <div className="border-t border-gray-100 px-4 pb-4">
-            <div className="mt-3 flex items-center space-x-3">
+          <div className="border-t border-gray-100 p-4">
+            <div className="flex items-center space-x-3">
               <img
-                src={currentUser.avatar || DEFAULT_AVATAR_SM}
-                alt={currentUser.name}
+                src={currentUser?.avatar || DEFAULT_AVATAR_SM}
+                alt="Your avatar"
                 className="h-8 w-8 rounded-full bg-gray-300 object-cover"
               />
-              <input
-                type="text"
+              <textarea
+                ref={textareaRef}
                 value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment..."
-                className="flex-1 rounded-full border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" && commentText.trim()) {
-                    // TODO: Call API to add comment
-                    console.log("Add comment:", commentText.trim());
-                    setCommentText("");
+                onChange={(e) => {
+                  setCommentText(e.target.value);
+                  // Auto-resize
+                  e.target.style.height = "auto";
+                  e.target.style.height = e.target.scrollHeight + "px";
+                }}
+                placeholder="Write a comment (max 1000 chars)..."
+                className="max-h-32 flex-1 resize-none overflow-y-auto rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                rows={1}
+                style={{ minHeight: "38px" }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAddComment(e);
                   }
                 }}
+                maxLength={1000}
               />
               <button
-                onClick={() => {
-                  if (commentText.trim()) {
-                    // TODO: Call API to add comment
-                    console.log("Add comment:", commentText.trim());
-                    setCommentText("");
-                  }
-                }}
-                disabled={!commentText.trim()}
+                onClick={handleAddComment}
+                disabled={!commentText.trim() || isAddingComment}
                 className="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Send
+                {isAddingComment ? "Sending..." : "Send"}
               </button>
             </div>
           </div>
@@ -358,4 +535,4 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
   );
 };
 
-export default GroupPostCardSimple;
+export default GroupPostCard;

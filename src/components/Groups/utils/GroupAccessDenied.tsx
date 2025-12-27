@@ -33,7 +33,7 @@ const GroupAccessDenied: React.FC<GroupAccessDeniedProps> = ({
           ) : (
             <FaLock className="relative z-10 text-4xl text-red-500" />
           )}
-          <div className="absolute -right-1 -top-1 rounded-full bg-white p-1.5 shadow-sm">
+          <div className="absolute -top-1 -right-1 rounded-full bg-white p-1.5 shadow-sm">
             {isClosed ? (
               <FaEyeSlash className="text-sm text-gray-400" />
             ) : (
@@ -76,20 +76,15 @@ const GroupAccessDenied: React.FC<GroupAccessDeniedProps> = ({
             <FaArrowLeft className="text-sm" />
             Go Back
           </button>
-          
+
           <button
-            onClick={() => navigate("/groups")}
-            className="w-full rounded-xl border border-gray-200 bg-white px-6 py-3 font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+            onClick={() => navigate("/groups/suggested")}
+            className="w-full rounded-xl border border-gray-500 bg-white px-6 py-3 font-semibold text-gray-700 transition-colors hover:bg-gray-100"
           >
             Explore Other Groups
           </button>
         </div>
       </div>
-      
-      {/* Footer Info */}
-      <p className="mt-8 text-xs text-gray-400">
-        If you believe this is an error, please contact support.
-      </p>
     </div>
   );
 };

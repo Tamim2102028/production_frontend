@@ -5,9 +5,16 @@ import type {
   GroupDetailsResponse,
   GroupMembersResponse,
   FeedResponse,
+  CreatePostRequest,
 } from "../types";
 
 export const groupService = {
+  // Create Group Post
+  createGroupPost: async (groupId: string, data: CreatePostRequest) => {
+    const response = await api.post(`/groups/${groupId}/post`, data);
+    return response.data;
+  },
+
   // Create Group
   createGroup: async (data: FormData) => {
     const response = await api.post("/groups", data, {
@@ -25,9 +32,9 @@ export const groupService = {
   },
 
   // Get Group Feed
-  getGroupFeed: async (slug: string, page = 1): Promise<FeedResponse> => {
+  getGroupFeed: async (groupId: string, page = 1): Promise<FeedResponse> => {
     const limit = POST_LIMIT;
-    const response = await api.get<FeedResponse>(`/groups/${slug}/feed`, {
+    const response = await api.get<FeedResponse>(`/groups/${groupId}/feed`, {
       params: { page, limit },
     });
     return response.data;
@@ -94,69 +101,69 @@ export const groupService = {
   },
 
   // Leave Group / Reject Invite
-  leaveGroup: async (slug: string) => {
-    const response = await api.delete(`/groups/${slug}/leave`);
+  leaveGroup: async (groupId: string) => {
+    const response = await api.delete(`/groups/${groupId}/leave`);
     return response.data;
   },
 
   // Join Group / Accept Invite
-  joinGroup: async (slug: string) => {
-    const response = await api.post(`/groups/${slug}/join`);
+  joinGroup: async (groupId: string) => {
+    const response = await api.post(`/groups/${groupId}/join`);
     return response.data;
   },
 
   // Cancel Join Request
-  cancelJoinRequest: async (slug: string) => {
-    const response = await api.post(`/groups/${slug}/cancel`);
+  cancelJoinRequest: async (groupId: string) => {
+    const response = await api.post(`/groups/${groupId}/cancel`);
     return response.data;
   },
 
   // Delete Group
-  deleteGroup: async (slug: string) => {
-    const response = await api.delete(`/groups/${slug}`);
+  deleteGroup: async (groupId: string) => {
+    const response = await api.delete(`/groups/${groupId}`);
     return response.data;
   },
 
   // Invite Members
-  inviteMembers: async (slug: string, targetUserIds: string | string[]) => {
+  inviteMembers: async (groupId: string, targetUserIds: string | string[]) => {
     // Backend expects an array, so we ensure it's always an array
     const ids = Array.isArray(targetUserIds) ? targetUserIds : [targetUserIds];
-    const response = await api.post(`/groups/${slug}/invite`, {
+    const response = await api.post(`/groups/${groupId}/invite`, {
       targetUserIds: ids,
     });
     return response.data;
   },
 
   // Remove Member (Kick)
-  removeMember: async (slug: string, userId: string) => {
-    const response = await api.delete(`/groups/${slug}/members/${userId}`);
+  removeMember: async (groupId: string, userId: string) => {
+    const response = await api.delete(`/groups/${groupId}/members/${userId}`);
     return response.data;
   },
 
   // Assign Admin
-  assignAdmin: async (slug: string, userId: string) => {
+  assignAdmin: async (groupId: string, userId: string) => {
     const response = await api.patch(
-      `/groups/${slug}/members/${userId}/assign-admin`
+      `/groups/${groupId}/members/${userId}/assign-admin`
     );
     return response.data;
   },
 
   // Revoke Admin
-  revokeAdmin: async (slug: string, userId: string) => {
+  revokeAdmin: async (groupId: string, userId: string) => {
     const response = await api.patch(
-      `/groups/${slug}/members/${userId}/revoke-admin`
+      `/groups/${groupId}/members/${userId}/revoke-admin`
     );
     return response.data;
   },
 
   // Get Group Members
   getGroupMembers: async (
-    slug: string,
+    groupId: string,
     page = 1
   ): Promise<GroupMembersResponse> => {
     const limit = GROUP_MEMBERS_LIMIT;
     const response = await api.get<GroupMembersResponse>(
-      `/groups/${slug}/members`,
+      `/groups/${groupId}/members`,
       {
         params: { page, limit },
       }
