@@ -66,8 +66,6 @@ const Login = () => {
       { email: data.email, password: data.password },
       {
         onError: (error: AxiosError<ApiError>) => {
-          // Email ভুল হয় না সাধারণত, password ভুল হয়
-          // তাই login fail হলেও email remember করে রাখি
           const message =
             error.response?.data?.message || "Invalid email or password";
           setServerError(message);
