@@ -32,7 +32,7 @@ export const postService = {
   // Get Profile Posts
   getProfilePosts: async (username: string) => {
     const response = await api.get<ProfilePostsResponse>(
-      `/posts/profile/${username}`
+      `/profile/${username}/posts`
     );
     return response.data;
   },
