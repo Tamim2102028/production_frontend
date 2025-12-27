@@ -62,3 +62,20 @@ export type GroupDetailsResponse = ApiResponse<{
   group: Group;
   meta: GroupMeta;
 }>;
+
+export type GroupMember = {
+  _id: string;
+  user: {
+    _id: string;
+    name: string;
+    username: string;
+    avatar?: string;
+  };
+  role: "member" | "admin" | "owner";
+  joinedAt: string;
+};
+
+export type GroupMembersResponse = ApiResponse<{
+  members: GroupMember[];
+  pagination: Pagination;
+}>;

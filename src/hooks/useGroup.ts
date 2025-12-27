@@ -8,7 +8,11 @@ import { groupService } from "../services/group.service";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
-import type { ApiError, GroupDetailsResponse } from "../types";
+import type {
+  ApiError,
+  GroupDetailsResponse,
+  GroupMembersResponse,
+} from "../types";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
@@ -154,5 +158,146 @@ export const useLeaveGroup = () => {
       const message = error?.response?.data?.message || "Failed to leave group";
       toast.error(message);
     },
+  });
+};
+
+export const useJoinGroup = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (groupId: string) => groupService.joinGroup(groupId),
+    onSuccess: () => {
+      toast.success("Group join request sent!");
+      queryClient.invalidateQueries({ queryKey: ["group"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message || "Failed to join group";
+      toast.error(message);
+    },
+  });
+};
+
+export const useCancelJoinRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (groupId: string) => groupService.cancelJoinRequest(groupId),
+    onSuccess: () => {
+      toast.success("Join request cancelled");
+      queryClient.invalidateQueries({ queryKey: ["group"] });
+      queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message =
+        error?.response?.data?.message || "Failed to cancel request";
+      toast.error(message);
+    },
+  });
+};
+
+export const useAcceptGroupInvite = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (groupId: string) => groupService.acceptInvite(groupId),
+    onSuccess: () => {
+      toast.success("Invitation accepted!");
+      queryClient.invalidateQueries({ queryKey: ["group"] });
+      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message =
+        error?.response?.data?.message || "Failed to accept invitation";
+      toast.error(message);
+    },
+  });
+};
+
+export const useRejectGroupInvite = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (groupId: string) => groupService.rejectInvite(groupId),
+    onSuccess: () => {
+      toast.success("Invitation rejected");
+      queryClient.invalidateQueries({ queryKey: ["invitedGroups"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message =
+        error?.response?.data?.message || "Failed to reject invitation";
+      toast.error(message);
+    },
+  });
+};
+
+export const useRemoveGroupMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
+      groupService.removeMember(groupId, userId),
+    onSuccess: () => {
+      toast.success("Member removed successfully");
+      queryClient.invalidateQueries({ queryKey: ["group"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message =
+        error?.response?.data?.message || "Failed to remove member";
+      toast.error(message);
+    },
+  });
+};
+
+export const useAssignGroupAdmin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
+      groupService.assignAdmin(groupId, userId),
+    onSuccess: () => {
+      toast.success("Admin assigned successfully");
+      queryClient.invalidateQueries({ queryKey: ["group"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message =
+        error?.response?.data?.message || "Failed to assign admin";
+      toast.error(message);
+    },
+  });
+};
+
+export const useRevokeGroupAdmin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
+      groupService.revokeAdmin(groupId, userId),
+    onSuccess: () => {
+      toast.success("Admin access revoked");
+      queryClient.invalidateQueries({ queryKey: ["group"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message =
+        error?.response?.data?.message || "Failed to revoke admin";
+      toast.error(message);
+    },
+  });
+};
+
+export const useGroupMembers = (groupId: string, limit = 10) => {
+  return useInfiniteQuery<GroupMembersResponse>({
+    queryKey: ["groupMembers", groupId],
+    queryFn: ({ pageParam = 1 }) =>
+      groupService.getGroupMembers(groupId, pageParam as number, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled: !!groupId,
+    staleTime: 1000 * 60 * 5,
   });
 };

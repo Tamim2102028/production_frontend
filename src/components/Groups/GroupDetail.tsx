@@ -17,9 +17,18 @@ import {
 } from "react-icons/fa";
 import GroupPostList from "./GroupPostList";
 import { BsPostcard } from "react-icons/bs";
-import { confirm, showSuccess } from "../../utils/sweetAlert";
+import { confirm } from "../../utils/sweetAlert";
 import GroupMembersTab from "./group-tabs/GroupMembersTab";
-import { useGroupDetails, useLeaveGroup } from "../../hooks/useGroup";
+import {
+  useGroupDetails,
+  useLeaveGroup,
+  useJoinGroup,
+  useCancelJoinRequest,
+  useAssignGroupAdmin,
+  useRevokeGroupAdmin,
+  useRemoveGroupMember,
+  useGroupMembers,
+} from "../../hooks/useGroup";
 import GroupAccessDenied from "./utils/GroupAccessDenied";
 import { GROUP_PRIVACY, GROUP_MEMBERSHIP_STATUS } from "../../constants/group";
 import { useUser } from "../../hooks/useAuth";
@@ -29,10 +38,30 @@ const GroupDetail: React.FC = () => {
   const navigate = useNavigate();
   const { user: currentUser } = useUser();
   const { mutate: leaveGroup, isPending: isLeaving } = useLeaveGroup();
+  const { mutate: joinGroup, isPending: isJoining } = useJoinGroup();
+  const { mutate: cancelJoinRequest, isPending: isCancelling } =
+    useCancelJoinRequest();
+  const { mutate: assignAdmin } = useAssignGroupAdmin();
+  const { mutate: revokeAdmin } = useRevokeGroupAdmin();
+  const { mutate: removeMember } = useRemoveGroupMember();
 
   const { data: groupData, isLoading, error } = useGroupDetails(slug!);
   const group = groupData?.data?.group;
   const meta = groupData?.data?.meta;
+
+  const { data: membersData } = useGroupMembers(group?._id || "");
+  const membersList =
+    membersData?.pages.flatMap((page) => page.data.members) || [];
+
+  const users = membersList.map((m) => ({
+    id: m.user._id,
+    name: m.user.name,
+    avatar: m.user.avatar,
+  }));
+
+  const admins = membersList
+    .filter((m) => m.role === "admin" || m.role === "owner")
+    .map((m) => m.user._id);
 
   const [activeTab, setActiveTab] = useState<
     "posts" | "pinned" | "members" | "media" | "about"
@@ -40,39 +69,40 @@ const GroupDetail: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleJoin = () => {
-    // TODO: Implement Join logic with API
-    console.log("Join group:", group?._id);
+    if (group?._id) {
+      joinGroup(group._id);
+    }
   };
 
   const handleCancel = () => {
-    // TODO: Implement Cancel Join logic with API
-    console.log("Cancel join request:", group?._id);
+    if (group?._id) {
+      cancelJoinRequest(group._id);
+    }
   };
 
   const handleMakeAdmin = (userId: string) => {
-    // TODO: Implement Make Admin logic with API
-    console.log("Make admin:", userId);
+    if (group?._id) {
+      assignAdmin({ groupId: group._id, userId });
+    }
   };
 
   const handleRemoveAdmin = (userId: string) => {
-    // TODO: Implement Remove Admin logic with API
-    console.log("Remove admin:", userId);
+    if (group?._id) {
+      revokeAdmin({ groupId: group._id, userId });
+    }
   };
 
   const handleRemoveMember = async (userId: string) => {
     if (
       await confirm({
-        // TODO: Implement Remove Member logic with API
         title: "Are you sure?",
         text: "This member will be removed from the group.",
         confirmButtonText: "Yes, remove member!",
       })
     ) {
-      console.log("Remove member:", userId);
-      showSuccess({
-        title: "Removed!",
-        text: "Member has been removed from the group.",
-      });
+      if (group?._id) {
+        removeMember({ groupId: group._id, userId });
+      }
     }
   };
 
@@ -214,7 +244,7 @@ const GroupDetail: React.FC = () => {
                                   }
                                 }}
                                 disabled={isLeaving}
-                                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 <FaUserSlash className="h-4 w-4 flex-shrink-0" />
                                 <span className="font-medium">
@@ -245,18 +275,20 @@ const GroupDetail: React.FC = () => {
                       group.privacy !== "closed" && (
                         <button
                           onClick={handleJoin}
-                          className="rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white transition hover:bg-blue-700"
+                          disabled={isJoining}
+                          className="rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          Join Group
+                          {isJoining ? "Joining..." : "Join Group"}
                         </button>
                       )}
 
                     {isRequested && !isMember && (
                       <button
                         onClick={handleCancel}
-                        className="rounded-lg bg-red-600 px-6 py-2.5 font-semibold text-white transition hover:bg-red-700"
+                        disabled={isCancelling}
+                        className="rounded-lg bg-red-600 px-6 py-2.5 font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        Cancel Request
+                        {isCancelling ? "Cancelling..." : "Cancel Request"}
                       </button>
                     )}
 
@@ -348,7 +380,9 @@ const GroupDetail: React.FC = () => {
             {activeTab === "members" && (
               <GroupMembersTab
                 groupId={group._id}
-                users={[]} // TODO: Pass real members
+                users={users}
+                admins={admins}
+                owner={group.owner}
                 currentUserId={currentUser?._id}
                 onMakeAdmin={handleMakeAdmin}
                 onRemoveAdmin={handleRemoveAdmin}

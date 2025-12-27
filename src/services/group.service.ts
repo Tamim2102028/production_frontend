@@ -2,6 +2,7 @@ import api from "../lib/axios";
 import type {
   MyGroupsResponse,
   GroupDetailsResponse,
+  GroupMembersResponse,
 } from "../types";
 
 export const groupService = {
@@ -84,6 +85,63 @@ export const groupService = {
   // Leave Group
   leaveGroup: async (groupId: string) => {
     const response = await api.delete(`/groups/${groupId}/leave`);
+    return response.data;
+  },
+
+  // Join Group
+  joinGroup: async (groupId: string) => {
+    const response = await api.post(`/groups/${groupId}/join`);
+    return response.data;
+  },
+
+  // Cancel Join Request
+  cancelJoinRequest: async (groupId: string) => {
+    const response = await api.post(`/groups/${groupId}/cancel-request`);
+    return response.data;
+  },
+
+  // Accept Invite
+  acceptInvite: async (groupId: string) => {
+    const response = await api.post(`/groups/${groupId}/accept-invite`);
+    return response.data;
+  },
+
+  // Reject Invite
+  rejectInvite: async (groupId: string) => {
+    const response = await api.post(`/groups/${groupId}/reject-invite`);
+    return response.data;
+  },
+
+  // Remove Member (Kick)
+  removeMember: async (groupId: string, userId: string) => {
+    const response = await api.delete(`/groups/${groupId}/members/${userId}`);
+    return response.data;
+  },
+
+  // Assign Admin
+  assignAdmin: async (groupId: string, userId: string) => {
+    const response = await api.patch(`/groups/${groupId}/admins/${userId}`);
+    return response.data;
+  },
+
+  // Revoke Admin
+  revokeAdmin: async (groupId: string, userId: string) => {
+    const response = await api.delete(`/groups/${groupId}/admins/${userId}`);
+    return response.data;
+  },
+
+  // Get Group Members
+  getGroupMembers: async (
+    groupId: string,
+    page = 1,
+    limit = 10
+  ): Promise<GroupMembersResponse> => {
+    const response = await api.get<GroupMembersResponse>(
+      `/groups/${groupId}/members`,
+      {
+        params: { page, limit },
+      }
+    );
     return response.data;
   },
 };
