@@ -47,12 +47,13 @@ export const postService = {
   // Like Post
   togglePostLike: async (
     postId: string,
-    context: string = POST_TARGET_MODELS.USER
+    targetModel: string = POST_TARGET_MODELS.USER
   ) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const { data } = await api.post(`/${routeSegment}/posts/${postId}/like`);
@@ -60,9 +61,14 @@ export const postService = {
   },
 
   // Get Profile Posts
-  getProfilePosts: async (username: string) => {
+  getProfilePosts: async (
+    username: string,
+    page: number = 1,
+    limit: number = 10
+  ) => {
     const response = await api.get<ProfilePostsResponse>(
-      `/profile/${username}/posts`
+      `/profile/${username}/posts`,
+      { params: { page, limit } }
     );
     return response.data;
   },
@@ -70,12 +76,13 @@ export const postService = {
   // Delete Post
   deletePost: async (
     postId: string,
-    context: string = POST_TARGET_MODELS.USER
+    targetModel: string = POST_TARGET_MODELS.USER
   ) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const response = await api.delete(`/${routeSegment}/posts/${postId}`);
@@ -86,12 +93,13 @@ export const postService = {
   updatePost: async (
     postId: string,
     data: { content: string; tags?: string[]; visibility?: string },
-    context: string = POST_TARGET_MODELS.USER
+    targetModel: string = POST_TARGET_MODELS.USER
   ) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const response = await api.patch(`/${routeSegment}/posts/${postId}`, data);
@@ -101,12 +109,13 @@ export const postService = {
   // Toggle Read Status
   toggleReadStatus: async (
     postId: string,
-    context: string = POST_TARGET_MODELS.USER
+    targetModel: string = POST_TARGET_MODELS.USER
   ) => {
     let routeSegment = "profile";
-    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
-    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
-    else if (context === POST_TARGET_MODELS.INSTITUTION)
+    if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
     const response = await api.post(`/${routeSegment}/posts/${postId}/read`);
