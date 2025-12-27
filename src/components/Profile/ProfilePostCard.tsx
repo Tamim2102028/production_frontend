@@ -71,14 +71,25 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   // Comment hooks
   const { data: commentsData, isLoading: isLoadingComments } = usePostComments(
     post._id,
+    post.postOnModel,
     showCommentBox
   );
   const { mutate: addComment, isPending: isAddingComment } = useAddComment(
-    post._id
+    post._id,
+    post.postOnModel
   );
-  const { mutate: deleteComment } = useDeleteComment(post._id);
-  const { mutate: toggleLikeComment } = useToggleLikeComment(post._id);
-  const { mutate: updateComment } = useUpdateComment(post._id);
+  const { mutate: deleteComment } = useDeleteComment(
+    post._id,
+    post.postOnModel
+  );
+  const { mutate: toggleLikeComment } = useToggleLikeComment(
+    post._id,
+    post.postOnModel
+  );
+  const { mutate: updateComment } = useUpdateComment(
+    post._id,
+    post.postOnModel
+  );
 
   const postComments = commentsData?.data?.comments || [];
 

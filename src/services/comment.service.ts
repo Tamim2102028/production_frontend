@@ -6,9 +6,9 @@ export const commentService = {
   // Get comments for a post
   getPostComments: async (
     postId: string,
-    context: string = POST_TARGET_MODELS.USER,
-    page = 1,
-    limit = 10
+    context: string,
+    page: number = 1,
+    limit: number = 10
   ) => {
     let routeSegment = "profile";
     if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
@@ -26,11 +26,7 @@ export const commentService = {
   },
 
   // Add a comment to a post
-  addComment: async (
-    postId: string,
-    content: string,
-    context: string = POST_TARGET_MODELS.USER
-  ) => {
+  addComment: async (postId: string, content: string, context: string) => {
     let routeSegment = "profile";
     if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
     else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
@@ -47,10 +43,7 @@ export const commentService = {
   },
 
   // Delete a comment
-  deleteComment: async (
-    commentId: string,
-    context: string = POST_TARGET_MODELS.USER
-  ) => {
+  deleteComment: async (commentId: string, context: string) => {
     let routeSegment = "profile";
     if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
     else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
@@ -65,7 +58,7 @@ export const commentService = {
   updateComment: async (
     commentId: string,
     content: string,
-    context: string = POST_TARGET_MODELS.USER
+    context: string
   ) => {
     let routeSegment = "profile";
     if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
@@ -80,10 +73,7 @@ export const commentService = {
   },
 
   // Toggle like comment
-  toggleLikeComment: async (
-    commentId: string,
-    context: string = POST_TARGET_MODELS.USER
-  ) => {
+  toggleLikeComment: async (commentId: string, context: string) => {
     let routeSegment = "profile";
     if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
     else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";

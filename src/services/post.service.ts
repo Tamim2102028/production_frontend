@@ -94,10 +94,7 @@ export const postService = {
     else if (context === POST_TARGET_MODELS.INSTITUTION)
       routeSegment = "institutions";
 
-    const response = await api.patch(
-      `/${routeSegment}/posts/${postId}`,
-      data
-    );
+    const response = await api.patch(`/${routeSegment}/posts/${postId}`, data);
     return response.data;
   },
 
