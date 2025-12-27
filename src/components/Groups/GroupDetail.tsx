@@ -53,15 +53,20 @@ const GroupDetail: React.FC = () => {
   const membersList =
     membersData?.pages.flatMap((page) => page.data.members) || [];
 
-  const users = membersList.map((m) => ({
-    id: m.user._id,
-    name: m.user.name,
-    avatar: m.user.avatar,
+  const users = membersList.map((item) => ({
+    id: item.member.user._id,
+    name: item.member.user.name,
+    avatar: item.member.user.avatar,
+    isFriend: item.meta?.isFriend,
+    hasRequest: item.meta?.hasPendingRequest,
+    isRequested: item.meta?.isSentRequest,
   }));
 
   const admins = membersList
-    .filter((m) => m.role === "admin" || m.role === "owner")
-    .map((m) => m.user._id);
+    .filter(
+      (item) => item.member.role === "admin" || item.member.role === "owner"
+    )
+    .map((item) => item.member.user._id);
 
   const [activeTab, setActiveTab] = useState<
     "posts" | "pinned" | "members" | "media" | "about"

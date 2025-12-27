@@ -1,4 +1,9 @@
 import type { ApiResponse, Pagination } from "./common.types";
+import type {
+  GROUP_JOIN_METHOD,
+  GROUP_MEMBERSHIP_STATUS,
+  GROUP_ROLES,
+} from "../constants";
 
 // Group Card Type
 export type GroupCardProps = {
@@ -65,17 +70,31 @@ export type GroupDetailsResponse = ApiResponse<{
 
 export type GroupMember = {
   _id: string;
+  group: string;
   user: {
     _id: string;
     name: string;
     username: string;
     avatar?: string;
   };
-  role: "member" | "admin" | "owner";
-  joinedAt: string;
+  role: (typeof GROUP_ROLES)[keyof typeof GROUP_ROLES];
+  status: (typeof GROUP_MEMBERSHIP_STATUS)[keyof typeof GROUP_MEMBERSHIP_STATUS];
+  joinedAt: Date;
+  joinedMethod: (typeof GROUP_JOIN_METHOD)[keyof typeof GROUP_JOIN_METHOD];
+};
+
+export type GroupMemberMeta = {
+  isFriend: boolean;
+  hasPendingRequest: boolean;
+  isSentRequest: boolean;
+};
+
+export type GroupMemberItem = {
+  member: GroupMember;
+  meta: GroupMemberMeta;
 };
 
 export type GroupMembersResponse = ApiResponse<{
-  members: GroupMember[];
+  members: GroupMemberItem[];
   pagination: Pagination;
 }>;
