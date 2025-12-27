@@ -7,8 +7,7 @@ export const commentService = {
   getPostComments: async (
     postId: string,
     targetModel: string,
-    page: number = 1,
-    limit: number = 10
+    page: number = 1
   ) => {
     let routeSegment = "profile";
     if (targetModel === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
@@ -20,7 +19,7 @@ export const commentService = {
     const response = await api.get<CommentsResponse>(
       `/${routeSegment}/posts/${postId}/comments`,
       {
-        params: { page, limit },
+        params: { page, limit: 10 },
       }
     );
     return response.data;

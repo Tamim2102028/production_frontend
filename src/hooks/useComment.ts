@@ -2,22 +2,26 @@ import {
   useMutation,
   useInfiniteQuery,
   useQueryClient,
+  type InfiniteData,
 } from "@tanstack/react-query";
 import { commentService } from "../services/comment.service";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../types";
+import type { ApiError, CommentsResponse } from "../types";
 
-export const usePostComments = (
-  postId: string,
-  targetModel: string,
-  enabled = false,
-  limit = 10
-) => {
+export const usePostComments = ({
+  postId,
+  targetModel,
+  enabled = true,
+}: {
+  postId: string;
+  targetModel: string;
+  enabled?: boolean;
+}) => {
   return useInfiniteQuery({
-    queryKey: ["comments", postId, targetModel, limit],
+    queryKey: ["comments", postId, targetModel],
     queryFn: ({ pageParam = 1 }) =>
-      commentService.getPostComments(postId, targetModel, pageParam, limit),
+      commentService.getPostComments(postId, targetModel, Number(pageParam)),
     getNextPageParam: (lastPage) => {
       if (lastPage.data.pagination.hasNextPage) {
         return lastPage.data.pagination.page + 1;
@@ -25,12 +29,18 @@ export const usePostComments = (
       return undefined;
     },
     initialPageParam: 1,
-    enabled: !!postId && enabled,
+    enabled: !!postId && !!targetModel && enabled,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 };
 
-export const useAddComment = (postId: string, targetModel: string) => {
+export const useAddComment = ({
+  postId,
+  targetModel,
+}: {
+  postId: string;
+  targetModel: string;
+}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -51,7 +61,13 @@ export const useAddComment = (postId: string, targetModel: string) => {
   });
 };
 
-export const useDeleteComment = (postId: string, targetModel: string) => {
+export const useDeleteComment = ({
+  postId,
+  targetModel,
+}: {
+  postId: string;
+  targetModel: string;
+}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -68,7 +84,13 @@ export const useDeleteComment = (postId: string, targetModel: string) => {
   });
 };
 
-export const useUpdateComment = (postId: string, targetModel: string) => {
+export const useUpdateComment = ({
+  postId,
+  targetModel,
+}: {
+  postId: string;
+  targetModel: string;
+}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -95,18 +117,76 @@ export const useUpdateComment = (postId: string, targetModel: string) => {
   });
 };
 
-export const useToggleLikeComment = (postId: string, targetModel: string) => {
+export const useToggleLikeComment = ({
+  postId,
+  targetModel,
+}: {
+  postId: string;
+  targetModel: string;
+}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (commentId: string) =>
       commentService.toggleLikeComment(commentId, targetModel),
-    onSuccess: () => {
-      // Invalidate comments for this post to refresh like count and status
-      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+
+    onMutate: async (commentId) => {
+      // Cancel queries
+      await queryClient.cancelQueries({ queryKey: ["comments", postId] });
+
+      // Snapshot previous data
+      const previousComments = queryClient.getQueriesData({
+        queryKey: ["comments", postId],
+      });
+
+      // Optimistic Update
+      queryClient.setQueriesData(
+        { queryKey: ["comments", postId] },
+        (oldData: InfiniteData<CommentsResponse> | undefined) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              data: {
+                ...page.data,
+                comments: page.data.comments.map((item) => {
+                  if (item.comment._id === commentId) {
+                    const isLiked = item.meta.isLiked;
+                    return {
+                      ...item,
+                      meta: {
+                        ...item.meta,
+                        isLiked: !isLiked,
+                      },
+                      comment: {
+                        ...item.comment,
+                        likesCount:
+                          (isLiked ? -1 : 1) + (item.comment.likesCount || 0),
+                      },
+                    };
+                  }
+                  return item;
+                }),
+              },
+            })),
+          };
+        }
+      );
+
+      return { previousComments };
     },
-    onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to like comment");
+
+    onError: (error: AxiosError<ApiError>, _commentId, context) => {
+      if (context?.previousComments) {
+        context.previousComments.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      toast.error(
+        error.response?.data?.message || "Failed to like/unlike comment"
+      );
     },
   });
 };
