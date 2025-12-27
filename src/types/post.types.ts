@@ -28,18 +28,10 @@ export interface Post {
     userName: string;
   };
 
-  stats: {
-    likes: number;
-    comments: number;
-    shares: number;
-  };
-
-  context: {
-    isLiked: boolean;
-    isSaved: boolean;
-    isMine: boolean;
-    isRead: boolean;
-  };
+  // Stats
+  likesCount: number;
+  commentsCount: number;
+  sharesCount: number;
 
   createdAt: string;
   updatedAt: string;
@@ -57,10 +49,22 @@ export interface Post {
   tags?: string[];
 }
 
+export interface PostMeta {
+  isLiked: boolean;
+  isSaved: boolean;
+  isMine: boolean;
+  isRead: boolean;
+}
+
+export interface PostResponseItem {
+  post: Post;
+  meta: PostMeta;
+}
+
 export interface FeedResponse {
   statusCode: number;
   data: {
-    posts: Post[];
+    posts: PostResponseItem[];
     pagination: Pagination;
   };
   message: string;
@@ -70,7 +74,7 @@ export interface FeedResponse {
 export interface ProfilePostsResponse {
   statusCode: number;
   data: {
-    posts: Post[];
+    posts: PostResponseItem[];
     pagination: Pagination;
     isOwnProfile: boolean;
   };

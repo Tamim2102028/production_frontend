@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { postService } from "../services/post.service";
-import { type CreatePostRequest, type Post } from "../types/post.types";
+import {
+  type CreatePostRequest,
+  type PostResponseItem,
+} from "../types/post.types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import type { ApiError } from "../types/user.types";
@@ -40,29 +43,34 @@ export const useToggleLikePost = () => {
         { queryKey: ["profilePosts"] },
         (
           oldData:
-            | { posts: Post[]; pagination: Pagination; isOwnProfile: boolean }
+            | {
+                posts: PostResponseItem[];
+                pagination: Pagination;
+                isOwnProfile: boolean;
+              }
             | undefined
         ) => {
           if (!oldData || !oldData.posts) return oldData;
 
           return {
             ...oldData,
-            posts: oldData.posts.map((post: Post) => {
-              if (post._id === postId) {
+            posts: oldData.posts.map((item) => {
+              if (item.post._id === postId) {
+                const isLiked = item.meta.isLiked;
                 return {
-                  ...post,
-                  context: {
-                    ...post.context,
-                    isLiked: !post.context.isLiked,
+                  ...item,
+                  meta: {
+                    ...item.meta,
+                    isLiked: !isLiked,
                   },
-                  stats: {
-                    ...post.stats,
-                    likes:
-                      (post.context.isLiked ? -1 : 1) + (post.stats.likes || 0),
+                  post: {
+                    ...item.post,
+                    likesCount:
+                      (isLiked ? -1 : 1) + (item.post.likesCount || 0),
                   },
                 };
               }
-              return post;
+              return item;
             }),
           };
         }
@@ -109,22 +117,26 @@ export const useToggleReadStatus = () => {
 
       queryClient.setQueriesData(
         { queryKey: ["profilePosts"] },
-        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+        (
+          oldData:
+            | { posts: PostResponseItem[]; isOwnProfile: boolean }
+            | undefined
+        ) => {
           if (!oldData || !oldData.posts) return oldData;
 
           return {
             ...oldData,
-            posts: oldData.posts.map((post: Post) => {
-              if (post._id === postId) {
+            posts: oldData.posts.map((item) => {
+              if (item.post._id === postId) {
                 return {
-                  ...post,
-                  context: {
-                    ...post.context,
-                    isRead: !post.context.isRead,
+                  ...item,
+                  meta: {
+                    ...item.meta,
+                    isRead: !item.meta.isRead,
                   },
                 };
               }
-              return post;
+              return item;
             }),
           };
         }
@@ -160,22 +172,26 @@ export const useToggleBookmark = () => {
 
       queryClient.setQueriesData(
         { queryKey: ["profilePosts"] },
-        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+        (
+          oldData:
+            | { posts: PostResponseItem[]; isOwnProfile: boolean }
+            | undefined
+        ) => {
           if (!oldData || !oldData.posts) return oldData;
 
           return {
             ...oldData,
-            posts: oldData.posts.map((post: Post) => {
-              if (post._id === postId) {
+            posts: oldData.posts.map((item) => {
+              if (item.post._id === postId) {
                 return {
-                  ...post,
-                  context: {
-                    ...post.context,
-                    isSaved: !post.context.isSaved,
+                  ...item,
+                  meta: {
+                    ...item.meta,
+                    isSaved: !item.meta.isSaved,
                   },
                 };
               }
-              return post;
+              return item;
             }),
           };
         }
@@ -212,12 +228,16 @@ export const useCreateProfilePost = () => {
       // Optimistic update: নতুন পোস্ট লিস্টের শুরুতে যোগ করা
       queryClient.setQueriesData(
         { queryKey: ["profilePosts"] },
-        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+        (
+          oldData:
+            | { posts: PostResponseItem[]; isOwnProfile: boolean }
+            | undefined
+        ) => {
           if (!oldData || !oldData.posts) return oldData;
-          const newPost = data.data.post;
+          const newItem = data.data; // { post, meta }
           return {
             ...oldData,
-            posts: [newPost, ...oldData.posts],
+            posts: [newItem, ...oldData.posts],
           };
         }
       );
@@ -255,18 +275,16 @@ export const useUpdatePost = () => {
       // Optimistic update
       queryClient.setQueriesData(
         { queryKey: ["profilePosts"] },
-        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+        (
+          oldData:
+            | { posts: PostResponseItem[]; isOwnProfile: boolean }
+            | undefined
+        ) => {
           if (!oldData || !oldData.posts) return oldData;
           return {
             ...oldData,
-            posts: oldData.posts.map((post: Post) =>
-              post._id === data.data._id
-                ? {
-                    ...data.data,
-                    stats: post.stats,
-                    context: post.context,
-                  }
-                : post
+            posts: oldData.posts.map((item) =>
+              item.post._id === data.data.post._id ? data.data : item
             ),
           };
         }
@@ -289,11 +307,15 @@ export const useDeletePost = () => {
       // 1. Profile Posts থেকে পোস্টটি রিমুভ করা
       queryClient.setQueriesData(
         { queryKey: ["profilePosts"] },
-        (oldData: { posts: Post[]; isOwnProfile: boolean } | undefined) => {
+        (
+          oldData:
+            | { posts: PostResponseItem[]; isOwnProfile: boolean }
+            | undefined
+        ) => {
           if (!oldData || !oldData.posts) return oldData;
           return {
             ...oldData,
-            posts: oldData.posts.filter((post) => post._id !== postId),
+            posts: oldData.posts.filter((item) => item.post._id !== postId),
           };
         }
       );

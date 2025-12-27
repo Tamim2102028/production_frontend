@@ -43,10 +43,11 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
       {/* Posts List */}
       {posts.length > 0 ? (
         <div className="space-y-4">
-          {posts.map((post) => (
+          {posts.map((item) => (
             <ProfilePostCard
-              key={post._id}
-              post={post}
+              key={item.post._id}
+              post={item.post}
+              meta={item.meta}
               isOwnProfile={isOwnProfile}
             />
           ))}

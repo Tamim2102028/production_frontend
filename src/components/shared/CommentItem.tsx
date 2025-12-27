@@ -8,6 +8,7 @@ import type { CommentItemProps } from "../../types/comment.types";
 
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
+  meta,
   currentUserId = "",
   onLikeComment,
   onDeleteComment,
@@ -19,12 +20,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Check if current user can delete/edit this comment
-  const isOwner = currentUserId === comment.author._id;
+  const isOwner = meta?.isMine || currentUserId === comment.author._id;
   const canDelete = isOwner;
   const canEdit = isOwner;
 
-  const isLiked = comment.isLiked;
-  const likesCount = comment.stats.likes;
+  const isLiked = meta?.isLiked;
+  const likesCount = comment.likesCount;
   const isLongContent =
     comment.content.length > 300 || comment.content.split("\n").length > 5;
 

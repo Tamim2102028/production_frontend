@@ -80,4 +80,10 @@ export const groupService = {
     });
     return response.data;
   },
+
+  // Leave Group
+  leaveGroup: async (groupId: string) => {
+    const response = await api.delete(`/groups/${groupId}/leave`);
+    return response.data;
+  },
 };

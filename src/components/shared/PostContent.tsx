@@ -180,7 +180,7 @@ const PostContent: React.FC<PostContentProps> = ({
               });
               onCancel();
             }}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50"
+            className="rounded-lg border border-red-500 px-3 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50"
             disabled={isUpdating}
           >
             Cancel
@@ -188,7 +188,7 @@ const PostContent: React.FC<PostContentProps> = ({
           <button
             type="submit"
             disabled={!isValid || isUpdating}
-            className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+            className="rounded-lg border border-blue-600 bg-blue-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
           >
             {isUpdating ? "Saving..." : "Save"}
           </button>

@@ -24,7 +24,7 @@ import CommentItem from "../shared/CommentItem";
 import CommentSkeleton from "../shared/skeletons/CommentSkeleton";
 import PostContent from "../shared/PostContent";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
-import type { Attachment, Post } from "../../types/post.types";
+import type { Attachment, Post, PostMeta } from "../../types/post.types";
 import { useUser } from "../../hooks/useAuth";
 import {
   useToggleLikePost,
@@ -45,10 +45,11 @@ import confirm from "../../utils/sweetAlert";
 
 interface ProfilePostCardProps {
   post: Post;
+  meta: PostMeta;
   isOwnProfile: boolean;
 }
 
-const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
+const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -59,7 +60,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
 
   // Get current logged-in user
   const { user: currentUser } = useUser();
-  const isOwnPost = post.author._id === currentUser?._id;
+  const isOwnPost = meta.isMine;
 
   // Post hooks
   const { mutate: likeMutate } = useToggleLikePost();
@@ -189,13 +190,13 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           <button
             onClick={() => toggleReadStatus(post._id)}
             className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
-              post.context?.isRead ? "text-blue-600" : "text-gray-500"
+              meta.isRead ? "text-blue-600" : "text-gray-500"
             }`}
-            title={post.context?.isRead ? "Mark as unread" : "Mark as read"}
+            title={meta.isRead ? "Mark as unread" : "Mark as read"}
           >
             <FaCheckDouble className="h-4 w-4" />
             <span className="text-sm font-medium">
-              {post.context?.isRead ? "Read" : "Mark as read"}
+              {meta.isRead ? "Read" : "Mark as read"}
             </span>
           </button>
 
@@ -214,10 +215,10 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
                   <button
                     onClick={handleToggleBookmark}
                     className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
-                      post.context?.isSaved ? "text-blue-600" : "text-gray-700"
+                      meta.isSaved ? "text-blue-600" : "text-gray-700"
                     }`}
                   >
-                    {post.context?.isSaved ? (
+                    {meta.isSaved ? (
                       <>
                         <FaBookmark className="h-4 w-4 flex-shrink-0" />
                         <span className="font-medium">Remove from saved</span>
@@ -361,11 +362,11 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
       <div className="border-t border-gray-100 px-4 py-2">
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-3">
-            <span>{post.stats.likes || 0} likes</span>
+            <span>{post.likesCount || 0} likes</span>
             <SeparatorDot />
-            <span>{post.stats.comments || 0} comments</span>
+            <span>{post.commentsCount || 0} comments</span>
             <SeparatorDot />
-            <span>{post.stats.shares || 0} shares</span>
+            <span>{post.sharesCount || 0} shares</span>
 
             {post.isEdited && post.editedAt && (
               <>
@@ -388,16 +389,12 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
           <button
             onClick={handleLike}
             className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
-              post.context?.isLiked
+              meta.isLiked
                 ? "bg-red-50 text-red-600 hover:bg-red-100"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {post.context?.isLiked ? (
-              <FaHeart size={18} />
-            ) : (
-              <FaRegHeart size={18} />
-            )}
+            {meta.isLiked ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
             <span className="text-sm font-medium">Like</span>
           </button>
 
@@ -442,11 +439,11 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post }) => {
             <div className="px-2.5 py-2">
               <div className="max-h-[400px] space-y-1 overflow-y-auto">
                 {/* Display all comments - Newest first */}
-                {postComments.map((comment) => (
+                {postComments.map((item) => (
                   <CommentItem
-                    key={comment._id}
-                    comment={comment}
-                    postOwnerId={post.author._id}
+                    key={item.comment._id}
+                    comment={item.comment}
+                    meta={item.meta}
                     currentUserId={currentUser?._id}
                     onDeleteComment={(commentId) => deleteComment(commentId)}
                     onLikeComment={(commentId) => toggleLikeComment(commentId)}

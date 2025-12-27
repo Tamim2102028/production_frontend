@@ -55,6 +55,7 @@ export type GroupMeta = {
   status: string;
   isMember: boolean;
   isAdmin: boolean;
+  isOwner: boolean;
 };
 
 export type GroupDetailsResponse = ApiResponse<{

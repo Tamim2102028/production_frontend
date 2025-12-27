@@ -12,19 +12,29 @@ export interface Comment {
   content: string;
   post: string;
   author: CommentAuthor;
+  likesCount: number;
+  repliesCount?: number; // Optional as it was removed but might be useful later or for compatibility
   createdAt: string;
-  stats: { likes: number };
-  isMine: boolean;
-  isLiked: boolean;
   updatedAt?: string;
   isEdited?: boolean;
   editedAt?: string;
+  isDeleted?: boolean;
+}
+
+export interface CommentMeta {
+  isMine: boolean;
+  isLiked: boolean;
+}
+
+export interface CommentResponseItem {
+  comment: Comment;
+  meta: CommentMeta;
 }
 
 export interface CommentsResponse {
   success: boolean;
   data: {
-    comments: Comment[];
+    comments: CommentResponseItem[];
     pagination: Pagination;
   };
   message: string;
@@ -32,15 +42,13 @@ export interface CommentsResponse {
 
 export interface AddCommentResponse {
   success: boolean;
-  data: {
-    comment: Comment;
-  };
+  data: CommentResponseItem;
   message: string;
 }
 
 export interface CommentItemProps {
   comment: Comment;
-  postOwnerId?: string; // Optional now as we don't use it for delete logic anymore, but kept for compatibility or future use
+  meta: CommentMeta;
   currentUserId?: string;
   onLikeComment?: (commentId: string) => void;
   onDeleteComment?: (commentId: string) => void;

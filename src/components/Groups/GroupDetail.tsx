@@ -19,7 +19,7 @@ import GroupPostList from "./GroupPostList";
 import { BsPostcard } from "react-icons/bs";
 import { confirm, showSuccess } from "../../utils/sweetAlert";
 import GroupMembersTab from "./group-tabs/GroupMembersTab";
-import { useGroupDetails } from "../../hooks/useGroup";
+import { useGroupDetails, useLeaveGroup } from "../../hooks/useGroup";
 import GroupAccessDenied from "./utils/GroupAccessDenied";
 import { GROUP_PRIVACY, GROUP_MEMBERSHIP_STATUS } from "../../constants/group";
 import { useUser } from "../../hooks/useAuth";
@@ -28,6 +28,7 @@ const GroupDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useUser();
+  const { mutate: leaveGroup, isPending: isLeaving } = useLeaveGroup();
 
   const { data: groupData, isLoading, error } = useGroupDetails(slug!);
   const group = groupData?.data?.group;
@@ -107,6 +108,7 @@ const GroupDetail: React.FC = () => {
 
   const isMember = meta?.isMember;
   const isAdmin = meta?.isAdmin;
+  const isOwner = meta?.isOwner;
 
   const isRestricted =
     (group.privacy === GROUP_PRIVACY.PRIVATE ||
@@ -191,7 +193,7 @@ const GroupDetail: React.FC = () => {
                                 Copy Group Link
                               </span>
                             </button>
-                            {isMember && (
+                            {isMember && !isOwner && (
                               <button
                                 onClick={async () => {
                                   setShowMenu(false);
@@ -202,13 +204,18 @@ const GroupDetail: React.FC = () => {
                                       confirmButtonText: "Yes, leave",
                                     })
                                   ) {
-                                    // dispatch(leaveGroup(group.id));
+                                    if (group) {
+                                      leaveGroup(group._id);
+                                    }
                                   }
                                 }}
-                                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
+                                disabled={isLeaving}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
                               >
                                 <FaUserSlash className="h-4 w-4 flex-shrink-0" />
-                                <span className="font-medium">Leave Group</span>
+                                <span className="font-medium">
+                                  {isLeaving ? "Leaving..." : "Leave Group"}
+                                </span>
                               </button>
                             )}
                             {!isMember && (

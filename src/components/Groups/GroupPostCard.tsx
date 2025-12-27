@@ -13,10 +13,15 @@ import {
   FaEdit,
   FaTrash,
 } from "react-icons/fa";
-import { formatPostDate, formatPostClock } from "../../utils/dateUtils";
+import {
+  formatPostDate,
+  formatPostClock,
+  formatPostDateTime,
+} from "../../utils/dateUtils";
 import SeparatorDot from "../shared/SeparatorDot";
-import CommentItem, { type CommentData } from "../shared/CommentItem";
+import CommentItem from "../shared/CommentItem";
 import { DEFAULT_AVATAR_SM } from "../../constants/images";
+import type { CommentResponseItem } from "../../types/comment.types";
 
 // TODO: Replace with API data
 interface GroupPost {
@@ -55,7 +60,7 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
   };
   const isOwnPost = post.createdBy === currentUser.id;
   // TODO: Replace with API data for comments
-  const postComments: CommentData[] = [];
+  const postComments: CommentResponseItem[] = [];
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likedBy?.length || 0);
@@ -283,11 +288,12 @@ const GroupPostCardSimple: React.FC<Props> = ({ post, author }) => {
                 {[...postComments]
                   .reverse()
                   .slice(0, displayedCommentsCount)
-                  .map((comment) => (
+                  .map((item) => (
                     <CommentItem
-                      key={comment.commentId}
-                      comment={comment}
-                      postOwnerId={post.createdBy}
+                      key={item.comment._id}
+                      comment={item.comment}
+                      meta={item.meta}
+                      currentUserId={currentUser.id}
                     />
                   ))}
 
