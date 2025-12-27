@@ -1,4 +1,4 @@
-import { POST_TARGET_MODELS } from "../constants";
+import { COMMENT_LIMIT, POST_TARGET_MODELS } from "../constants";
 import api from "../lib/axios";
 import type { CommentsResponse, AddCommentResponse } from "../types";
 
@@ -19,7 +19,7 @@ export const commentService = {
     const response = await api.get<CommentsResponse>(
       `/${routeSegment}/posts/${postId}/comments`,
       {
-        params: { page, limit: 10 },
+        params: { page, limit: COMMENT_LIMIT },
       }
     );
     return response.data;

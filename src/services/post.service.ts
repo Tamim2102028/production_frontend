@@ -1,4 +1,4 @@
-import { POST_TARGET_MODELS } from "../constants";
+import { POST_LIMIT, POST_TARGET_MODELS } from "../constants";
 import api from "../lib/axios";
 import type {
   CreatePostRequest,
@@ -64,7 +64,7 @@ export const postService = {
   getProfilePosts: async (username: string, page: number) => {
     const response = await api.get<ProfilePostsResponse>(
       `/profile/${username}/posts`,
-      { params: { page, limit: 10 } }
+      { params: { page, limit: POST_LIMIT } }
     );
     return response.data;
   },
