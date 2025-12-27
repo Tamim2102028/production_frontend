@@ -37,13 +37,10 @@ import type { User, Institution, Department } from "../../types/user.types";
 import type { FriendshipStatus } from "../../types/profile.types";
 import { toast } from "sonner";
 
-type Props = {
-  userData: User;
-  isOwnProfile: boolean;
-};
-
-const ProfileHeader: React.FC<Props> = ({ userData, isOwnProfile }) => {
-  // এই userData যার profile visit করতেছি তার
+const ProfileHeader: React.FC<{ userData: User; isOwnProfile: boolean }> = ({
+  userData, // যার Profile visit করিতেছি তার User Data
+  isOwnProfile, // If true, it means the current user is viewing their own profile
+}) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 

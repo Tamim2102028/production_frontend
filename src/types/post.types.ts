@@ -76,7 +76,6 @@ export interface ProfilePostsResponse {
   data: {
     posts: PostResponseItem[];
     pagination: Pagination;
-    isOwnProfile: boolean;
   };
   message: string;
   success: boolean;

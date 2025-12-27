@@ -46,7 +46,6 @@ import confirm from "../../utils/sweetAlert";
 interface ProfilePostCardProps {
   post: Post;
   meta: PostMeta;
-  isOwnProfile: boolean;
 }
 
 const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {

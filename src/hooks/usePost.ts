@@ -46,7 +46,6 @@ export const useToggleLikePost = () => {
             | {
                 posts: PostResponseItem[];
                 pagination: Pagination;
-                isOwnProfile: boolean;
               }
             | undefined
         ) => {

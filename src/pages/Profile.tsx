@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   ProfileHeader,
   ProfilePosts,
   PublicFiles,
   ProfileTabs,
   CreateProfilePost,
+  ProfileNotFound,
 } from "../components/Profile";
 import { useUser } from "../hooks/useAuth";
 import { useProfileHeader } from "../hooks/useProfile";
@@ -13,19 +14,14 @@ import ProfileHeaderSkeleton from "../components/shared/skeletons/ProfileHeaderS
 
 const Profile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"posts" | "files">("posts");
 
-  // Get current user from useUser hook
   const { user: currentUser } = useUser();
-
-  // Determine which username to fetch
+  // If no username is provided, default to current user's username
   const profileUsername = username || currentUser?.userName;
-
   // Check if viewing own profile
-  const isOwnProfile = !username || username === currentUser?.userName;
+  const isOwnProfile = username === currentUser?.userName;
 
-  // Fetch profile header data using TanStack Query
   const {
     data: userData,
     isLoading,
@@ -37,20 +33,7 @@ const Profile: React.FC = () => {
   }
 
   if (error || !userData) {
-    return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <h2 className="text-2xl font-bold text-gray-900">User Not Found</h2>
-        <p className="mt-2 text-gray-600">
-          The user you're looking for doesn't exist.
-        </p>
-        <button
-          onClick={() => navigate("/")}
-          className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-        >
-          Go Home
-        </button>
-      </div>
-    );
+    return <ProfileNotFound />;
   }
 
   return (

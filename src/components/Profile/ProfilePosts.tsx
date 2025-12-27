@@ -48,7 +48,6 @@ const ProfilePosts: React.FC<ProfilePostsProps> = ({
               key={item.post._id}
               post={item.post}
               meta={item.meta}
-              isOwnProfile={isOwnProfile}
             />
           ))}
           {/* TODO: Implement 'Load More' button for pagination */}
