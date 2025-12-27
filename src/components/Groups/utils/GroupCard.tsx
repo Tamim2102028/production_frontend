@@ -117,7 +117,6 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
 
           {/* Join */}
           {status === GROUP_MEMBERSHIP_STATUS.NOT_JOINED &&
-            status !== GROUP_MEMBERSHIP_STATUS.BANNED &&
             group.privacy !== GROUP_PRIVACY.CLOSED && (
               <button
                 type="button"
