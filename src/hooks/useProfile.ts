@@ -2,11 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AUTH_KEYS } from "./useAuth";
 import profileApi from "../services/profile.service";
-import type {
-  UpdateGeneralData,
-  UpdateAcademicData,
-  ApiError,
-} from "../types";
+import type { UpdateGeneralData, UpdateAcademicData, ApiError } from "../types";
 import type { AxiosError } from "axios";
 
 /**

@@ -23,15 +23,11 @@ export const AUTH_KEYS = {
  * - useRegister: Register new user
  * - useLogin: User login
  * - useLogout: User logout
- * - useAuthCheck: Verifies auth on app load (alias for useUser)
  */
 
 /**
  * useUser Hook
- *
- * Replaces Redux selector.
  * Fetches and caches user data using TanStack Query.
- *
  * @returns { user, isAuthenticated, isCheckingAuth }
  */
 export const useUser = (): AuthState => {
