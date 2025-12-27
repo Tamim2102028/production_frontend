@@ -7,7 +7,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useLogin } from "../../hooks/useAuth";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../../types/user.types";
+import type { ApiError } from "../../types";
 
 // ✅ Zod Schema for Login
 const loginSchema = z.object({

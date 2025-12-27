@@ -21,7 +21,7 @@ import {
 } from "../../constants/post";
 import { useUser } from "../../hooks/useAuth";
 import { useCreateProfilePost } from "../../hooks/usePost";
-import type { CreateProfilePostProps } from "../../types/post.types";
+import type { CreateProfilePostProps } from "../../types";
 
 const createProfilePostSchema = z.object({
   content: z

@@ -19,7 +19,7 @@ import {
 
 import { useUpdateAcademic } from "../../hooks/useProfile";
 import { USER_TYPES, TEACHER_RANKS } from "../../constants";
-import type { User, Institution, Department } from "../../types/user.types";
+import type { User, Institution, Department } from "../../types";
 
 // ====================================
 // ZOD VALIDATION SCHEMAS

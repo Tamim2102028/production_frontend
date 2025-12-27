@@ -10,7 +10,7 @@ import {
 } from "./FriendActions";
 import { BsThreeDots } from "react-icons/bs";
 import confirm from "../../../utils/sweetAlert";
-import type { FriendUser } from "../../../types/friendship.types";
+import type { FriendUser } from "../../../types";
 import {
   useAcceptFriendRequest,
   useCancelFriendRequest,

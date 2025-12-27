@@ -1,10 +1,11 @@
 import api from "../lib/axios";
-import type { ApiResponse, User } from "../types/user.types";
 import type {
+  User,
+  ApiResponse,
   UpdateGeneralData,
   UpdateAcademicData,
   ProfileHeaderData,
-} from "../types/profile.types";
+} from "../types";
 
 export const profileApi = {
   /**

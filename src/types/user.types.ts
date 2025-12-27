@@ -157,22 +157,6 @@ export interface AuthState {
   isCheckingAuth: boolean;
 }
 
-// API Response Types
-export interface ApiResponse<T> {
-  statusCode: number;
-  data: T;
-  message: string;
-  success: boolean;
-}
-
-export interface ApiError {
-  statusCode: number;
-  data: null;
-  message: string;
-  success: false;
-  errors: string[];
-}
-
 export interface AuthResponse {
   user: User;
 }
@@ -182,15 +166,4 @@ export interface LoginCredentials {
   email?: string;
   userName?: string;
   password: string;
-}
-
-// Register Types
-export interface RegisterData {
-  fullName: string;
-  email: string;
-  userName: string;
-  password: string;
-  userType: UserType;
-  avatar?: File;
-  coverImage?: File;
 }

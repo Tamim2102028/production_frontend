@@ -1,10 +1,5 @@
 import api from "../lib/axios";
-import type {
-  ApiResponse,
-  AuthResponse,
-  LoginCredentials,
-  User,
-} from "../types/user.types";
+import type { LoginCredentials, User, ApiResponse } from "../types";
 
 /**
  * ====================================
@@ -39,8 +34,10 @@ export const authApi = {
    *
    * ⚠️ multipart/form-data কারণ avatar file upload আছে
    */
-  register: async (formData: FormData): Promise<ApiResponse<AuthResponse>> => {
-    const response = await api.post<ApiResponse<AuthResponse>>(
+  register: async (
+    formData: FormData
+  ): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.post<ApiResponse<{ user: User }>>(
       "/users/register",
       formData,
       {
@@ -62,13 +59,13 @@ export const authApi = {
    */
   login: async (
     credentials: LoginCredentials
-  ): Promise<ApiResponse<AuthResponse>> => {
+  ): Promise<ApiResponse<{ user: User }>> => {
     // Determine if it's email or username based on @ symbol
     const payload = credentials.email?.includes("@")
       ? { email: credentials.email, password: credentials.password }
       : { userName: credentials.email, password: credentials.password };
 
-    const response = await api.post<ApiResponse<AuthResponse>>(
+    const response = await api.post<ApiResponse<{ user: User }>>(
       "/users/login",
       payload
     );
@@ -94,8 +91,10 @@ export const authApi = {
    * Cookie তে valid token থাকলে user data পাবে।
    * Token invalid/expired হলে 401 পাবে।
    */
-  getCurrentUser: async (): Promise<ApiResponse<User>> => {
-    const response = await api.get<ApiResponse<User>>("/users/current-user");
+  getCurrentUser: async (): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.get<ApiResponse<{ user: User }>>(
+      "/users/current-user"
+    );
     return response.data;
   },
 
@@ -108,8 +107,8 @@ export const authApi = {
    * Backend refresh token cookie থেকে পড়ে,
    * নতুন access token cookie তে set করে দেয়।
    */
-  refreshToken: async (): Promise<ApiResponse<AuthResponse>> => {
-    const response = await api.post<ApiResponse<AuthResponse>>(
+  refreshToken: async (): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.post<ApiResponse<{ user: User }>>(
       "/users/refresh-token"
     );
     return response.data;

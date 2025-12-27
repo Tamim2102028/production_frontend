@@ -8,8 +8,7 @@ import { groupService } from "../services/group.service";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../types/user.types";
-import type { GroupDetailsResponse } from "../types/group.types";
+import type { ApiError, GroupDetailsResponse } from "../types";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
@@ -144,7 +143,7 @@ export const useLeaveGroup = () => {
       queryClient.invalidateQueries({ queryKey: ["group"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
 
-      // Navigate to groups list or stay? 
+      // Navigate to groups list or stay?
       // If we are on the group detail page, we might want to stay or go to list.
       // Usually if you leave a private group you can't see it anymore.
       // For now, let's not force navigation, let the component handle it or user decide.
@@ -152,8 +151,7 @@ export const useLeaveGroup = () => {
       navigate("/groups");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message || "Failed to leave group";
+      const message = error?.response?.data?.message || "Failed to leave group";
       toast.error(message);
     },
   });

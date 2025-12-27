@@ -33,11 +33,12 @@ import {
   PROFILE_RELATION_STATUS,
   USER_TYPES,
 } from "../../constants";
-import type { Institution, Department } from "../../types/user.types";
 import type {
+  Institution,
+  Department,
   FriendshipStatus,
   ProfileHeaderData,
-} from "../../types/profile.types";
+} from "../../types";
 import { toast } from "sonner";
 
 const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {

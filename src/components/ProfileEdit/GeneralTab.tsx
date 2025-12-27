@@ -19,7 +19,7 @@ import {
 
 import { useUpdateGeneral } from "../../hooks/useProfile";
 import { GENDERS, RELIGIONS } from "../../constants";
-import type { User } from "../../types/user.types";
+import type { User } from "../../types";
 
 // ====================================
 // ZOD VALIDATION SCHEMA

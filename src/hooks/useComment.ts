@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { commentService } from "../services/comment.service";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../types/user.types";
+import type { ApiError } from "../types";
 
 export const usePostComments = (
   postId: string,

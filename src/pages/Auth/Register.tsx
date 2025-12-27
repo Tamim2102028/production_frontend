@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useRegister } from "../../hooks/useAuth";
 import { USER_TYPES } from "../../constants";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../../types/user.types";
+import type { ApiError } from "../../types";
 
 // ✅ Zod Schema - Backend validation এর সাথে match করে
 const registerSchema = z.object({

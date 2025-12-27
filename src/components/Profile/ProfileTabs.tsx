@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaFolder, FaFileAlt, FaBookmark, FaUserFriends } from "react-icons/fa";
-import type { ProfileHeaderData } from "../../types/profile.types";
+import type { ProfileHeaderData } from "../../types";
 
 interface ProfileTabsProps {
   activeTab: "posts" | "files";

@@ -5,7 +5,7 @@ import {
   GROUP_MEMBERSHIP_STATUS,
   GROUP_PRIVACY,
 } from "../../../constants/index";
-import type { GroupCardResponse } from "../../../types/group.types";
+import type { GroupCardResponse } from "../../../types";
 
 const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
   const navigate = useNavigate();

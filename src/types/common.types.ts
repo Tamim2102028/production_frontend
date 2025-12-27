@@ -6,6 +6,14 @@ export interface ApiResponse<T> {
   success: boolean;
 }
 
+export interface ApiError {
+  statusCode: number;
+  data: null;
+  message: string;
+  success: false;
+  errors: string[];
+}
+
 export interface Pagination {
   totalDocs: number;
   limit: number;

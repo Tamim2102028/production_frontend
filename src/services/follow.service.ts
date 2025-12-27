@@ -1,6 +1,6 @@
 import { FOLLOW_TARGET_MODELS } from "../constants";
 import api from "../lib/axios";
-import type { ApiResponse } from "../types/user.types";
+import type { ApiResponse } from "../types";
 
 export const followApi = {
   // Toggle follow status (handles both follow and unfollow)

@@ -2,9 +2,8 @@ import React from "react";
 import ProfilePostCard from "./ProfilePostCard";
 import { useProfilePosts } from "../../hooks/usePost";
 import PostSkeleton from "../shared/skeletons/PostSkeleton";
-import type { ProfilePostsProps } from "../../types/post.types";
+import type { ProfilePostsProps, ApiError } from "../../types";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../../types/user.types";
 
 const ProfilePosts: React.FC<ProfilePostsProps> = ({
   username,

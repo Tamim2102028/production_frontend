@@ -2,7 +2,7 @@ import api from "../lib/axios";
 import type {
   MyGroupsResponse,
   GroupDetailsResponse,
-} from "../types/group.types";
+} from "../types";
 
 export const groupService = {
   // Create Group

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { FaGlobe, FaUserFriends, FaLock, FaBuilding } from "react-icons/fa";
 import type { IconType } from "react-icons";
 import { POST_VISIBILITY } from "../../constants/post";
-import type { PostContentProps } from "../../types/post.types";
+import type { PostContentProps } from "../../types";
 
 const editPostSchema = z.object({
   content: z

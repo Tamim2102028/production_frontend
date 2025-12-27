@@ -5,8 +5,8 @@ import profileApi from "../services/profile.service";
 import type {
   UpdateGeneralData,
   UpdateAcademicData,
-} from "../types/profile.types";
-import type { ApiError } from "../types/user.types";
+  ApiError,
+} from "../types";
 import type { AxiosError } from "axios";
 
 /**

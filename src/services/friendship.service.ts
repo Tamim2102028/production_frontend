@@ -1,6 +1,6 @@
 import api from "../lib/axios";
-import type { ApiResponse } from "../types/user.types";
 import type {
+  ApiResponse,
   SendFriendRequestData,
   AcceptFriendRequestData,
   RejectFriendRequestData,
@@ -9,7 +9,7 @@ import type {
   BlockData,
   UnblockData,
   FriendshipListData,
-} from "../types/friendship.types";
+} from "../types";
 
 export const friendshipApi = {
   // ====================================

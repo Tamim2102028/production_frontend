@@ -24,7 +24,7 @@ import CommentItem from "../shared/CommentItem";
 import CommentSkeleton from "../shared/skeletons/CommentSkeleton";
 import PostContent from "../shared/PostContent";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
-import type { Attachment, Post, PostMeta } from "../../types/post.types";
+import type { Attachment, Post, PostMeta } from "../../types";
 import { useUser } from "../../hooks/useAuth";
 import {
   useToggleLikePost,

@@ -18,7 +18,7 @@ const Profile: React.FC = () => {
 
   const { user: currentUser } = useUser();
   // If no username is provided, default to current user's username
-  const profileUsername = username || currentUser?.userName;
+  const profileUsername = !username ? currentUser?.userName : username;
 
   const {
     data: profileData,

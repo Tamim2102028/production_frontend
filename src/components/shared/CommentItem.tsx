@@ -4,7 +4,7 @@ import { formatPostDateTime } from "../../utils/dateUtils";
 import { confirmDelete } from "../../utils/sweetAlert";
 import { DEFAULT_AVATAR_SM } from "../../constants/images";
 import SeparatorDot from "./SeparatorDot";
-import type { CommentItemProps } from "../../types/comment.types";
+import type { CommentItemProps } from "../../types";
 
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,

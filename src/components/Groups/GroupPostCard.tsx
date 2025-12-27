@@ -21,7 +21,7 @@ import {
 import SeparatorDot from "../shared/SeparatorDot";
 import CommentItem from "../shared/CommentItem";
 import { DEFAULT_AVATAR_SM } from "../../constants/images";
-import type { CommentResponseItem } from "../../types/comment.types";
+import type { CommentResponseItem } from "../../types";
 
 // TODO: Replace with API data
 interface GroupPost {

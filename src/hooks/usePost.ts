@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { postService } from "../services/post.service";
-import {
-  type CreatePostRequest,
-  type PostResponseItem,
-} from "../types/post.types";
+import type {
+  CreatePostRequest,
+  PostResponseItem,
+  ApiError,
+  Pagination,
+} from "../types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import type { ApiError } from "../types/user.types";
-import type { Pagination } from "../types/common.types";
 
 export const useProfilePosts = (username: string | undefined) => {
   return useQuery({

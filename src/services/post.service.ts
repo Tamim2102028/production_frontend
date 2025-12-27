@@ -3,7 +3,7 @@ import type {
   CreatePostRequest,
   FeedResponse,
   ProfilePostsResponse,
-} from "../types/post.types";
+} from "../types";
 
 export const postService = {
   // Get News Feed

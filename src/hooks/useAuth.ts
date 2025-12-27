@@ -2,11 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import authApi from "../services/auth.service";
-import type {
-  LoginCredentials,
-  ApiError,
-  AuthState,
-} from "../types/user.types";
+import type { LoginCredentials, AuthState, ApiError } from "../types";
 import type { AxiosError } from "axios";
 
 // Query Keys for caching
@@ -44,7 +40,9 @@ export const useUser = (): AuthState => {
     queryFn: async () => {
       try {
         const response = await authApi.getCurrentUser();
-        return response.data;
+        // The API returns ApiResponse<AuthResponse> which contains { user: User }
+        // But our useUser hook expects User | null
+        return response.data.user;
       } catch (error) {
         // 401/403 means not logged in
         console.log("Auth error:", error);
@@ -81,12 +79,9 @@ export const useRegister = () => {
       // Step 1: Register API call
       const registerResponse = await authApi.register(formData);
 
-      // Step 2: Fetch fresh user data
-      const userResponse = await authApi.getCurrentUser();
-
       return {
         registerData: registerResponse.data,
-        userData: userResponse.data,
+        userData: registerResponse.data.user,
       };
     },
     onSuccess: (response) => {
@@ -120,12 +115,9 @@ export const useLogin = () => {
       // Step 1: Login API call
       const loginResponse = await authApi.login(credentials);
 
-      // Step 2: Fetch fresh user data
-      const userResponse = await authApi.getCurrentUser();
-
       return {
         loginData: loginResponse.data,
-        userData: userResponse.data,
+        userData: loginResponse.data.user,
       };
     },
     onSuccess: (response) => {

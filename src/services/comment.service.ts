@@ -2,7 +2,7 @@ import api from "../lib/axios";
 import type {
   CommentsResponse,
   AddCommentResponse,
-} from "../types/comment.types";
+} from "../types";
 
 export const commentService = {
   // Get comments for a post
