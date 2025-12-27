@@ -175,8 +175,6 @@ export interface ApiError {
 
 export interface AuthResponse {
   user: User;
-  accessToken: string;
-  refreshToken: string;
 }
 
 // Login Types
