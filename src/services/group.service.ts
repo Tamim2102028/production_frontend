@@ -3,6 +3,7 @@ import type {
   MyGroupsResponse,
   GroupDetailsResponse,
   GroupMembersResponse,
+  FeedResponse,
 } from "../types";
 
 export const groupService = {
@@ -19,6 +20,18 @@ export const groupService = {
   // Get Group Details
   getGroupDetails: async (slug: string): Promise<GroupDetailsResponse> => {
     const response = await api.get<GroupDetailsResponse>(`/groups/${slug}`);
+    return response.data;
+  },
+
+  // Get Group Feed
+  getGroupFeed: async (
+    slug: string,
+    page = 1,
+    limit = 10
+  ): Promise<FeedResponse> => {
+    const response = await api.get<FeedResponse>(`/groups/${slug}/feed`, {
+      params: { page, limit },
+    });
     return response.data;
   },
 

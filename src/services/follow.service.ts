@@ -8,7 +8,23 @@ export const followApi = {
     targetId: string,
     targetModel: (typeof FOLLOW_TARGET_MODELS)[keyof typeof FOLLOW_TARGET_MODELS] = FOLLOW_TARGET_MODELS.USER
   ): Promise<ApiResponse<{ isFollowing: boolean }>> => {
-    const response = await api.post(`/follows/${targetId}`, { targetModel });
+    let url = "";
+
+    switch (targetModel) {
+      case FOLLOW_TARGET_MODELS.USER:
+        url = `/profile/${targetId}/follow`;
+        break;
+      case FOLLOW_TARGET_MODELS.DEPARTMENT:
+        url = `/depts/${targetId}/follow`;
+        break;
+      case FOLLOW_TARGET_MODELS.INSTITUTION:
+        url = `/institutions/${targetId}/follow`;
+        break;
+      default:
+        throw new Error("Invalid target model for follow");
+    }
+
+    const response = await api.post(url);
     return response.data;
   },
 };

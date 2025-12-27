@@ -1,3 +1,4 @@
+import { POST_TARGET_MODELS } from "../constants";
 import api from "../lib/axios";
 import type {
   CreatePostRequest,
@@ -18,14 +19,43 @@ export const postService = {
 
   // Create Post
   createPost: async (reqData: CreatePostRequest) => {
-    const response = await api.post("/posts", reqData);
+    let url = "/profile/post"; // Default to User Profile
+    const { postOnModel, postOnId } = reqData;
+
+    switch (postOnModel) {
+      case POST_TARGET_MODELS.USER:
+        url = "/profile/post";
+        break;
+      case POST_TARGET_MODELS.GROUP:
+        url = `/groups/${postOnId}/post`;
+        break;
+      case POST_TARGET_MODELS.DEPARTMENT:
+        url = `/depts/${postOnId}/post`;
+        break;
+      case POST_TARGET_MODELS.INSTITUTION:
+        url = `/institutions/${postOnId}/post`;
+        break;
+      case POST_TARGET_MODELS.CR_CORNER:
+        url = `/cr-corner/post`;
+        break;
+    }
+
+    const response = await api.post(url, reqData);
     return response.data;
   },
 
   // Like Post
-  togglePostLike: async (postId: string) => {
-    // সার্ভারে রিকোয়েস্ট (POST বা PUT)
-    const { data } = await api.post(`/posts/${postId}/toggle-like`);
+  togglePostLike: async (
+    postId: string,
+    context: string = POST_TARGET_MODELS.USER
+  ) => {
+    let routeSegment = "profile";
+    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
+    else if (context === POST_TARGET_MODELS.INSTITUTION)
+      routeSegment = "institutions";
+
+    const { data } = await api.post(`/${routeSegment}/posts/${postId}/like`);
     return data;
   },
 
@@ -38,23 +68,51 @@ export const postService = {
   },
 
   // Delete Post
-  deletePost: async (postId: string) => {
-    const response = await api.delete(`/posts/${postId}`);
+  deletePost: async (
+    postId: string,
+    context: string = POST_TARGET_MODELS.USER
+  ) => {
+    let routeSegment = "profile";
+    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
+    else if (context === POST_TARGET_MODELS.INSTITUTION)
+      routeSegment = "institutions";
+
+    const response = await api.delete(`/${routeSegment}/posts/${postId}`);
     return response.data;
   },
 
   // Update Post
   updatePost: async (
     postId: string,
-    data: { content: string; tags?: string[]; visibility?: string }
+    data: { content: string; tags?: string[]; visibility?: string },
+    context: string = POST_TARGET_MODELS.USER
   ) => {
-    const response = await api.patch(`/posts/${postId}`, data);
+    let routeSegment = "profile";
+    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
+    else if (context === POST_TARGET_MODELS.INSTITUTION)
+      routeSegment = "institutions";
+
+    const response = await api.patch(
+      `/${routeSegment}/posts/${postId}`,
+      data
+    );
     return response.data;
   },
 
   // Toggle Read Status
-  toggleReadStatus: async (postId: string) => {
-    const response = await api.post(`/posts/${postId}/toggle-read`);
+  toggleReadStatus: async (
+    postId: string,
+    context: string = POST_TARGET_MODELS.USER
+  ) => {
+    let routeSegment = "profile";
+    if (context === POST_TARGET_MODELS.GROUP) routeSegment = "groups";
+    else if (context === POST_TARGET_MODELS.DEPARTMENT) routeSegment = "depts";
+    else if (context === POST_TARGET_MODELS.INSTITUTION)
+      routeSegment = "institutions";
+
+    const response = await api.post(`/${routeSegment}/posts/${postId}/read`);
     return response.data;
   },
 
