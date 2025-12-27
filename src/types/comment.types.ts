@@ -9,16 +9,21 @@ export interface CommentAuthor {
 
 export interface Comment {
   _id: string;
+
   content: string;
   post: string;
   author: CommentAuthor;
+
+  // stats
   likesCount: number;
-  repliesCount?: number; // Optional as it was removed but might be useful later or for compatibility
-  createdAt: string;
-  updatedAt?: string;
+
+  // edit status
   isEdited?: boolean;
   editedAt?: string;
+
   isDeleted?: boolean;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface CommentMeta {
