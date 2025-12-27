@@ -39,26 +39,30 @@ const GroupDetail: React.FC = () => {
   >("posts");
   const [showMenu, setShowMenu] = useState(false);
 
-  // TODO: Implement Join/Leave logic with API
   const handleJoin = () => {
+    // TODO: Implement Join logic with API
     console.log("Join group:", group?._id);
   };
 
   const handleCancel = () => {
+    // TODO: Implement Cancel Join logic with API
     console.log("Cancel join request:", group?._id);
   };
 
   const handleMakeAdmin = (userId: string) => {
+    // TODO: Implement Make Admin logic with API
     console.log("Make admin:", userId);
   };
 
   const handleRemoveAdmin = (userId: string) => {
+    // TODO: Implement Remove Admin logic with API
     console.log("Remove admin:", userId);
   };
 
   const handleRemoveMember = async (userId: string) => {
     if (
       await confirm({
+        // TODO: Implement Remove Member logic with API
         title: "Are you sure?",
         text: "This member will be removed from the group.",
         confirmButtonText: "Yes, remove member!",
