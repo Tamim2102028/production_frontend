@@ -1,23 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaFolder, FaFileAlt, FaBookmark, FaUserFriends } from "react-icons/fa";
-import type { User } from "../../types/user.types";
+import type { ProfileHeaderData } from "../../types/profile.types";
 
 interface ProfileTabsProps {
   activeTab: "posts" | "files";
   setActiveTab: (tab: "posts" | "files") => void;
   isOwnProfile: boolean;
-  userData: User;
+  data: ProfileHeaderData;
 }
 
 const ProfileTabs: React.FC<ProfileTabsProps> = ({
   activeTab,
   setActiveTab,
   isOwnProfile,
-  userData,
+  data,
 }) => {
-  const postsCount = userData?.stats?.postsCount || 0;
-  const publicFilesCount = userData?.stats?.publicFilesCount || 0;
+  const postsCount = data.meta.stats?.postsCount || 0;
+  const publicFilesCount = data.meta.stats?.publicFilesCount || 0;
 
   return (
     <div className="rounded-t-lg border-b border-gray-200 bg-white">

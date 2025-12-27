@@ -1,34 +1,28 @@
-// Profile Types - For Profile Feature
-
 import { PROFILE_RELATION_STATUS } from "../constants";
-import type { Gender, SocialLinks } from "./user.types";
+import type { Gender, SocialLinks, User } from "./user.types";
 
-// ====================================
-// FRIENDSHIP STATUS (from Backend constants)
-// ====================================
-
-/**
- * Profile relation status between currentUser and profile owner
- *
- * - SELF: নিজের প্রোফাইল → Edit Profile button
- * - FRIEND: বন্ধু → Message / Unfriend buttons
- * - REQUEST_SENT: আমি পাঠিয়েছি → Cancel Request button
- * - REQUEST_RECEIVED: সে পাঠিয়েছে → Accept/Reject buttons
- * - BLOCKED: আমি ব্লক করেছি → Unblock button
- * - NOT_FRIENDS: কোনো সম্পর্ক নেই → Add Friend button
- */
 export type FriendshipStatus =
   (typeof PROFILE_RELATION_STATUS)[keyof typeof PROFILE_RELATION_STATUS];
 
-// ====================================
-// API RESPONSE TYPES
-// ====================================
+export interface ProfileMeta {
+  profile_relation_status: FriendshipStatus;
+  isFollowing: boolean;
+  isBlockedByMe: boolean;
+  isBlockedByTarget: boolean;
+  isOwnProfile: boolean;
+  stats: {
+    postsCount: number;
+    friendsCount: number;
+    followersCount: number;
+    followingCount: number;
+    publicFilesCount: number;
+  };
+}
 
-/**
- * GET /users/p/:username response
- * Backend returns user fields + profile_relation_status in flat structure
- * We use 'User' type directly as it includes profile_relation_status
- */
+export interface ProfileHeaderData {
+  user: User;
+  meta: ProfileMeta;
+}
 
 // ====================================
 // UPDATE PROFILE DATA TYPES

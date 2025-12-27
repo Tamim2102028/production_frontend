@@ -3,31 +3,11 @@ import type { ApiResponse, User } from "../types/user.types";
 import type {
   UpdateGeneralData,
   UpdateAcademicData,
+  ProfileHeaderData,
 } from "../types/profile.types";
-
-/**
- * ====================================
- * PROFILE API SERVICE
- * ====================================
- *
- * Profile related সব API calls এখানে।
- *
- * APIs:
- * - getProfile: GET /users/p/:username → যেকোনো user এর profile + friendshipStatus
- * - updateGeneral: PATCH /users/update-general → Name, Bio, Phone, etc.
- * - updateAcademic: PATCH /users/update-academic → Session, Section, Rank, etc.
- * - updateAvatar: PATCH /users/avatar → Avatar image upload
- * - updateCoverImage: PATCH /users/cover-image → Cover image upload
- * - changePassword: POST /users/change-password → Password change
- */
 
 export const profileApi = {
   /**
-   * Get user profile by username
-   *
-   * @param username - User's unique username
-   * @returns User profile with profile_relation_status
-   *
    * profile_relation_status:
    * - SELF: নিজের প্রোফাইল
    * - FRIEND: বন্ধু
@@ -36,8 +16,12 @@ export const profileApi = {
    * - BLOCKED: ব্লক করা
    * - NOT_FRIENDS: কোনো relation নেই
    */
-  getProfile: async (username: string): Promise<ApiResponse<User>> => {
-    const response = await api.get<ApiResponse<User>>(`/users/p/${username}`);
+  getProfile: async (
+    username: string
+  ): Promise<ApiResponse<ProfileHeaderData>> => {
+    const response = await api.get<ApiResponse<ProfileHeaderData>>(
+      `/users/p/${username}`
+    );
     return response.data;
   },
 
@@ -48,7 +32,9 @@ export const profileApi = {
    * @returns User object without calculated stats/relations
    */
   getProfileDetails: async (username: string): Promise<ApiResponse<User>> => {
-    const response = await api.get<ApiResponse<User>>(`/users/details/${username}`);
+    const response = await api.get<ApiResponse<User>>(
+      `/users/details/${username}`
+    );
     return response.data;
   },
 

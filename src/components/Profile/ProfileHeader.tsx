@@ -33,14 +33,16 @@ import {
   PROFILE_RELATION_STATUS,
   USER_TYPES,
 } from "../../constants";
-import type { User, Institution, Department } from "../../types/user.types";
-import type { FriendshipStatus } from "../../types/profile.types";
+import type { Institution, Department } from "../../types/user.types";
+import type {
+  FriendshipStatus,
+  ProfileHeaderData,
+} from "../../types/profile.types";
 import { toast } from "sonner";
 
-const ProfileHeader: React.FC<{ userData: User; isOwnProfile: boolean }> = ({
-  userData, // যার Profile visit করিতেছি তার User Data
-  isOwnProfile, // If true, it means the current user is viewing their own profile
-}) => {
+const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
+  const { user: userData, meta } = data;
+  const { isOwnProfile } = meta;
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 
@@ -56,12 +58,11 @@ const ProfileHeader: React.FC<{ userData: User; isOwnProfile: boolean }> = ({
   // Hook for follow actions
   const toggleFollow = useToggleFollow();
 
-  // Calculate friendshipStatus from userData
+  // Calculate friendshipStatus from meta
   const friendshipStatus: FriendshipStatus =
-    (userData?.profile_relation_status as FriendshipStatus) ||
-    PROFILE_RELATION_STATUS.NOT_FRIENDS;
+    meta.profile_relation_status || PROFILE_RELATION_STATUS.NOT_FRIENDS;
 
-  const isFollowing = userData?.isFollowing || false;
+  const isFollowing = meta.isFollowing || false;
 
   // Helper to get institution name
   const getInstitutionName = (): string => {
@@ -294,8 +295,8 @@ const ProfileHeader: React.FC<{ userData: User; isOwnProfile: boolean }> = ({
                   <span className="font-medium">Copy profile link</span>
                 </button>
                 {!isOwnProfile &&
-                  !userData.isBlockedByMe &&
-                  !userData.isBlockedByTarget && (
+                  !meta.isBlockedByMe &&
+                  !meta.isBlockedByTarget && (
                     <button
                       onClick={handleBlock}
                       className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
@@ -304,7 +305,7 @@ const ProfileHeader: React.FC<{ userData: User; isOwnProfile: boolean }> = ({
                       <span className="font-medium">Block user</span>
                     </button>
                   )}
-                {userData.isBlockedByMe && (
+                {meta.isBlockedByMe && (
                   <button
                     onClick={() => {
                       setShowMenu(false);
@@ -382,26 +383,42 @@ const ProfileHeader: React.FC<{ userData: User; isOwnProfile: boolean }> = ({
               </p>
             )}
 
-            {/* Stats */}
-            <div className="mt-2 flex gap-4 text-sm text-gray-500">
-              <span>
-                <strong className="text-gray-900">
-                  {userData.stats?.friendsCount || 0}
-                </strong>{" "}
-                Friends
-              </span>
-              <span>
-                <strong className="text-gray-900">
-                  {userData.stats?.followersCount || 0}
-                </strong>{" "}
-                Followers
-              </span>
-              <span>
-                <strong className="text-gray-900">
-                  {userData.stats?.followingCount || 0}
-                </strong>{" "}
-                Following
-              </span>
+            {/* Profile Stats */}
+            <div className="mt-4 grid grid-cols-4 divide-x divide-gray-200 rounded-lg border border-gray-200 bg-white py-2 shadow-sm">
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">
+                  {meta.stats?.postsCount || 0}
+                </p>
+                <p className="text-xs font-medium text-gray-500">
+                  {meta.stats?.postsCount === 1 ? "Post" : "Posts"}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">
+                  {meta.stats?.friendsCount || 0}
+                </p>
+                <p className="text-xs font-medium text-gray-500">
+                  {meta.stats?.friendsCount === 1 ? "Friend" : "Friends"}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">
+                  {meta.stats?.followersCount || 0}
+                </p>
+                <p className="text-xs font-medium text-gray-500">
+                  {meta.stats?.followersCount === 1 ? "Follower" : "Followers"}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">
+                  {meta.stats?.followingCount || 0}
+                </p>
+                <p className="text-xs font-medium text-gray-500">
+                  {meta.stats?.followingCount === 1
+                    ? "Following"
+                    : "Followings"}
+                </p>
+              </div>
             </div>
           </div>
 

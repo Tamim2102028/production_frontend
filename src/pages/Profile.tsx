@@ -19,11 +19,9 @@ const Profile: React.FC = () => {
   const { user: currentUser } = useUser();
   // If no username is provided, default to current user's username
   const profileUsername = username || currentUser?.userName;
-  // Check if viewing own profile
-  const isOwnProfile = username === currentUser?.userName;
 
   const {
-    data: userData,
+    data: profileData,
     isLoading,
     error,
   } = useProfileHeader(profileUsername);
@@ -32,19 +30,23 @@ const Profile: React.FC = () => {
     return <ProfileHeaderSkeleton />;
   }
 
-  if (error || !userData) {
+  if (error || !profileData) {
     return <ProfileNotFound />;
   }
 
+  const { user, meta } = profileData;
+  // Fallback to meta.isOwnProfile if available, otherwise calculate locally (though backend should provide it)
+  const isOwnProfile = meta?.isOwnProfile ?? username === currentUser?.userName;
+
   return (
     <>
-      <ProfileHeader userData={userData} isOwnProfile={isOwnProfile} />
+      <ProfileHeader data={profileData} />
 
       <ProfileTabs
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isOwnProfile={isOwnProfile}
-        userData={userData}
+        data={profileData}
       />
 
       {/* Tab Content */}
@@ -58,7 +60,7 @@ const Profile: React.FC = () => {
               </div>
             )}
             <ProfilePosts
-              username={userData.userName}
+              username={user.userName}
               isOwnProfile={isOwnProfile}
             />
           </div>
@@ -66,10 +68,7 @@ const Profile: React.FC = () => {
 
         {activeTab === "files" && (
           <div className="space-y-3">
-            <PublicFiles
-              username={userData.userName}
-              isOwnProfile={isOwnProfile}
-            />
+            <PublicFiles username={user.userName} isOwnProfile={isOwnProfile} />
           </div>
         )}
       </div>
