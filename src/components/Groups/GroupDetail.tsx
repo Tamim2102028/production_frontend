@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, Routes, Route } from "react-router-dom";
-import GroupMediaTab from "./GroupMediaTab";
+import GroupMediaTab from "./group-tabs-inside/GroupMediaTab";
 import GroupAboutTab from "./GroupAboutTab";
 import { useGroupDetails } from "../../hooks/useGroup";
 import GroupAccessDenied from "./utils/GroupAccessDenied";

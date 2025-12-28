@@ -97,3 +97,10 @@ export type GroupMembersResponse = ApiResponse<{
   }[];
   pagination: Pagination;
 }>;
+
+export type GroupCardResponse = {
+  group: GroupCard;
+  meta: {
+    status: (typeof GROUP_MEMBERSHIP_STATUS)[keyof typeof GROUP_MEMBERSHIP_STATUS];
+  };
+};

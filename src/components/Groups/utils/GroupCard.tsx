@@ -5,12 +5,12 @@ import {
   GROUP_MEMBERSHIP_STATUS,
   GROUP_PRIVACY,
 } from "../../../constants/index";
-import type { GroupCardResponse } from "../../../types";
 import {
   useJoinGroup,
   useLeaveGroup,
   useCancelJoinRequest,
 } from "../../../hooks/useGroup";
+import type { GroupCardResponse } from "../../../types";
 
 const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
   const navigate = useNavigate();
@@ -30,27 +30,27 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
   const handleJoin = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    joinGroup(group.slug);
+    joinGroup(group._id);
   };
 
   const handleCancel = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    cancelJoin(group.slug);
+    cancelJoin(group._id);
   };
 
   const handleAccept = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // Accepting an invite is effectively joining the group
-    joinGroup(group.slug);
+    joinGroup(group._id);
   };
 
   const handleReject = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // Rejecting an invite is effectively leaving the potential relationship
-    leaveGroup(group.slug);
+    leaveGroup(group._id);
   };
 
   const isLoading = isJoining || isLeaving || isCancelling;
