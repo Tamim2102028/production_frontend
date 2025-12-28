@@ -9,9 +9,10 @@ import {
   FaShareAlt,
   FaTrash,
 } from "react-icons/fa";
+import { toast } from "sonner";
 import { confirm } from "../../utils/sweetAlert";
 import type { Group, GroupMeta } from "../../types";
-import { GROUP_MEMBERSHIP_STATUS } from "../../constants";
+import { GROUP_MEMBERSHIP_STATUS, GROUP_PRIVACY } from "../../constants";
 import {
   useCancelJoinRequest,
   useJoinGroup,
@@ -73,6 +74,18 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
     cancelJoinRequest(group._id);
   };
 
+  const handleCopyLink = async () => {
+    const slugOrId = group.slug || group._id;
+    const url = `${window.location.origin}/groups/${slugOrId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Group link copied to clipboard");
+    } catch (error) {
+      toast.error(`Failed to copy link: ${error}`);
+    }
+    setShowMenu(false);
+  };
+
   const { isAdmin, isOwner, status } = meta;
 
   return (
@@ -108,10 +121,21 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                       {group.name}
                     </h1>
                     <p className="mt-1 text-gray-600">
-                      {group.privacy === "PUBLIC"
+                      {group.privacy === GROUP_PRIVACY.PUBLIC
                         ? "Public Group"
-                        : "Private Group"}{" "}
-                      · {group.membersCount || 0} members
+                        : group.privacy === GROUP_PRIVACY.CLOSED
+                          ? "Closed Group"
+                          : "Private Group"}
+                      {" - "}
+                      {!group.membersCount || group.membersCount === 1
+                        ? "Member"
+                        : "Members"}{" "}
+                      {group.membersCount?.toLocaleString() || 0}
+                      {" - "}
+                      {!group.postsCount || group.postsCount === 1
+                        ? "Post"
+                        : "Posts"}{" "}
+                      {group.postsCount?.toLocaleString() || 0}
                     </p>
                   </div>
 
@@ -136,7 +160,10 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                               </span>
                             </button>
                           )}
-                          <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50">
+                          <button
+                            onClick={handleCopyLink}
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                          >
                             <FaLink className="h-4 w-4 flex-shrink-0" />
                             <span className="font-medium">Copy Group Link</span>
                           </button>
@@ -198,17 +225,17 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                   )}
 
                   {status === GROUP_MEMBERSHIP_STATUS.JOINED && (
-                    <button className="flex items-center gap-2 rounded-lg bg-gray-200 px-6 py-2.5 font-semibold text-gray-700 transition hover:bg-gray-300">
+                    <div className="flex items-center gap-2 rounded-lg bg-gray-200 px-6 py-2.5 font-semibold text-gray-700">
                       <FaCheck /> Joined
-                    </button>
+                    </div>
                   )}
 
-                  <button className="flex items-center gap-2 rounded-lg bg-gray-200 px-6 py-2.5 font-semibold text-gray-700 hover:bg-gray-300">
+                  <button className="flex cursor-pointer items-center gap-2 rounded-lg bg-blue-200 px-6 py-2.5 font-semibold text-gray-700 hover:bg-blue-300">
                     <FaBell className="h-4 w-4" />
                     Notifications
                   </button>
 
-                  <button className="flex items-center gap-2 rounded-lg bg-gray-200 px-6 py-2.5 font-semibold text-gray-700 hover:bg-gray-300">
+                  <button className="flex cursor-pointer items-center gap-2 rounded-lg bg-blue-200 px-6 py-2.5 font-semibold text-gray-700 hover:bg-blue-300">
                     <FaShareAlt className="h-4 w-4" />
                     Share
                   </button>
