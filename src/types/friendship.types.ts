@@ -58,19 +58,15 @@ export interface FriendUser {
   userName: string;
   fullName: string;
   avatar: string;
-  institution: InstitutionBasic | null;
+  institution: {
+    _id?: string;
+    name: string;
+  } | null;
   userType: string;
-  department: DepartmentBasic | null;
+  department: {
+    _id?: string;
+    name: string;
+  } | null;
   friendshipStatus: (typeof PROFILE_RELATION_STATUS)[keyof typeof PROFILE_RELATION_STATUS];
   friendshipId?: string;
-}
-
-export interface InstitutionBasic {
-  _id?: string;
-  name: string;
-}
-
-export interface DepartmentBasic {
-  _id?: string;
-  name: string;
 }

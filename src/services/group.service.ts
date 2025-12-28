@@ -2,10 +2,10 @@ import { GROUP_LIMIT, GROUP_MEMBERS_LIMIT, POST_LIMIT } from "../constants";
 import api from "../lib/axios";
 import type {
   MyGroupsResponse,
-  GroupDetailsResponse,
   GroupMembersResponse,
   FeedResponse,
   CreatePostRequest,
+  GroupDetailsResponse,
 } from "../types";
 
 export const groupService = {
@@ -37,6 +37,12 @@ export const groupService = {
     const response = await api.get<FeedResponse>(`/groups/${groupId}/feed`, {
       params: { page, limit },
     });
+    return response.data;
+  },
+
+  // Get Group Pinned Posts
+  getGroupPinnedPosts: async (groupId: string): Promise<FeedResponse> => {
+    const response = await api.get<FeedResponse>(`/groups/${groupId}/pinned`);
     return response.data;
   },
 

@@ -2,37 +2,12 @@ import type { ApiResponse, Pagination } from "./common.types";
 import type {
   GROUP_JOIN_METHOD,
   GROUP_MEMBERSHIP_STATUS,
+  GROUP_PRIVACY,
   GROUP_ROLES,
+  GROUP_TYPES,
 } from "../constants";
 
-// Group Card Type
-export type GroupCardProps = {
-  group: GroupCard;
-  status: string;
-};
-export type GroupCard = {
-  _id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  coverImage?: string;
-  type: string;
-  privacy?: string;
-  membersCount?: number;
-  postsCount?: number;
-};
-
-export type GroupCardResponse = {
-  group: GroupCard;
-  meta: GroupMeta;
-};
-
-export type MyGroupsResponse = ApiResponse<{
-  groups: GroupCardResponse[];
-  pagination: Pagination;
-}>;
-
-// Group Type
+// Group Details Type
 export type Group = {
   _id: string;
   name: string;
@@ -41,8 +16,8 @@ export type Group = {
   coverImage?: string;
   avatar?: string;
   institution?: string;
-  type: string;
-  privacy?: string;
+  type: (typeof GROUP_TYPES)[keyof typeof GROUP_TYPES];
+  privacy?: (typeof GROUP_PRIVACY)[keyof typeof GROUP_PRIVACY];
   settings?: {
     allowComments?: boolean;
     allowPosts?: boolean;
@@ -56,17 +31,40 @@ export type Group = {
   updatedAt?: Date;
 };
 
-export type GroupMeta = {
-  status: string;
-  isMember: boolean;
-  isAdmin: boolean;
-  isOwner: boolean;
+// Group Card Type
+export type GroupCardProps = {
+  group: GroupCard;
+  status: (typeof GROUP_MEMBERSHIP_STATUS)[keyof typeof GROUP_MEMBERSHIP_STATUS];
 };
 
-export type GroupDetailsResponse = ApiResponse<{
-  group: Group;
-  meta: GroupMeta;
+export type GroupCard = {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  coverImage?: string;
+  type: (typeof GROUP_TYPES)[keyof typeof GROUP_TYPES];
+  privacy?: (typeof GROUP_PRIVACY)[keyof typeof GROUP_PRIVACY];
+  membersCount?: number;
+  postsCount?: number;
+};
+
+export type MyGroupsResponse = ApiResponse<{
+  groups: {
+    group: GroupCard;
+    meta: GroupMeta;
+  }[];
+  pagination: Pagination;
 }>;
+
+export type GroupMeta = {
+  status: (typeof GROUP_MEMBERSHIP_STATUS)[keyof typeof GROUP_MEMBERSHIP_STATUS];
+  isAdmin: boolean;
+  isOwner: boolean;
+  isModerator: boolean;
+  isMember: boolean;
+  isRestricted: boolean;
+};
 
 export type GroupMember = {
   _id: string;
@@ -83,18 +81,19 @@ export type GroupMember = {
   joinedMethod: (typeof GROUP_JOIN_METHOD)[keyof typeof GROUP_JOIN_METHOD];
 };
 
-export type GroupMemberMeta = {
-  isFriend: boolean;
-  hasPendingRequest: boolean;
-  isSentRequest: boolean;
-};
-
-export type GroupMemberItem = {
-  member: GroupMember;
-  meta: GroupMemberMeta;
-};
+export type GroupDetailsResponse = ApiResponse<{
+  group: Group;
+  meta: GroupMeta;
+}>;
 
 export type GroupMembersResponse = ApiResponse<{
-  members: GroupMemberItem[];
+  members: {
+    member: GroupMember;
+    meta: {
+      isFriend: boolean;
+      hasPendingRequest: boolean;
+      isSentRequest: boolean;
+    };
+  }[];
   pagination: Pagination;
 }>;

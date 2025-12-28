@@ -29,16 +29,21 @@ export interface ConfirmOptions {
   cancelButtonText?: string;
   icon?: "warning" | "info" | "success" | "error" | "question";
   isDanger?: boolean; // true = red confirm button (for delete actions)
+  confirmButtonColor?: string; // Explicit color override
 }
 
 export const confirm = async (opts: ConfirmOptions) => {
+  const confirmColor =
+    opts.confirmButtonColor ?? (opts.isDanger ? "#d33" : "#3085d6");
+  const cancelColor = opts.isDanger ? "#6b7280" : "#d33";
+
   const result = await Swal.fire({
     title: opts.title ?? "Are you sure?",
     text: opts.text ?? "",
     icon: opts.icon ?? "warning",
     showCancelButton: true,
-    confirmButtonColor: opts.isDanger ? "#d33" : "#3085d6",
-    cancelButtonColor: opts.isDanger ? "#6b7280" : "#d33",
+    confirmButtonColor: confirmColor,
+    cancelButtonColor: cancelColor,
     confirmButtonText: opts.confirmButtonText ?? "Yes",
     cancelButtonText: opts.cancelButtonText ?? "Cancel",
   });

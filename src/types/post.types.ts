@@ -11,6 +11,7 @@ export interface Attachment {
   name?: string;
 }
 
+// Post Details Type
 export interface Post {
   _id: string;
   content: string;

@@ -8,19 +8,17 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { GROUP_PRIVACY } from "../../../constants/group";
+import type { Group } from "../../../types/group.types";
 
 interface GroupAccessDeniedProps {
-  groupName?: string;
-  privacyType?: string; // PRIVATE or CLOSED
+  group: Group;
 }
 
-const GroupAccessDenied: React.FC<GroupAccessDeniedProps> = ({
-  groupName = "Group",
-  privacyType = GROUP_PRIVACY.PRIVATE,
-}) => {
+const GroupAccessDenied: React.FC<GroupAccessDeniedProps> = ({ group }) => {
   const navigate = useNavigate();
 
-  const isClosed = privacyType === GROUP_PRIVACY.CLOSED;
+  const { name: groupName, privacy } = group;
+  const isClosed = privacy === GROUP_PRIVACY.CLOSED;
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center p-4">

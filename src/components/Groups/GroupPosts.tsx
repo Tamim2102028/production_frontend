@@ -7,10 +7,9 @@ import type { AxiosError } from "axios";
 
 interface GroupPostsProps {
   groupId: string;
-  mode?: "posts" | "pinned";
 }
 
-const GroupPosts: React.FC<GroupPostsProps> = ({ groupId, mode = "posts" }) => {
+const GroupPosts: React.FC<GroupPostsProps> = ({ groupId }) => {
   const {
     data: postsData,
     isLoading,
@@ -19,15 +18,6 @@ const GroupPosts: React.FC<GroupPostsProps> = ({ groupId, mode = "posts" }) => {
     hasNextPage,
     isFetchingNextPage,
   } = useGroupFeed(groupId);
-
-  // If mode is pinned, show placeholder for now or handle it
-  if (mode === "pinned") {
-    return (
-      <div className="rounded-lg border border-gray-200 bg-white p-12 text-center shadow">
-        <p className="text-gray-500">No pinned posts to show.</p>
-      </div>
-    );
-  }
 
   const posts = postsData?.pages.flatMap((page) => page.data.posts) || [];
 

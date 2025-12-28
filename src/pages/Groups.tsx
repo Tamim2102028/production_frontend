@@ -65,7 +65,7 @@ const Groups: React.FC = () => {
 
         {/* Standalone Routes (No Header/Tabs) */}
         <Route path="creategroup" element={<CreateGroupPage />} />
-        <Route path=":slug" element={<GroupDetail />} />
+        <Route path=":slug/*" element={<GroupDetail />} />
       </Routes>
     </Suspense>
   );

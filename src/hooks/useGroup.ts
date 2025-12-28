@@ -10,13 +10,7 @@ import { postService } from "../services/post.service";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
-import type {
-  ApiError,
-  GroupDetailsResponse,
-  GroupMembersResponse,
-  FeedResponse,
-  CreatePostRequest,
-} from "../types";
+import type { ApiError, FeedResponse, CreatePostRequest } from "../types";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
@@ -33,7 +27,6 @@ export const useCreateGroup = () => {
       if (groupSlug) {
         navigate(`/groups/${groupSlug}`);
       } else {
-        // Fallback if slug is missing
         navigate("/groups");
       }
     },
@@ -124,9 +117,12 @@ export const useInvitedGroups = () => {
 };
 
 export const useGroupDetails = (slug: string) => {
-  return useQuery<GroupDetailsResponse>({
+  return useQuery({
     queryKey: ["groupDetails", slug],
-    queryFn: () => groupService.getGroupDetails(slug),
+    queryFn: async () => {
+      const result = await groupService.getGroupDetails(slug);
+      return result;
+    },
     staleTime: 1000 * 60 * 10, // 10 minutes
     enabled: !!slug,
     retry: 1,
@@ -134,7 +130,7 @@ export const useGroupDetails = (slug: string) => {
 };
 
 export const useGroupMembers = (groupId: string) => {
-  return useInfiniteQuery<GroupMembersResponse>({
+  return useInfiniteQuery({
     queryKey: ["groupMembers", groupId],
     queryFn: ({ pageParam = 1 }) =>
       groupService.getGroupMembers(groupId, pageParam as number),
@@ -153,7 +149,7 @@ export const useGroupMembers = (groupId: string) => {
 // ====================================
 
 export const useGroupFeed = (groupId: string) => {
-  return useInfiniteQuery<FeedResponse>({
+  return useInfiniteQuery({
     queryKey: ["groupFeed", groupId],
     queryFn: async ({ pageParam }) => {
       const page = Number(pageParam || 1);
@@ -166,6 +162,15 @@ export const useGroupFeed = (groupId: string) => {
     },
     enabled: !!groupId,
     staleTime: 1000 * 60 * 1, // 1 minute
+  });
+};
+
+export const useGroupPinnedPosts = (groupId: string) => {
+  return useQuery({
+    queryKey: ["groupPinnedPosts", groupId],
+    queryFn: () => groupService.getGroupPinnedPosts(groupId),
+    enabled: !!groupId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
