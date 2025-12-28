@@ -204,7 +204,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
   );
 
   return (
-    <div className="rounded-lg border border-gray-400 bg-white shadow">
+    <div className="rounded border border-gray-400 bg-white shadow">
       {/* Post Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-3">
