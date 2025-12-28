@@ -47,9 +47,10 @@ import confirm from "../../utils/sweetAlert";
 interface GroupPostCardProps {
   post: Post;
   meta: PostMeta;
+  slug: string;
 }
 
-const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
+const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -65,7 +66,8 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
   // Post hooks
   const { mutate: likeMutate } = useToggleLikeGroupPost(post.postOnId);
   const { mutate: deletePost, isPending: isDeleting } = useDeleteGroupPost(
-    post.postOnId
+    post.postOnId,
+    slug
   );
   const { mutate: updatePost, isPending: isUpdating } = useUpdateGroupPost(
     post.postOnId

@@ -5,9 +5,13 @@ import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 
 interface GroupPinnedPostsProps {
   groupId: string;
+  slug: string;
 }
 
-const GroupPinnedPosts: React.FC<GroupPinnedPostsProps> = ({ groupId }) => {
+const GroupPinnedPosts: React.FC<GroupPinnedPostsProps> = ({
+  groupId,
+  slug,
+}) => {
   const { data: pinnedData, isLoading } = useGroupPinnedPosts(groupId);
   const posts = pinnedData?.data.posts || [];
 
@@ -30,7 +34,12 @@ const GroupPinnedPosts: React.FC<GroupPinnedPostsProps> = ({ groupId }) => {
   return (
     <div className="space-y-4">
       {posts.map((item) => (
-        <GroupPostCard key={item.post._id} post={item.post} meta={item.meta} />
+        <GroupPostCard
+          key={item.post._id}
+          post={item.post}
+          meta={item.meta}
+          slug={slug}
+        />
       ))}
     </div>
   );

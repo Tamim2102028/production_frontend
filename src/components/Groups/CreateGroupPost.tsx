@@ -41,11 +41,15 @@ type CreateProfilePostFormData = z.infer<typeof createProfilePostSchema>;
 
 interface CreateGroupPostProps {
   groupId: string;
+  slug: string;
 }
 
-const CreateGroupPost: React.FC<CreateGroupPostProps> = ({ groupId }) => {
+const CreateGroupPost: React.FC<CreateGroupPostProps> = ({ groupId, slug }) => {
   const { user } = useUser();
-  const { mutate, isPending } = useCreateGroupPost(groupId);
+  const { mutate: createGroupPost, isPending } = useCreateGroupPost(
+    groupId,
+    slug
+  );
   const [isExpanded, setIsExpanded] = useState(false);
 
   const {
@@ -76,7 +80,7 @@ const CreateGroupPost: React.FC<CreateGroupPostProps> = ({ groupId }) => {
           .filter((tag) => tag.length > 0)
       : [];
 
-    mutate(
+    createGroupPost(
       {
         content: data.content,
         visibility: data.visibility,

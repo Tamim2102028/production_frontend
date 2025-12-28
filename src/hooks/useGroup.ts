@@ -168,7 +168,7 @@ export const useGroupPinnedPosts = (groupId: string) => {
   });
 };
 
-export const useCreateGroupPost = (groupId: string) => {
+export const useCreateGroupPost = (groupId: string, slug: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -177,6 +177,10 @@ export const useCreateGroupPost = (groupId: string) => {
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupPinnedPosts", groupId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
@@ -254,7 +258,7 @@ export const useToggleLikeGroupPost = (groupId: string) => {
   });
 };
 
-export const useDeleteGroupPost = (groupId: string) => {
+export const useDeleteGroupPost = (groupId: string, slug: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -268,6 +272,10 @@ export const useDeleteGroupPost = (groupId: string) => {
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupPinnedPosts", groupId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;

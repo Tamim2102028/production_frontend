@@ -130,12 +130,11 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                       {!group.membersCount || group.membersCount === 1
                         ? "Member"
                         : "Members"}{" "}
-                      {group.membersCount?.toLocaleString() || 0}
-                      {" - "}
+                      ({group.membersCount?.toLocaleString() || 0}){" - "}
                       {!group.postsCount || group.postsCount === 1
                         ? "Post"
                         : "Posts"}{" "}
-                      {group.postsCount?.toLocaleString() || 0}
+                      ({group.postsCount?.toLocaleString() || 0})
                     </p>
                   </div>
 

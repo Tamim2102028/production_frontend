@@ -98,7 +98,8 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
         <div className="mb-3 flex items-center gap-2 text-sm text-gray-600">
           <FaUsers size={14} />
           <span className="font-medium">
-            {group.membersCount?.toLocaleString()} members
+            {group.membersCount?.toLocaleString()}{" "}
+            {group.membersCount === 1 ? "member" : "members"}
           </span>
         </div>
 

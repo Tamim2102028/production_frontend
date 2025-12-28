@@ -41,23 +41,27 @@ const GroupDetail: React.FC = () => {
       <GroupHeader group={group} meta={meta} />
 
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-xl bg-white shadow">
+        <div className="space-y-3 rounded-xl shadow">
           <GroupNavBar />
 
-          <div className="p-3">
+          <div className="space-y-3">
             <Routes>
               <Route
                 index
                 element={
                   <>
-                    {meta.isMember && <CreateGroupPost groupId={group._id} />}
-                    <GroupPosts groupId={group._id} />
+                    {meta.isMember && (
+                      <CreateGroupPost groupId={group._id} slug={group.slug} />
+                    )}
+                    <GroupPosts groupId={group._id} slug={group.slug} />
                   </>
                 }
               />
               <Route
                 path="pinned"
-                element={<GroupPinnedPosts groupId={group._id} />}
+                element={
+                  <GroupPinnedPosts groupId={group._id} slug={group.slug} />
+                }
               />
               <Route
                 path="members"

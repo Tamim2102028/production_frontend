@@ -7,9 +7,10 @@ import type { AxiosError } from "axios";
 
 interface GroupPostsProps {
   groupId: string;
+  slug: string;
 }
 
-const GroupPosts: React.FC<GroupPostsProps> = ({ groupId }) => {
+const GroupPosts: React.FC<GroupPostsProps> = ({ groupId, slug }) => {
   const {
     data: postsData,
     isLoading,
@@ -49,12 +50,13 @@ const GroupPosts: React.FC<GroupPostsProps> = ({ groupId }) => {
     <>
       {/* Posts List */}
       {posts.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {posts.map((item) => (
             <GroupPostCard
               key={item.post._id}
               post={item.post}
               meta={item.meta}
+              slug={slug}
             />
           ))}
         </div>
