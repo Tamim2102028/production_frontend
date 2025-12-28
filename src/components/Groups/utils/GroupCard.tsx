@@ -116,17 +116,16 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
           )}
 
           {/* Join */}
-          {status === GROUP_MEMBERSHIP_STATUS.NOT_JOINED &&
-            group.privacy !== GROUP_PRIVACY.CLOSED && (
-              <button
-                type="button"
-                onClick={handleJoin}
-                disabled={isLoading}
-                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
-              >
-                {isJoining ? "Joining..." : "Join Group"}
-              </button>
-            )}
+          {!status && group.privacy !== GROUP_PRIVACY.CLOSED && (
+            <button
+              type="button"
+              onClick={handleJoin}
+              disabled={isLoading}
+              className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
+            >
+              {isJoining ? "Joining..." : "Join Group"}
+            </button>
+          )}
 
           {/* Cancel Join Request */}
           {status === GROUP_MEMBERSHIP_STATUS.PENDING && (

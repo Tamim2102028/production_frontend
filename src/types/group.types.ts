@@ -58,7 +58,9 @@ export type MyGroupsResponse = ApiResponse<{
 }>;
 
 export type GroupMeta = {
-  status: (typeof GROUP_MEMBERSHIP_STATUS)[keyof typeof GROUP_MEMBERSHIP_STATUS];
+  status?:
+    | (typeof GROUP_MEMBERSHIP_STATUS)[keyof typeof GROUP_MEMBERSHIP_STATUS]
+    | null;
   isAdmin: boolean;
   isOwner: boolean;
   isModerator: boolean;

@@ -177,7 +177,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
 
                 {/* Action Buttons */}
                 <div className="mt-6 flex flex-wrap gap-3">
-                  {status === GROUP_MEMBERSHIP_STATUS.NOT_JOINED && (
+                  {!status && (
                     <button
                       onClick={handleJoin}
                       disabled={isJoining}
