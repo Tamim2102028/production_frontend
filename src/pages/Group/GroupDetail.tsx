@@ -1,17 +1,17 @@
 import React from "react";
 import { useParams, Routes, Route } from "react-router-dom";
-import GroupMediaTab from "./group-tabs-inside/GroupMediaTab";
-import GroupAboutTab from "./group-tabs-inside/GroupAboutTab";
+import GroupMediaTab from "../../components/Groups/group-tabs-inside/GroupMediaTab";
+import GroupAboutTab from "../../components/Groups/group-tabs-inside/GroupAboutTab";
 import { useGroupDetails } from "../../hooks/useGroup";
-import GroupAccessDenied from "./utils/GroupAccessDenied";
-import GroupHeader from "./GroupHeader";
-import GroupNavBar from "./GroupNavBar";
-import CreateGroupPost from "./CreateGroupPost";
-import GroupPosts from "./group-tabs-inside/GroupPosts";
-import GroupPinnedPosts from "./group-tabs-inside/GroupPinnedPosts";
-import GroupMembersTab from "./group-tabs-inside/GroupMembersTab";
-import GroupNotFound from "./utils/GroupNotFound";
-import GroupLoading from "./utils/GroupLoading";
+import GroupAccessDenied from "../../components/Groups/utils/GroupAccessDenied";
+import GroupHeader from "../../components/Groups/GroupHeader";
+import GroupNavBar from "../../components/Groups/GroupNavBar";
+import CreateGroupPost from "../../components/Groups/CreateGroupPost";
+import GroupPosts from "../../components/Groups/group-tabs-inside/GroupPosts";
+import GroupPinnedPosts from "../../components/Groups/group-tabs-inside/GroupPinnedPosts";
+import GroupMembersTab from "../../components/Groups/group-tabs-inside/GroupMembersTab";
+import GroupNotFound from "../../components/Groups/utils/GroupNotFound";
+import GroupLoading from "../../components/Groups/utils/GroupLoading";
 
 const GroupDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();

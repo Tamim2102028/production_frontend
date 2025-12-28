@@ -1,4 +1,8 @@
-import { GROUP_LIMIT, GROUP_MEMBERS_LIMIT, POST_LIMIT } from "../constants";
+import {
+  GROUP_LIMIT,
+  GROUP_MEMBERS_LIMIT,
+  GROUP_POSTS_LIMIT,
+} from "../constants";
 import api from "../lib/axios";
 import type {
   MyGroupsResponse,
@@ -33,7 +37,7 @@ export const groupService = {
 
   // Get Group Feed
   getGroupFeed: async (groupId: string, page = 1): Promise<FeedResponse> => {
-    const limit = POST_LIMIT;
+    const limit = GROUP_POSTS_LIMIT;
     const response = await api.get<FeedResponse>(`/groups/${groupId}/feed`, {
       params: { page, limit },
     });

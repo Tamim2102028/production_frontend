@@ -1,16 +1,16 @@
 import React, { Suspense, lazy } from "react";
 import { Routes, Route, NavLink, Navigate, Outlet } from "react-router-dom";
-import GroupsHeader from "../components/Groups/utils/GroupsHeader.tsx";
-import MyGroups from "../components/Groups/group-tabs/MyGroups.tsx";
-import SuggestedGroups from "../components/Groups/group-tabs/SuggestedGroups.tsx";
-import CareerGroups from "../components/Groups/group-tabs/CareerGroups.tsx";
-import UniversityGroups from "../components/Groups/group-tabs/UniversityGroups.tsx";
-import SentGroupRequests from "../components/Groups/group-tabs/SentGroupRequests.tsx";
-import InvitedGroup from "../components/Groups/group-tabs/InvitedGroup.tsx";
-import PageLoader from "./Fallbacks/PageLoader";
+import GroupsHeader from "../../components/Groups/utils/GroupsHeader.tsx";
+import MyGroups from "../../components/Groups/group-tabs/MyGroups.tsx";
+import SuggestedGroups from "../../components/Groups/group-tabs/SuggestedGroups.tsx";
+import CareerGroups from "../../components/Groups/group-tabs/CareerGroups.tsx";
+import UniversityGroups from "../../components/Groups/group-tabs/UniversityGroups.tsx";
+import SentGroupRequests from "../../components/Groups/group-tabs/SentGroupRequests.tsx";
+import InvitedGroup from "../../components/Groups/group-tabs/InvitedGroup.tsx";
+import PageLoader from "./../Fallbacks/PageLoader";
 
 // Lazy load detail and create pages to avoid circular deps or large bundles
-const GroupDetail = lazy(() => import("../components/Groups/GroupDetail"));
+const GroupDetail = lazy(() => import("./../Group/GroupDetail.tsx"));
 const CreateGroupPage = lazy(() => import("./CreateGroupPage.tsx"));
 
 const GroupsLayout: React.FC = () => {

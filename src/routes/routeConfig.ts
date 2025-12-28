@@ -124,7 +124,7 @@ export const routes: RouteConfig[] = [
   // Social features
   {
     path: "/groups/*",
-    component: lazy(() => import("../pages/Groups")),
+    component: lazy(() => import("../pages/Group/Groups")),
     requireAuth: true,
     title: "Groups",
     category: "social",
