@@ -16,15 +16,13 @@ export const useToggleFollow = () => {
       targetId: string;
       targetModel?: (typeof FOLLOW_TARGET_MODELS)[keyof typeof FOLLOW_TARGET_MODELS];
     }) => followApi.toggleFollow(targetId, targetModel),
-    onSuccess: (data) => {
-      const isFollowing = data.data.isFollowing;
-      toast.success(
-        isFollowing ? "Followed successfully" : "Unfollowed successfully"
-      );
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to follow user");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };

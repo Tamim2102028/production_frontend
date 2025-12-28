@@ -1,15 +1,15 @@
 import React from "react";
 import { useParams, Routes, Route } from "react-router-dom";
 import GroupMediaTab from "./group-tabs-inside/GroupMediaTab";
-import GroupAboutTab from "./GroupAboutTab";
+import GroupAboutTab from "./group-tabs-inside/GroupAboutTab";
 import { useGroupDetails } from "../../hooks/useGroup";
 import GroupAccessDenied from "./utils/GroupAccessDenied";
 import GroupHeader from "./GroupHeader";
 import GroupNavBar from "./GroupNavBar";
 import CreateGroupPost from "./CreateGroupPost";
-import GroupPosts from "./GroupPosts";
-import GroupPinnedPosts from "./GroupPinnedPosts";
-import GroupMembersTab from "./GroupMembersTab";
+import GroupPosts from "./group-tabs-inside/GroupPosts";
+import GroupPinnedPosts from "./group-tabs-inside/GroupPinnedPosts";
+import GroupMembersTab from "./group-tabs-inside/GroupMembersTab";
 import GroupNotFound from "./utils/GroupNotFound";
 import GroupLoading from "./utils/GroupLoading";
 

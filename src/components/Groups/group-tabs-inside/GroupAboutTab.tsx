@@ -1,5 +1,5 @@
 import React from "react";
-import type { Group } from "../../types";
+import type { Group } from "../../../types";
 
 const GroupAboutTab: React.FC<{ group: Group }> = ({ group }) => {
   return (

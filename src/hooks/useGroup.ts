@@ -19,21 +19,15 @@ export const useCreateGroup = () => {
   return useMutation({
     mutationFn: (data: FormData) => groupService.createGroup(data),
     onSuccess: (data) => {
-      toast.success("Group created successfully!");
+      toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
       queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
 
       const groupSlug = data.data.group?.slug;
-      if (groupSlug) {
-        navigate(`/groups/${groupSlug}`);
-      } else {
-        navigate("/groups");
-      }
+      navigate(`/groups/${groupSlug}`);
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message || "Failed to create group";
-      toast.error(message);
+      toast.error(error?.response?.data?.message);
     },
   });
 };
@@ -180,12 +174,12 @@ export const useCreateGroupPost = (groupId: string) => {
   return useMutation({
     mutationFn: (data: CreatePostRequest) =>
       groupService.createGroupPost(groupId, data),
-    onSuccess: () => {
-      toast.success("Post created successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message || "Failed to create post";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -248,13 +242,14 @@ export const useToggleLikeGroupPost = (groupId: string) => {
       return { previousGroupFeed };
     },
 
-    onError: (_error, _variables, context) => {
+    onError: (error: AxiosError<ApiError>, _variables, context) => {
       if (context?.previousGroupFeed) {
         context.previousGroupFeed.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-      toast.error("Failed to like post");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -270,12 +265,12 @@ export const useDeleteGroupPost = (groupId: string) => {
       postId: string;
       targetModel?: string;
     }) => postService.deletePost(postId, targetModel),
-    onSuccess: () => {
-      toast.success("Post deleted successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message || "Failed to delete post";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -294,12 +289,12 @@ export const useUpdateGroupPost = (groupId: string) => {
       data: { content: string; tags?: string[]; visibility?: string };
       targetModel?: string;
     }) => postService.updatePost(postId, data, targetModel),
-    onSuccess: () => {
-      toast.success("Post updated successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message || "Failed to update post";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -356,13 +351,14 @@ export const useToggleReadStatusGroupPost = (groupId: string) => {
       return { previousGroupFeed };
     },
 
-    onError: (_error, _variables, context) => {
+    onError: (error: AxiosError<ApiError>, _variables, context) => {
       if (context?.previousGroupFeed) {
         context.previousGroupFeed.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-      toast.error("Failed to update read status");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -412,13 +408,14 @@ export const useToggleBookmarkGroupPost = (groupId: string) => {
       return { previousGroupFeed };
     },
 
-    onError: (_error, _variables, context) => {
+    onError: (error: AxiosError<ApiError>, _variables, context) => {
       if (context?.previousGroupFeed) {
         context.previousGroupFeed.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-      toast.error("Failed to update bookmark");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -432,8 +429,8 @@ export const useJoinGroup = () => {
 
   return useMutation({
     mutationFn: (groupId: string) => groupService.joinGroup(groupId),
-    onSuccess: () => {
-      toast.success("Request sent / Joined successfully!");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
       queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
       queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
@@ -443,7 +440,7 @@ export const useJoinGroup = () => {
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message || "Failed to join group";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -454,8 +451,8 @@ export const useLeaveGroup = () => {
 
   return useMutation({
     mutationFn: (groupId: string) => groupService.leaveGroup(groupId),
-    onSuccess: () => {
-      toast.success("You have left the group");
+    onSuccess: (response) => {
+      toast.success(response.message);
 
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
@@ -463,7 +460,7 @@ export const useLeaveGroup = () => {
       queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message || "Failed to leave group";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -474,8 +471,8 @@ export const useCancelJoinRequest = () => {
 
   return useMutation({
     mutationFn: (groupId: string) => groupService.cancelJoinRequest(groupId),
-    onSuccess: () => {
-      toast.success("Join request cancelled");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
       queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
       queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
@@ -485,8 +482,7 @@ export const useCancelJoinRequest = () => {
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message || "Failed to cancel request";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -498,8 +494,8 @@ export const useDeleteGroup = () => {
 
   return useMutation({
     mutationFn: (groupId: string) => groupService.deleteGroup(groupId),
-    onSuccess: () => {
-      toast.success("Group deleted successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
       queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
       queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
@@ -510,8 +506,7 @@ export const useDeleteGroup = () => {
       navigate("/groups");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message || "Failed to delete group";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -528,13 +523,12 @@ export const useInviteMembers = () => {
       groupId: string;
       targetUserIds: string | string[];
     }) => groupService.inviteMembers(groupId, targetUserIds),
-    onSuccess: () => {
-      toast.success("Invitations sent successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message || "Failed to send invitations";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -546,13 +540,12 @@ export const useRemoveGroupMember = () => {
   return useMutation({
     mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
       groupService.removeMember(groupId, userId),
-    onSuccess: () => {
-      toast.success("Member removed successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupMembers"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message || "Failed to remove member";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -564,13 +557,12 @@ export const useAssignGroupAdmin = () => {
   return useMutation({
     mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
       groupService.assignAdmin(groupId, userId),
-    onSuccess: () => {
-      toast.success("Admin assigned successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupMembers"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message || "Failed to assign admin";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });
@@ -582,13 +574,12 @@ export const useRevokeGroupAdmin = () => {
   return useMutation({
     mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
       groupService.revokeAdmin(groupId, userId),
-    onSuccess: () => {
-      toast.success("Admin access revoked");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupMembers"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message || "Failed to revoke admin";
+      const message = error?.response?.data?.message;
       toast.error(message);
     },
   });

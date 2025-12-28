@@ -1,7 +1,7 @@
 import React from "react";
-import GroupPostCard from "./GroupPostCard";
-import { useGroupPinnedPosts } from "../../hooks/useGroup";
-import PostSkeleton from "../shared/skeletons/PostSkeleton";
+import GroupPostCard from "./../GroupPostCard";
+import { useGroupPinnedPosts } from "../../../hooks/useGroup";
+import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 
 interface GroupPinnedPostsProps {
   groupId: string;

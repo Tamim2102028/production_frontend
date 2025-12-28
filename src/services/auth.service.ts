@@ -60,7 +60,6 @@ export const authApi = {
   login: async (
     credentials: LoginCredentials
   ): Promise<ApiResponse<{ user: User }>> => {
-    // Determine if it's email or username based on @ symbol
     const payload = credentials.email?.includes("@")
       ? { email: credentials.email, password: credentials.password }
       : { userName: credentials.email, password: credentials.password };

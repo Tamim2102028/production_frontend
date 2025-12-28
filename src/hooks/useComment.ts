@@ -48,7 +48,7 @@ export const useAddComment = ({
   return useMutation({
     mutationFn: ({ content }: { content: string }) =>
       commentService.addComment(postId, content, targetModel),
-    onSuccess: () => {
+    onSuccess: (response) => {
       // Invalidate comments for this post
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
       // Also invalidate profile posts to update comment count
@@ -57,10 +57,11 @@ export const useAddComment = ({
       if (onSuccess) {
         onSuccess();
       }
-      toast.success("Comment added!");
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to add comment");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -79,16 +80,17 @@ export const useDeleteComment = ({
   return useMutation({
     mutationFn: (commentId: string) =>
       commentService.deleteComment(commentId, targetModel),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
       queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
       if (onSuccess) {
         onSuccess();
       }
-      toast.success("Comment deleted");
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to delete comment");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -110,18 +112,13 @@ export const useUpdateComment = ({
       commentId: string;
       content: string;
     }) => commentService.updateComment(commentId, content, targetModel),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-      toast.success("Comment updated");
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      const errorMessage =
-        error.response?.data?.message || "Failed to update comment";
-      if (errorMessage.includes("maximum allowed length")) {
-        toast.error("Comment cannot exceed 1000 characters");
-      } else {
-        toast.error(errorMessage);
-      }
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -193,9 +190,8 @@ export const useToggleLikeComment = ({
           queryClient.setQueryData(queryKey, data);
         });
       }
-      toast.error(
-        error.response?.data?.message || "Failed to like/unlike comment"
-      );
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };

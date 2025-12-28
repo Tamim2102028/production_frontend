@@ -85,10 +85,11 @@ export const useUpdateGeneral = () => {
       // ✅ Invalidate profile cache
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
 
-      toast.success("Profile updated successfully!");
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to update profile");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -108,12 +109,11 @@ export const useUpdateAcademic = () => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
 
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
-      toast.success("Academic info updated!");
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(
-        error.response?.data?.message || "Failed to update academic info"
-      );
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -133,10 +133,11 @@ export const useUpdateAvatar = () => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
 
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
-      toast.success("Avatar updated!");
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to update avatar");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -156,12 +157,11 @@ export const useUpdateCoverImage = () => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
 
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
-      toast.success("Cover image updated!");
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(
-        error.response?.data?.message || "Failed to update cover image"
-      );
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -175,11 +175,12 @@ export const useChangePassword = () => {
   return useMutation({
     mutationFn: (data: { oldPassword: string; newPassword: string }) =>
       profileApi.changePassword(data),
-    onSuccess: () => {
-      toast.success("Password changed successfully!");
+    onSuccess: (response) => {
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to change password");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };

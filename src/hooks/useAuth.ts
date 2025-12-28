@@ -73,25 +73,17 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: async (formData: FormData) => {
       // Step 1: Register API call
-      const registerResponse = await authApi.register(formData);
-
-      return {
-        registerData: registerResponse.data,
-        userData: registerResponse.data.user,
-      };
+      return await authApi.register(formData);
     },
     onSuccess: (response) => {
       // ✅ Update Cache
-      queryClient.setQueryData(AUTH_KEYS.currentUser, response.userData);
-
-      // Welcome message
-      toast.success("Account created successfully! Welcome to SocialHub!");
-
-      // Redirect
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
+      toast.success(response.message);
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
-      console.error("Registration error:", error.response?.data?.message);
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -109,25 +101,17 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
       // Step 1: Login API call
-      const loginResponse = await authApi.login(credentials);
-
-      return {
-        loginData: loginResponse.data,
-        userData: loginResponse.data.user,
-      };
+      return await authApi.login(credentials);
     },
     onSuccess: (response) => {
       // ✅ Update Cache
-      queryClient.setQueryData(AUTH_KEYS.currentUser, response.userData);
-
-      // Welcome message
-      toast.success(`Welcome back, ${response.userData.fullName}!`);
-
-      // Redirect
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
+      toast.success(response.message);
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
-      console.error("Login error:", error.response?.data?.message);
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -144,19 +128,21 @@ export const useLogout = () => {
 
   return useMutation({
     mutationFn: () => authApi.logout(),
-    onSuccess: () => {
+    onSuccess: (response) => {
       // ✅ Clear Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, null);
       queryClient.removeQueries({ queryKey: AUTH_KEYS.currentUser });
 
-      toast.success("Logged out successfully. See you soon!");
+      toast.success(response?.message);
       navigate("/login");
     },
     onError: (error: AxiosError<ApiError>) => {
-      console.error("Logout error:", error.response?.data?.message);
+      const message = error?.response?.data?.message;
       // Force logout locally even if server fails
       queryClient.setQueryData(AUTH_KEYS.currentUser, null);
-      toast.error("Logout failed, but you've been signed out locally.");
+      toast.error(
+        message || "Logout failed, but you've been signed out locally."
+      );
       navigate("/login");
     },
   });

@@ -93,19 +93,16 @@ export const useToggleLikePost = () => {
       // স্ন্যাপশট রিটার্ন করা
       return { previousProfilePosts };
     },
-
-    // ২. যদি সার্ভারে এরর হয়
-    onError: (_error, _variables, context) => {
+    onError: (error: AxiosError<ApiError>, _variables, context) => {
       // আগের অবস্থায় ফিরিয়ে নেওয়া (Rollback)
       if (context?.previousProfilePosts) {
         context.previousProfilePosts.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-      toast.error("Failed to like post");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
-
-    // ৩. সবকিছু শেষে (সফল বা ব্যর্থ)
     onSettled: () => {
       // ডেটা সিঙ্ক ঠিক রাখার জন্য একবার রিফ্রেশ
       // queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
@@ -165,13 +162,14 @@ export const useToggleReadStatus = () => {
       return { previousProfilePosts };
     },
 
-    onError: (_error, _variables, context) => {
+    onError: (error: AxiosError<ApiError>, _variables, context) => {
       if (context?.previousProfilePosts) {
         context.previousProfilePosts.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-      toast.error("Failed to update read status");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -222,13 +220,14 @@ export const useToggleBookmark = () => {
       return { previousProfilePosts };
     },
 
-    onError: (_error, _postId, context) => {
+    onError: (error: AxiosError<ApiError>, _postId, context) => {
       if (context?.previousProfilePosts) {
         context.previousProfilePosts.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-      toast.error("Failed to bookmark post");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -246,14 +245,14 @@ export const useCreateProfilePost = () => {
     mutationFn: async (payload: CreatePostRequest) => {
       return postService.createPost(payload);
     },
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       // Optimistic update: নতুন পোস্ট লিস্টের শুরুতে যোগ করা
       queryClient.setQueriesData(
         { queryKey: ["profilePosts"] },
         (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
           if (!oldData || oldData.pages.length === 0) return oldData;
 
-          const newItem = data.data; // { post, meta }
+          const newItem = response.data; // { post, meta }
 
           // Add to the first page
           const firstPage = oldData.pages[0];
@@ -271,14 +270,15 @@ export const useCreateProfilePost = () => {
           };
         }
       );
-      toast.success("Post created successfully!");
+      toast.success(response.message);
 
       // Profile Header Invalidate করা (যাতে Post Count বাড়ে)
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
     },
     onError: (error: AxiosError<ApiError>) => {
       console.error("Create post error:", error);
-      toast.error(error.response?.data?.message || "Failed to create post");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -324,11 +324,12 @@ export const useUpdatePost = () => {
           };
         }
       );
-      toast.success("Post updated successfully!");
+      toast.success(data.message || data.data?.message);
     },
     onError: (error: AxiosError<ApiError>) => {
       console.error("Update post error:", error);
-      toast.error(error.response?.data?.message || "Failed to update post");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -369,11 +370,12 @@ export const useDeletePost = () => {
       // 2. Profile Header Invalidate করা (যাতে Post Count কমে)
       queryClient.invalidateQueries({ queryKey: ["profile"] });
 
-      toast.success("Post deleted successfully");
+      toast.success(_data?.message || "Post deleted successfully");
     },
     onError: (error: AxiosError<ApiError>) => {
       console.error("Delete post error:", error);
-      toast.error(error.response?.data?.message || "Failed to delete post");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };

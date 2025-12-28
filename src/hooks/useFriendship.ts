@@ -14,16 +14,15 @@ export const useSendFriendRequest = () => {
 
   return useMutation({
     mutationFn: (userId: string) => friendshipApi.sendRequest(userId),
-    onSuccess: () => {
-      toast.success("Friend request sent!");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(
-        error.response?.data?.message || "Failed to send friend request"
-      );
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -35,16 +34,15 @@ export const useAcceptFriendRequest = () => {
   return useMutation({
     mutationFn: (requesterId: string) =>
       friendshipApi.acceptRequest(requesterId),
-    onSuccess: () => {
-      toast.success("Friend request accepted!");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(
-        error.response?.data?.message || "Failed to accept friend request"
-      );
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -56,16 +54,15 @@ export const useRejectFriendRequest = () => {
   return useMutation({
     mutationFn: (requesterId: string) =>
       friendshipApi.rejectRequest(requesterId),
-    onSuccess: () => {
-      toast.info("Friend request rejected");
+    onSuccess: (response) => {
+      toast.info(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(
-        error.response?.data?.message || "Failed to reject friend request"
-      );
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -76,16 +73,15 @@ export const useCancelFriendRequest = () => {
   return useMutation({
     mutationFn: (recipientId: string) =>
       friendshipApi.cancelRequest(recipientId),
-    onSuccess: () => {
-      toast.info("Friend request cancelled");
+    onSuccess: (response) => {
+      toast.info(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(
-        error.response?.data?.message || "Failed to cancel friend request"
-      );
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -96,14 +92,15 @@ export const useUnfriendUser = () => {
 
   return useMutation({
     mutationFn: (friendId: string) => friendshipApi.unfriend(friendId),
-    onSuccess: () => {
-      toast.info("Unfriended successfully");
+    onSuccess: (response) => {
+      toast.info(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to unfriend user");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -114,8 +111,8 @@ export const useBlockUser = () => {
 
   return useMutation({
     mutationFn: (userId: string) => friendshipApi.block(userId),
-    onSuccess: () => {
-      toast.success("User blocked successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
@@ -123,7 +120,8 @@ export const useBlockUser = () => {
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to block user");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
@@ -134,13 +132,14 @@ export const useUnblockUser = () => {
 
   return useMutation({
     mutationFn: (userId: string) => friendshipApi.unblock(userId),
-    onSuccess: () => {
-      toast.success("User unblocked successfully");
+    onSuccess: (response) => {
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data?.message || "Failed to unblock user");
+      const message = error?.response?.data?.message;
+      toast.error(message);
     },
   });
 };
