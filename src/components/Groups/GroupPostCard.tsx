@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   FaHeart,
@@ -27,12 +28,12 @@ import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
 import type { Attachment, Post, PostMeta } from "../../types";
 import { useUser } from "../../hooks/useAuth";
 import {
-  useToggleLikePost,
-  useDeletePost,
-  useToggleReadStatus,
-  useToggleBookmark,
-  useUpdatePost,
-} from "../../hooks/usePost";
+  useToggleLikeGroupPost,
+  useDeleteGroupPost,
+  useUpdateGroupPost,
+  useToggleReadStatusGroupPost,
+  useToggleBookmarkGroupPost,
+} from "../../hooks/useGroup";
 import {
   usePostComments,
   useAddComment,
@@ -43,12 +44,12 @@ import {
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
 
-interface ProfilePostCardProps {
+interface GroupPostCardProps {
   post: Post;
   meta: PostMeta;
 }
 
-const GroupPostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
+const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -62,13 +63,21 @@ const GroupPostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const isOwnPost = meta.isMine;
 
   // Post hooks
-  const { mutate: likeMutate } = useToggleLikePost();
-  const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
-  const { mutate: updatePost, isPending: isUpdating } = useUpdatePost();
-  const { mutate: toggleReadStatus } = useToggleReadStatus();
-  const { mutate: toggleBookmark } = useToggleBookmark();
+  const { mutate: likeMutate } = useToggleLikeGroupPost(post.postOnId);
+  const { mutate: deletePost, isPending: isDeleting } = useDeleteGroupPost(
+    post.postOnId
+  );
+  const { mutate: updatePost, isPending: isUpdating } = useUpdateGroupPost(
+    post.postOnId
+  );
+  const { mutate: toggleReadStatus } = useToggleReadStatusGroupPost(
+    post.postOnId
+  );
+  const { mutate: toggleBookmark } = useToggleBookmarkGroupPost(post.postOnId);
 
   // Comment hooks
+  const queryClient = useQueryClient();
+
   const {
     data: commentsData,
     isLoading: isLoadingComments,
@@ -84,10 +93,20 @@ const GroupPostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const { mutate: addComment, isPending: isAddingComment } = useAddComment({
     postId: post._id,
     targetModel: post.postOnModel,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["groupFeed", post.postOnId],
+      });
+    },
   });
   const { mutate: deleteComment } = useDeleteComment({
     postId: post._id,
     targetModel: post.postOnModel,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["groupFeed", post.postOnId],
+      });
+    },
   });
   const { mutate: toggleLikeComment } = useToggleLikeComment({
     postId: post._id,

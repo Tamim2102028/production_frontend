@@ -37,9 +37,11 @@ export const usePostComments = ({
 export const useAddComment = ({
   postId,
   targetModel,
+  onSuccess,
 }: {
   postId: string;
   targetModel: string;
+  onSuccess?: () => void;
 }) => {
   const queryClient = useQueryClient();
 
@@ -52,7 +54,9 @@ export const useAddComment = ({
       // Also invalidate profile posts to update comment count
       queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
       // Invalidate group/dept/institution posts if needed
-      // For now, simpler invalidation
+      if (onSuccess) {
+        onSuccess();
+      }
       toast.success("Comment added!");
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -64,9 +68,11 @@ export const useAddComment = ({
 export const useDeleteComment = ({
   postId,
   targetModel,
+  onSuccess,
 }: {
   postId: string;
   targetModel: string;
+  onSuccess?: () => void;
 }) => {
   const queryClient = useQueryClient();
 
@@ -76,6 +82,9 @@ export const useDeleteComment = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
       queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      if (onSuccess) {
+        onSuccess();
+      }
       toast.success("Comment deleted");
     },
     onError: (error: AxiosError<ApiError>) => {
