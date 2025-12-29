@@ -7,7 +7,7 @@ import type {
   ProfileHeaderData,
 } from "../types";
 
-export const profileApi = {
+export const profileService = {
   /**
    * profile_relation_status:
    * - SELF: নিজের প্রোফাইল
@@ -126,6 +126,13 @@ export const profileApi = {
     );
     return response.data;
   },
+  // Get Profile Posts (paginated)
+  getProfilePosts: async (username: string, page: number) => {
+    const response = await api.get(`/profile/${username}/posts`, {
+      params: { page, limit: 10 },
+    });
+    return response.data;
+  },
 };
 
-export default profileApi;
+export default profileService;

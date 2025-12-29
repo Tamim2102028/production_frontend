@@ -77,11 +77,10 @@ export const useToggleLikePost = () => {
         });
       }
       const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(message || "Error from useToggleLikePost");
     },
     onSettled: () => {
-      // ডেটা সিঙ্ক ঠিক রাখার জন্য একবার রিফ্রেশ
-      // queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      // ডেটা সিঙ্ক ঠিক রাখার জন্য একবার রিফ্রেশ করা
     },
   });
 };
@@ -145,7 +144,7 @@ export const useToggleReadStatus = () => {
         });
       }
       const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(message || "Error from useToggleReadStatus");
     },
   });
 };
@@ -203,23 +202,11 @@ export const useToggleBookmark = () => {
         });
       }
       const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(message || "Error from useToggleBookmark");
     },
   });
 };
 
-/**
- * useCreateProfilePost Hook
- *
- * Profile এ নতুন পোস্ট তৈরি করার জন্য।
- * এটি User মডেলের উপর পোস্ট তৈরি করে।
- */
-
-/**
- * useUpdatePost Hook
- *
- * পোস্ট আপডেট করার জন্য।
- */
 export const useUpdatePost = () => {
   const queryClient = useQueryClient();
 
@@ -261,7 +248,7 @@ export const useUpdatePost = () => {
     onError: (error: AxiosError<ApiError>) => {
       console.error("Update post error:", error);
       const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(message || "Error from useUpdatePost");
     },
   });
 };
@@ -307,7 +294,7 @@ export const useDeletePost = () => {
     onError: (error: AxiosError<ApiError>) => {
       console.error("Delete post error:", error);
       const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(message || "Error from useDeletePost");
     },
   });
 };

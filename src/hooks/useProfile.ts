@@ -1,8 +1,20 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  type InfiniteData,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AUTH_KEYS } from "./useAuth";
-import profileApi from "../services/profile.service";
-import type { UpdateGeneralData, UpdateAcademicData, ApiError, ProfilePostsResponse, CreatePostRequest } from "../types";
+import { profileService } from "../services/profile.service";
+import type {
+  UpdateGeneralData,
+  UpdateAcademicData,
+  ApiError,
+  ProfilePostsResponse,
+  CreatePostRequest,
+} from "../types";
 import type { AxiosError } from "axios";
 import { postService } from "../services/utils/post.service";
 
@@ -36,7 +48,7 @@ export const useProfileHeader = (username: string | undefined) => {
     queryKey: ["profile_header", username],
     queryFn: async () => {
       if (!username) throw new Error("Username is required");
-      const response = await profileApi.getProfile(username);
+      const response = await profileService.getProfile(username);
       return response.data;
     },
     enabled: !!username, // Only fetch if username exists
@@ -59,7 +71,7 @@ export const useProfileDetails = (username: string | undefined) => {
     queryKey: ["profile_details", username],
     queryFn: async () => {
       if (!username) throw new Error("Username is required");
-      const response = await profileApi.getProfileDetails(username);
+      const response = await profileService.getProfileDetails(username);
       return response.data;
     },
     enabled: !!username, // Only fetch if username exists
@@ -78,7 +90,7 @@ export const useUpdateGeneral = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: UpdateGeneralData) => profileApi.updateGeneral(data),
+    mutationFn: (data: UpdateGeneralData) => profileService.updateGeneral(data),
     onSuccess: (response) => {
       // ✅ Update Current User Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
@@ -104,7 +116,8 @@ export const useUpdateAcademic = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: UpdateAcademicData) => profileApi.updateAcademic(data),
+    mutationFn: (data: UpdateAcademicData) =>
+      profileService.updateAcademic(data),
     onSuccess: (response) => {
       // ✅ Update Current User Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
@@ -128,7 +141,7 @@ export const useUpdateAvatar = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (formData: FormData) => profileApi.updateAvatar(formData),
+    mutationFn: (formData: FormData) => profileService.updateAvatar(formData),
     onSuccess: (response) => {
       // ✅ Update Current User Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
@@ -152,7 +165,8 @@ export const useUpdateCoverImage = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (formData: FormData) => profileApi.updateCoverImage(formData),
+    mutationFn: (formData: FormData) =>
+      profileService.updateCoverImage(formData),
     onSuccess: (response) => {
       // ✅ Update Current User Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
@@ -175,7 +189,7 @@ export const useUpdateCoverImage = () => {
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: (data: { oldPassword: string; newPassword: string }) =>
-      profileApi.changePassword(data),
+      profileService.changePassword(data),
     onSuccess: (response) => {
       toast.success(response.message);
     },
@@ -192,7 +206,7 @@ export const useProfilePosts = (username: string | undefined) => {
     queryFn: async ({ pageParam }) => {
       if (!username) throw new Error("Username is required");
       const page = Number(pageParam || 1);
-      const response = await postService.getProfilePosts(username, page);
+      const response = await profileService.getProfilePosts(username, page);
       return response;
     },
     initialPageParam: 1,

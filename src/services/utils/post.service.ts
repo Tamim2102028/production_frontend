@@ -1,10 +1,6 @@
-import { POST_LIMIT, POST_TARGET_MODELS } from "../../constants";
+import { POST_TARGET_MODELS } from "../../constants";
 import api from "../../lib/axios";
-import type {
-  CreatePostRequest,
-  FeedResponse,
-  ProfilePostsResponse,
-} from "../../types";
+import type { CreatePostRequest, FeedResponse } from "../../types";
 
 export const postService = {
   // Get News Feed
@@ -58,15 +54,6 @@ export const postService = {
 
     const { data } = await api.post(`/${routeSegment}/posts/${postId}/like`);
     return data;
-  },
-
-  // Get Profile Posts
-  getProfilePosts: async (username: string, page: number) => {
-    const response = await api.get<ProfilePostsResponse>(
-      `/profile/${username}/posts`,
-      { params: { page, limit: POST_LIMIT } }
-    );
-    return response.data;
   },
 
   // Delete Post

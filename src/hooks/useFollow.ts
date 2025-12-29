@@ -22,7 +22,7 @@ export const useToggleFollow = () => {
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
-      toast.error(message || "Error from Frontend useToggleFollow");
+      toast.error(message || "Error from useToggleFollow");
     },
   });
 };
