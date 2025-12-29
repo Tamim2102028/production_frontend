@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { followApi } from "../services/follow.service";
+import { followService } from "../services/follow.service";
 import type { ApiError } from "../types";
 import type { AxiosError } from "axios";
 import { FOLLOW_TARGET_MODELS } from "../constants";
@@ -15,7 +15,7 @@ export const useToggleFollow = () => {
     }: {
       targetId: string;
       targetModel?: (typeof FOLLOW_TARGET_MODELS)[keyof typeof FOLLOW_TARGET_MODELS];
-    }) => followApi.toggleFollow(targetId, targetModel),
+    }) => followService.toggleFollow(targetId, targetModel),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });

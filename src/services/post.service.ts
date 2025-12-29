@@ -44,7 +44,7 @@ export const postService = {
     return response.data;
   },
 
-  // Like Post
+  // Like / Unlike Post
   togglePostLike: async (
     postId: string,
     targetModel: string = POST_TARGET_MODELS.USER
@@ -124,19 +124,36 @@ export const postService = {
     return response.data;
   },
 
-  // Toggle Pin (groups only)
+  // Toggle Pin (Pin/Unpin Post)
   togglePin: async (postId: string, targetModel: string) => {
-    let routeSegment = "";
-    if (targetModel === POST_TARGET_MODELS.USER) {
-      routeSegment = "profile";
-    } else if (targetModel === POST_TARGET_MODELS.GROUP)
-      routeSegment = "groups";
-    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
-      routeSegment = "depts";
-    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
-      routeSegment = "institutions";
+    let url = "";
+    switch (targetModel) {
+      case POST_TARGET_MODELS.USER:
+        url = `/profile/posts/${postId}/pin`;
+        break;
+      case POST_TARGET_MODELS.GROUP:
+        url = `/groups/posts/${postId}/pin`;
+        break;
+      case POST_TARGET_MODELS.DEPARTMENT:
+        url = `/depts/posts/${postId}/pin`;
+        break;
+      case POST_TARGET_MODELS.INSTITUTION:
+        url = `/institutions/posts/${postId}/pin`;
+        break;
+      case POST_TARGET_MODELS.CR_CORNER:
+        url = `/cr-corner/posts/${postId}/pin`;
+        break;
+      case POST_TARGET_MODELS.ROOM:
+        url = `/events/posts/${postId}/pin`;
+        break;
+      case POST_TARGET_MODELS.PAGE:
+        url = `/events/posts/${postId}/pin`;
+        break;
+      default:
+        throw new Error("Invalid target model for pinning");
+    }
 
-    const response = await api.post(`/${routeSegment}/posts/${postId}/pin`);
+    const response = await api.post(url);
     return response.data;
   },
 };
