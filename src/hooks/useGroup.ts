@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { groupService } from "../services/group.service";
 import { postService } from "../services/post.service";
+import { POST_TARGET_MODELS } from "../constants";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
@@ -204,11 +205,17 @@ export const useToggleLikeGroupPost = (groupId: string) => {
 
     onMutate: async ({ postId }) => {
       await queryClient.cancelQueries({ queryKey: ["groupFeed", groupId] });
+      await queryClient.cancelQueries({ queryKey: ["groupPinnedPosts", groupId] });
 
       const previousGroupFeed = queryClient.getQueriesData({
         queryKey: ["groupFeed", groupId],
       });
 
+      const previousPinned = queryClient.getQueryData<FeedResponse | undefined>(
+        ["groupPinnedPosts", groupId]
+      );
+
+      // Update group feed optimistically
       queryClient.setQueriesData(
         { queryKey: ["groupFeed", groupId] },
         (oldData: InfiniteData<FeedResponse> | undefined) => {
@@ -244,7 +251,41 @@ export const useToggleLikeGroupPost = (groupId: string) => {
         }
       );
 
-      return { previousGroupFeed };
+      // Update pinned posts optimistically if present
+      if (previousPinned) {
+        queryClient.setQueryData(
+          ["groupPinnedPosts", groupId],
+          (old: FeedResponse | undefined) => {
+            if (!old) return old;
+            return {
+              ...old,
+              data: {
+                ...old.data,
+                posts: old.data.posts.map((item) => {
+                  if (item.post._id === postId) {
+                    const isLiked = item.meta.isLiked;
+                    return {
+                      ...item,
+                      meta: {
+                        ...item.meta,
+                        isLiked: !isLiked,
+                      },
+                      post: {
+                        ...item.post,
+                        likesCount:
+                          (isLiked ? -1 : 1) + (item.post.likesCount || 0),
+                      },
+                    };
+                  }
+                  return item;
+                }),
+              },
+            };
+          }
+        );
+      }
+
+      return { previousGroupFeed, previousPinned };
     },
 
     onError: (error: AxiosError<ApiError>, _variables, context) => {
@@ -253,6 +294,11 @@ export const useToggleLikeGroupPost = (groupId: string) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
+
+      if (context?.previousPinned) {
+        queryClient.setQueryData(["groupPinnedPosts", groupId], context.previousPinned);
+      }
+
       const message = error?.response?.data?.message;
       toast.error(message);
     },
@@ -423,6 +469,28 @@ export const useToggleBookmarkGroupPost = (groupId: string) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
+      const message = error?.response?.data?.message;
+      toast.error(message);
+    },
+  });
+};
+
+export const useTogglePinGroupPost = (groupId: string, slug?: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) =>
+      postService.togglePin(postId, POST_TARGET_MODELS.GROUP),
+    onSuccess: (response) => {
+      toast.success(response.message);
+      queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupPinnedPosts", groupId],
+      });
+      if (slug)
+        queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
       toast.error(message);
     },

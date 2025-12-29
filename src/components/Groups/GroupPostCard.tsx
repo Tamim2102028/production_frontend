@@ -34,6 +34,7 @@ import {
   useToggleReadStatusGroupPost,
   useToggleBookmarkGroupPost,
 } from "../../hooks/useGroup";
+import { useTogglePinGroupPost } from "../../hooks/useGroup";
 import {
   usePostComments,
   useAddComment,
@@ -61,7 +62,6 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
 
   // Get current logged-in user
   const { user: currentUser } = useUser();
-  const isOwnPost = meta.isMine;
 
   // Post hooks
   const { mutate: likeMutate } = useToggleLikeGroupPost(post.postOnId);
@@ -76,6 +76,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
     post.postOnId
   );
   const { mutate: toggleBookmark } = useToggleBookmarkGroupPost(post.postOnId);
+  const { mutate: togglePin } = useTogglePinGroupPost(post.postOnId, slug);
 
   // Comment hooks
   const queryClient = useQueryClient();
@@ -256,6 +257,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
             {showMenu && (
               <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
                 <div className="py-1">
+                  {/* save/unsave button */}
                   <button
                     onClick={handleToggleBookmark}
                     className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
@@ -274,6 +276,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
                       </>
                     )}
                   </button>
+                  {/* copy link button */}
                   <button
                     onClick={handleCopyLink}
                     className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
@@ -282,7 +285,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
                     <span className="font-medium">Copy link</span>
                   </button>
 
-                  {isOwnPost ? (
+                  {meta.isMine && (
                     <>
                       {/* edit button */}
                       <button
@@ -295,6 +298,27 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
                         <FaEdit className="h-4 w-4 flex-shrink-0" />
                         <span className="font-medium">Edit post</span>
                       </button>
+                    </>
+                  )}
+
+                  {(meta.isOwner || meta.isAdmin || meta.isModerator) && (
+                    <>
+                      {/* pin/unpin button */}
+                      <button
+                        onClick={() => {
+                          togglePin(post._id);
+                          setShowMenu(false);
+                        }}
+                        className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                          post.isPinned ? "text-yellow-600" : "text-gray-700"
+                        }`}
+                      >
+                        <FaFlag className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">
+                          {post.isPinned ? "Unpin post" : "Pin post"}
+                        </span>
+                      </button>
+
                       {/* delete button */}
                       <button
                         onClick={handleDelete}
@@ -305,13 +329,6 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta, slug }) => {
                         <span className="font-medium">
                           {isDeleting ? "Deleting..." : "Delete post"}
                         </span>
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50">
-                        <FaFlag className="h-4 w-4 flex-shrink-0" />
-                        <span className="font-medium">Report post</span>
                       </button>
                     </>
                   )}

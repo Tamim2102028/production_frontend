@@ -123,4 +123,20 @@ export const postService = {
     const response = await api.post(`/posts/${postId}/toggle-bookmark`);
     return response.data;
   },
+
+  // Toggle Pin (groups only)
+  togglePin: async (postId: string, targetModel: string) => {
+    let routeSegment = "";
+    if (targetModel === POST_TARGET_MODELS.USER) {
+      routeSegment = "profile";
+    } else if (targetModel === POST_TARGET_MODELS.GROUP)
+      routeSegment = "groups";
+    else if (targetModel === POST_TARGET_MODELS.DEPARTMENT)
+      routeSegment = "depts";
+    else if (targetModel === POST_TARGET_MODELS.INSTITUTION)
+      routeSegment = "institutions";
+
+    const response = await api.post(`/${routeSegment}/posts/${postId}/pin`);
+    return response.data;
+  },
 };

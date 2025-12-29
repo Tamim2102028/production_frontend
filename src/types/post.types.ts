@@ -55,6 +55,9 @@ export interface PostMeta {
   isSaved: boolean;
   isMine: boolean;
   isRead: boolean;
+  isOwner?: boolean;
+  isAdmin?: boolean;
+  isModerator?: boolean;
 }
 
 export interface PostResponseItem {
