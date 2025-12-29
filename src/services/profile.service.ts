@@ -1,4 +1,5 @@
 // Axios Instance
+import { POST_LIMIT } from "../constants";
 import api from "../lib/axios";
 
 // Types
@@ -82,7 +83,7 @@ export const profileService = {
   // Get Profile Posts
   getProfilePosts: async (username: string, page: number) => {
     const response = await api.get(`/profile/${username}/posts`, {
-      params: { page, limit: 10 },
+      params: { page, limit: POST_LIMIT },
     });
     return response.data;
   },
