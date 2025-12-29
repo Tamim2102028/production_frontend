@@ -54,8 +54,7 @@ export const useRegister = () => {
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message ?? "Registration failed";
-      toast.error(message);
+      toast.error(error?.response?.data?.message ?? "Registration failed");
     },
   });
 };
@@ -74,8 +73,7 @@ export const useLogin = () => {
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message ?? "Login failed";
-      toast.error(message);
+      toast.error(error?.response?.data?.message ?? "Login failed");
     },
   });
 };
@@ -94,9 +92,10 @@ export const useLogout = () => {
       navigate("/login");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message ?? null;
       queryClient.setQueryData(AUTH_KEYS.currentUser, null);
-      toast.error(message ?? "Logout failed, signed out locally.");
+      toast.error(
+        error?.response?.data?.message ?? "Logout failed, signed out locally."
+      );
       navigate("/login");
     },
   });
@@ -111,9 +110,7 @@ export const useChangePassword = () => {
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error?.response?.data?.message ?? "Change password failed";
-      toast.error(message);
+      toast.error(error?.response?.data?.message ?? "Change password failed");
     },
   });
 };
