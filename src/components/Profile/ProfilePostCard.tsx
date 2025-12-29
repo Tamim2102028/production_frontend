@@ -26,22 +26,23 @@ import PostContent from "../shared/PostContent";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
 import type { Attachment, Post, PostMeta } from "../../types";
 import { useUser } from "../../hooks/useAuth";
-import {
-  useToggleLikePost,
-  useDeletePost,
-  useToggleReadStatus,
-  useToggleBookmark,
-  useUpdatePost,
-} from "../../hooks/usePost";
+
 import {
   usePostComments,
   useAddComment,
   useDeleteComment,
   useToggleLikeComment,
   useUpdateComment,
-} from "../../hooks/useComment";
+} from "../../hooks/utils/useComment";
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
+import {
+  useDeleteProfilePost,
+  useToggleBookmarkProfilePost,
+  useToggleLikeProfilePost,
+  useToggleReadStatusProfilePost,
+  useUpdateProfilePost,
+} from "../../hooks/useProfile";
 
 interface ProfilePostCardProps {
   post: Post;
@@ -59,14 +60,25 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
 
   // Get current logged-in user
   const { user: currentUser } = useUser();
+
   const isOwnPost = meta.isMine;
 
   // Post hooks
-  const { mutate: likeMutate } = useToggleLikePost();
-  const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
-  const { mutate: updatePost, isPending: isUpdating } = useUpdatePost();
-  const { mutate: toggleReadStatus } = useToggleReadStatus();
-  const { mutate: toggleBookmark } = useToggleBookmark();
+  const { mutate: likeMutate } = useToggleLikeProfilePost(
+    currentUser?.userName
+  );
+  const { mutate: deletePost, isPending: isDeleting } = useDeleteProfilePost(
+    currentUser?.userName
+  );
+  const { mutate: updatePost, isPending: isUpdating } = useUpdateProfilePost(
+    currentUser?.userName
+  );
+  const { mutate: toggleReadStatus } = useToggleReadStatusProfilePost(
+    currentUser?.userName
+  );
+  const { mutate: toggleBookmark } = useToggleBookmarkProfilePost(
+    currentUser?.userName
+  );
 
   // Comment hooks
   const {

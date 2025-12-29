@@ -3,12 +3,77 @@ import {
   useQueryClient,
   type InfiniteData,
 } from "@tanstack/react-query";
-import { postService } from "../services/utils/post.service";
-import type { ApiError, ProfilePostsResponse } from "../types";
+import { postService } from "../../services/utils/post.service";
+import type {
+  ApiError,
+  CreatePostRequest,
+  ProfilePostsResponse,
+} from "../../types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
-export const useToggleLikePost = () => {
+// ইন্টারফেস ডিফাইন করা হলো
+interface UsePostMutationProps {
+  queryKey?: (string | undefined)[]; // যে লিস্ট আপডেট হবে (e.g. ["groupPosts", groupId])
+  invalidateKey?: (string | undefined)[] | (string | undefined)[][]; // Single key or Array of keys
+}
+
+export const useCreatePost = ({
+  queryKey,
+  invalidateKey,
+}: UsePostMutationProps) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreatePostRequest) => postService.createPost(data),
+    onSuccess: (response) => {
+      // 1. যদি কোনো লিস্ট থাকে, সেখানে ম্যানুয়ালি শুরুতে নতুন পোস্ট অ্যাড করা (Optional)
+      if (queryKey) {
+        queryClient.setQueriesData(
+          { queryKey: queryKey },
+          (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
+            if (!oldData || oldData.pages.length === 0) return oldData;
+
+            const newItem = response.data; // { post, meta }
+            const firstPage = oldData.pages[0];
+            const updatedFirstPage = {
+              ...firstPage,
+              data: {
+                ...firstPage.data,
+                posts: [newItem, ...firstPage.data.posts],
+              },
+            };
+
+            return {
+              ...oldData,
+              pages: [updatedFirstPage, ...oldData.pages.slice(1)],
+            };
+          }
+        );
+      }
+
+      // 2. অন্যান্য রিলেটেড ডেটা সিঙ্ক করা
+      if (invalidateKey) {
+        // invalidateKey যদি অ্যারে অফ অ্যারে হয় (multiple keys)
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({ queryKey: invalidateKey });
+        }
+      }
+
+      toast.success(response.message);
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message;
+      toast.error(message || "Create post failed");
+    },
+  });
+};
+
+export const useToggleLikePost = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -23,16 +88,16 @@ export const useToggleLikePost = () => {
     // ১. ক্লিক করার সাথে সাথে রান হবে (Optimistic Update)
     onMutate: async ({ postId }) => {
       // ব্যাকগ্রাউন্ড ফেচ আটকানো (Safety)
-      await queryClient.cancelQueries({ queryKey: ["profilePosts"] });
+      await queryClient.cancelQueries({ queryKey: queryKey }); // Dynamic Key
 
       // আগের ডেটার স্ন্যাপশট নেওয়া (Rollback এর জন্য)
-      const previousProfilePosts = queryClient.getQueriesData({
-        queryKey: ["profilePosts"],
+      const previousPosts = queryClient.getQueriesData({
+        queryKey: queryKey, // Dynamic Key
       });
 
-      // মেমোরিতে ডেটা ম্যানুয়ালি আপডেট করা (Optimistic Update for all profile posts)
+      // মেমোরিতে ডেটা ম্যানুয়ালি আপডেট করা
       queryClient.setQueriesData(
-        { queryKey: ["profilePosts"] },
+        { queryKey: queryKey }, // Dynamic Key
         (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
           if (!oldData) return oldData;
 
@@ -67,25 +132,26 @@ export const useToggleLikePost = () => {
       );
 
       // স্ন্যাপশট রিটার্ন করা
-      return { previousProfilePosts };
+      return { previousPosts };
     },
     onError: (error: AxiosError<ApiError>, _variables, context) => {
       // আগের অবস্থায় ফিরিয়ে নেওয়া (Rollback)
-      if (context?.previousProfilePosts) {
-        context.previousProfilePosts.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data);
+      if (context?.previousPosts) {
+        context.previousPosts.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
         });
       }
       const message = error?.response?.data?.message;
       toast.error(message || "Error from useToggleLikePost");
     },
     onSettled: () => {
-      // ডেটা সিঙ্ক ঠিক রাখার জন্য একবার রিফ্রেশ করা
+      // ডেটা সিঙ্ক ঠিক রাখার জন্য একবার রিফ্রেশ করা (Optional if needed)
+      // queryClient.invalidateQueries({ queryKey });
     },
   });
 };
 
-export const useToggleReadStatus = () => {
+export const useToggleReadStatus = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -99,14 +165,14 @@ export const useToggleReadStatus = () => {
 
     // Optimistic Update
     onMutate: async ({ postId }) => {
-      await queryClient.cancelQueries({ queryKey: ["profilePosts"] });
+      await queryClient.cancelQueries({ queryKey: queryKey });
 
-      const previousProfilePosts = queryClient.getQueriesData({
-        queryKey: ["profilePosts"],
+      const previousPosts = queryClient.getQueriesData({
+        queryKey: queryKey,
       });
 
       queryClient.setQueriesData(
-        { queryKey: ["profilePosts"] },
+        { queryKey: queryKey },
         (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
           if (!oldData) return oldData;
 
@@ -134,13 +200,13 @@ export const useToggleReadStatus = () => {
         }
       );
 
-      return { previousProfilePosts };
+      return { previousPosts };
     },
 
     onError: (error: AxiosError<ApiError>, _variables, context) => {
-      if (context?.previousProfilePosts) {
-        context.previousProfilePosts.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data);
+      if (context?.previousPosts) {
+        context.previousPosts.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
         });
       }
       const message = error?.response?.data?.message;
@@ -149,7 +215,7 @@ export const useToggleReadStatus = () => {
   });
 };
 
-export const useToggleBookmark = () => {
+export const useToggleBookmark = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -157,14 +223,14 @@ export const useToggleBookmark = () => {
 
     // Optimistic Update
     onMutate: async (postId) => {
-      await queryClient.cancelQueries({ queryKey: ["profilePosts"] });
+      await queryClient.cancelQueries({ queryKey: queryKey });
 
-      const previousProfilePosts = queryClient.getQueriesData({
-        queryKey: ["profilePosts"],
+      const previousPosts = queryClient.getQueriesData({
+        queryKey: queryKey,
       });
 
       queryClient.setQueriesData(
-        { queryKey: ["profilePosts"] },
+        { queryKey: queryKey },
         (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
           if (!oldData) return oldData;
 
@@ -192,13 +258,13 @@ export const useToggleBookmark = () => {
         }
       );
 
-      return { previousProfilePosts };
+      return { previousPosts };
     },
 
     onError: (error: AxiosError<ApiError>, _postId, context) => {
-      if (context?.previousProfilePosts) {
-        context.previousProfilePosts.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data);
+      if (context?.previousPosts) {
+        context.previousPosts.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
         });
       }
       const message = error?.response?.data?.message;
@@ -207,7 +273,7 @@ export const useToggleBookmark = () => {
   });
 };
 
-export const useUpdatePost = () => {
+export const useUpdatePost = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -225,7 +291,7 @@ export const useUpdatePost = () => {
     onSuccess: (data) => {
       // Optimistic update
       queryClient.setQueriesData(
-        { queryKey: ["profilePosts"] },
+        { queryKey: queryKey },
         (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
           if (!oldData) return oldData;
 
@@ -253,7 +319,10 @@ export const useUpdatePost = () => {
   });
 };
 
-export const useDeletePost = () => {
+export const useDeletePost = ({
+  queryKey,
+  invalidateKey,
+}: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -264,10 +333,11 @@ export const useDeletePost = () => {
       postId: string;
       targetModel?: string;
     }) => postService.deletePost(postId, targetModel),
+
     onSuccess: (_data, { postId }) => {
-      // 1. Profile Posts থেকে পোস্টটি রিমুভ করা
+      // 1. Dynamic Posts List থেকে পোস্টটি রিমুভ করা
       queryClient.setQueriesData(
-        { queryKey: ["profilePosts"] },
+        { queryKey: queryKey },
         (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
           if (!oldData) return oldData;
 
@@ -286,8 +356,10 @@ export const useDeletePost = () => {
         }
       );
 
-      // 2. Profile Header Invalidate করা (যাতে Post Count কমে)
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      // 2. Dynamic Header Invalidate করা (যদি Key থাকে)
+      if (invalidateKey) {
+        queryClient.invalidateQueries({ queryKey: invalidateKey });
+      }
 
       toast.success(_data?.message || "Post deleted successfully");
     },

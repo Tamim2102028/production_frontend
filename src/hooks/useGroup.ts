@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-  type InfiniteData,
 } from "@tanstack/react-query";
 import { groupService } from "../services/group.service";
 import { postService } from "../services/utils/post.service";
@@ -11,7 +10,15 @@ import { POST_TARGET_MODELS } from "../constants";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
-import type { ApiError, FeedResponse, CreatePostRequest } from "../types";
+import type { ApiError } from "../types";
+import {
+  useCreatePost,
+  useDeletePost,
+  useToggleBookmark,
+  useToggleLikePost,
+  useToggleReadStatus,
+  useUpdatePost,
+} from "./utils/usePost";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
@@ -171,314 +178,53 @@ export const useGroupPinnedPosts = (groupId: string) => {
 };
 
 export const useCreateGroupPost = (groupId: string, slug: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: CreatePostRequest) => postService.createPost(data),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
-      queryClient.invalidateQueries({
-        queryKey: ["groupPinnedPosts", groupId],
-      });
-      queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
+  return useCreatePost({
+    invalidateKey: [
+      ["groupFeed", groupId],
+      ["groupPinnedPosts", groupId],
+      ["groupDetails", slug],
+    ],
   });
 };
 
+// [REFACTORED] Using Generic Hook
 export const useToggleLikeGroupPost = (groupId: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      postId,
-      targetModel,
-    }: {
-      postId: string;
-      targetModel?: string;
-    }) => postService.togglePostLike(postId, targetModel),
-
-    onMutate: async ({ postId }) => {
-      await queryClient.cancelQueries({ queryKey: ["groupFeed", groupId] });
-      await queryClient.cancelQueries({
-        queryKey: ["groupPinnedPosts", groupId],
-      });
-
-      const previousGroupFeed = queryClient.getQueriesData({
-        queryKey: ["groupFeed", groupId],
-      });
-
-      const previousPinned = queryClient.getQueryData<FeedResponse | undefined>(
-        ["groupPinnedPosts", groupId]
-      );
-
-      // Update group feed optimistically
-      queryClient.setQueriesData(
-        { queryKey: ["groupFeed", groupId] },
-        (oldData: InfiniteData<FeedResponse> | undefined) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              data: {
-                ...page.data,
-                posts: page.data.posts.map((item) => {
-                  if (item.post._id === postId) {
-                    const isLiked = item.meta.isLiked;
-                    return {
-                      ...item,
-                      meta: {
-                        ...item.meta,
-                        isLiked: !isLiked,
-                      },
-                      post: {
-                        ...item.post,
-                        likesCount:
-                          (isLiked ? -1 : 1) + (item.post.likesCount || 0),
-                      },
-                    };
-                  }
-                  return item;
-                }),
-              },
-            })),
-          };
-        }
-      );
-
-      // Update pinned posts optimistically if present
-      if (previousPinned) {
-        queryClient.setQueryData(
-          ["groupPinnedPosts", groupId],
-          (old: FeedResponse | undefined) => {
-            if (!old) return old;
-            return {
-              ...old,
-              data: {
-                ...old.data,
-                posts: old.data.posts.map((item) => {
-                  if (item.post._id === postId) {
-                    const isLiked = item.meta.isLiked;
-                    return {
-                      ...item,
-                      meta: {
-                        ...item.meta,
-                        isLiked: !isLiked,
-                      },
-                      post: {
-                        ...item.post,
-                        likesCount:
-                          (isLiked ? -1 : 1) + (item.post.likesCount || 0),
-                      },
-                    };
-                  }
-                  return item;
-                }),
-              },
-            };
-          }
-        );
-      }
-
-      return { previousGroupFeed, previousPinned };
-    },
-
-    onError: (error: AxiosError<ApiError>, _variables, context) => {
-      if (context?.previousGroupFeed) {
-        context.previousGroupFeed.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data);
-        });
-      }
-
-      if (context?.previousPinned) {
-        queryClient.setQueryData(
-          ["groupPinnedPosts", groupId],
-          context.previousPinned
-        );
-      }
-
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
+  return useToggleLikePost({
+    queryKey: ["groupFeed", groupId],
+    invalidateKey: ["groupPinnedPosts", groupId], // Pinned post sync করার জন্য
   });
 };
 
+// [REFACTORED] Using Generic Hook
 export const useDeleteGroupPost = (groupId: string, slug: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      postId,
-      targetModel,
-    }: {
-      postId: string;
-      targetModel?: string;
-    }) => postService.deletePost(postId, targetModel),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
-      queryClient.invalidateQueries({
-        queryKey: ["groupPinnedPosts", groupId],
-      });
-      queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
+  return useDeletePost({
+    queryKey: ["groupFeed", groupId],
+    invalidateKey: ["groupDetails", slug], // Post count sync করার জন্য
   });
 };
 
+// [REFACTORED] Using Generic Hook
 export const useUpdateGroupPost = (groupId: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      postId,
-      data,
-      targetModel,
-    }: {
-      postId: string;
-      data: { content: string; tags?: string[]; visibility?: string };
-      targetModel?: string;
-    }) => postService.updatePost(postId, data, targetModel),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
+  return useUpdatePost({
+    queryKey: ["groupFeed", groupId],
   });
 };
 
+// [REFACTORED] Using Generic Hook
 export const useToggleReadStatusGroupPost = (groupId: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      postId,
-      targetModel,
-    }: {
-      postId: string;
-      targetModel?: string;
-    }) => postService.toggleReadStatus(postId, targetModel),
-
-    onMutate: async ({ postId }) => {
-      await queryClient.cancelQueries({ queryKey: ["groupFeed", groupId] });
-
-      const previousGroupFeed = queryClient.getQueriesData({
-        queryKey: ["groupFeed", groupId],
-      });
-
-      queryClient.setQueriesData(
-        { queryKey: ["groupFeed", groupId] },
-        (oldData: InfiniteData<FeedResponse> | undefined) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              data: {
-                ...page.data,
-                posts: page.data.posts.map((item) => {
-                  if (item.post._id === postId) {
-                    return {
-                      ...item,
-                      meta: {
-                        ...item.meta,
-                        isRead: !item.meta.isRead,
-                      },
-                    };
-                  }
-                  return item;
-                }),
-              },
-            })),
-          };
-        }
-      );
-
-      return { previousGroupFeed };
-    },
-
-    onError: (error: AxiosError<ApiError>, _variables, context) => {
-      if (context?.previousGroupFeed) {
-        context.previousGroupFeed.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data);
-        });
-      }
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
+  return useToggleReadStatus({
+    queryKey: ["groupFeed", groupId],
   });
 };
 
+// [REFACTORED] Using Generic Hook
 export const useToggleBookmarkGroupPost = (groupId: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (postId: string) => postService.toggleBookmark(postId),
-
-    onMutate: async (postId) => {
-      await queryClient.cancelQueries({ queryKey: ["groupFeed", groupId] });
-
-      const previousGroupFeed = queryClient.getQueriesData({
-        queryKey: ["groupFeed", groupId],
-      });
-
-      queryClient.setQueriesData(
-        { queryKey: ["groupFeed", groupId] },
-        (oldData: InfiniteData<FeedResponse> | undefined) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              data: {
-                ...page.data,
-                posts: page.data.posts.map((item) => {
-                  if (item.post._id === postId) {
-                    return {
-                      ...item,
-                      meta: {
-                        ...item.meta,
-                        isSaved: !item.meta.isSaved,
-                      },
-                    };
-                  }
-                  return item;
-                }),
-              },
-            })),
-          };
-        }
-      );
-
-      return { previousGroupFeed };
-    },
-
-    onError: (error: AxiosError<ApiError>, _variables, context) => {
-      if (context?.previousGroupFeed) {
-        context.previousGroupFeed.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data);
-        });
-      }
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
+  return useToggleBookmark({
+    queryKey: ["groupFeed", groupId],
   });
 };
 
+// [KEPT ORIGINAL] Generic hook does not have pin functionality yet
 export const useTogglePinGroupPost = (groupId: string, slug?: string) => {
   const queryClient = useQueryClient();
 

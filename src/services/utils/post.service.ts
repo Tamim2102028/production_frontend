@@ -1,18 +1,8 @@
 import { POST_TARGET_MODELS } from "../../constants";
 import api from "../../lib/axios";
-import type { CreatePostRequest, FeedResponse } from "../../types";
+import type { CreatePostRequest } from "../../types";
 
 export const postService = {
-  // Get News Feed
-  getNewsFeed: async (params: {
-    page: number;
-    limit: number;
-    type?: string;
-  }) => {
-    const response = await api.get<FeedResponse>("/posts/feed", { params });
-    return response.data;
-  },
-
   // Create Post
   createPost: async (reqData: CreatePostRequest) => {
     let url = "/profile/post"; // Default to User Profile

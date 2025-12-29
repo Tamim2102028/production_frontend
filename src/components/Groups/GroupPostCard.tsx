@@ -41,7 +41,7 @@ import {
   useDeleteComment,
   useToggleLikeComment,
   useUpdateComment,
-} from "../../hooks/useComment";
+} from "../../hooks/utils/useComment";
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
 

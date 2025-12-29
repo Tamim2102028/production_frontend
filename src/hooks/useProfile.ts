@@ -3,7 +3,6 @@ import {
   useMutation,
   useQueryClient,
   useInfiniteQuery,
-  type InfiniteData,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AUTH_KEYS } from "./useAuth";
@@ -13,10 +12,19 @@ import type {
   UpdateAcademicData,
   ApiError,
   ProfilePostsResponse,
-  CreatePostRequest,
 } from "../types";
 import type { AxiosError } from "axios";
-import { postService } from "../services/utils/post.service";
+import {
+  useCreatePost,
+  useDeletePost,
+  useToggleBookmark,
+  useToggleLikePost,
+  useToggleReadStatus,
+  useUpdatePost,
+} from "./utils/usePost";
+import { useToggleFollow } from "./utils/useFollow";
+
+// Import Generic Utils
 
 const FIVE_MIN = 1000 * 60 * 5;
 
@@ -139,39 +147,51 @@ export const useProfilePosts = (username?: string) =>
   );
 
 export const useCreateProfilePost = () => {
-  const queryClient = useQueryClient();
+  return useCreatePost({
+    queryKey: ["profilePosts"],       
+    invalidateKey: ["profile_header"],
+  });
+};
 
-  return useMutation({
-    mutationFn: (payload: CreatePostRequest) => postService.createPost(payload),
-    onSuccess: (response) => {
-      // Add new post to cached profile posts (if present)
-      queryClient.setQueriesData(
-        { queryKey: ["profilePosts"] },
-        (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
-          if (!oldData || oldData.pages.length === 0) return oldData;
+export const useToggleLikeProfilePost = (username?: string) => {
+  return useToggleLikePost({
+    queryKey: ["profilePosts", username],
 
-          const newItem = response.data; // { post, meta }
-          const firstPage = oldData.pages[0];
-          const updatedFirstPage = {
-            ...firstPage,
-            data: {
-              ...firstPage.data,
-              posts: [newItem, ...firstPage.data.posts],
-            },
-          };
+    
+    invalidateKey: ["profile_header", username],
+  });
+};
 
-          return {
-            ...oldData,
-            pages: [updatedFirstPage, ...oldData.pages.slice(1)],
-          };
-        }
-      );
+export const useDeleteProfilePost = (username?: string) => {
+  return useDeletePost({
+    queryKey: ["profilePosts", username],
+    invalidateKey: ["profile_header", username],
+  });
+};
 
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      toast.error(error?.response?.data?.message ?? "Create post failed");
-    },
+export const useUpdateProfilePost = (username?: string) => {
+  return useUpdatePost({
+    queryKey: ["profilePosts", username],
+    invalidateKey: ["profile_header", username],
+  });
+};
+
+export const useToggleReadStatusProfilePost = (username?: string) => {
+  return useToggleReadStatus({
+    queryKey: ["profilePosts", username],
+    invalidateKey: ["profile_header", username],
+  });
+};
+
+export const useToggleBookmarkProfilePost = (username?: string) => {
+  return useToggleBookmark({
+    queryKey: ["profilePosts", username],
+    invalidateKey: ["profile_header", username],
+  });
+};
+
+export const useToggleFollowProfile = (username?: string) => {
+  return useToggleFollow({
+      invalidateKey: ["profile_header", username],
   });
 };

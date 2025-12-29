@@ -27,7 +27,7 @@ import {
   useBlockUser,
   useUnblockUser,
 } from "../../hooks/useFriendship";
-import { useToggleFollow } from "../../hooks/useFollow";
+import { useToggleFollow } from "../../hooks/utils/useFollow";
 import {
   FOLLOW_TARGET_MODELS,
   PROFILE_RELATION_STATUS,

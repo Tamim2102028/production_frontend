@@ -4,10 +4,15 @@ import {
   useQueryClient,
   type InfiniteData,
 } from "@tanstack/react-query";
-import { commentService } from "../services/utils/comment.service";
+import { commentService } from "../../services/utils/comment.service";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
-import type { ApiError, CommentsResponse } from "../types";
+import type { ApiError, CommentsResponse } from "../../types";
+
+// Types for Dynamic Keys
+interface CommentHookProps {
+  postListKey?: (string | undefined)[]; // যেই পোস্ট লিস্টের কাউন্ট আপডেট করতে হবে (e.g., ["groupPosts", groupId])
+}
 
 export const usePostComments = ({
   postId,
@@ -38,11 +43,12 @@ export const useAddComment = ({
   postId,
   targetModel,
   onSuccess,
+  postListKey, // New Prop: Dynamic Key
 }: {
   postId: string;
   targetModel: string;
   onSuccess?: () => void;
-}) => {
+} & CommentHookProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -51,8 +57,15 @@ export const useAddComment = ({
     onSuccess: (response) => {
       // Invalidate comments for this post
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-      // Also invalidate profile posts to update comment count
-      queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+
+      // Also invalidate posts list to update comment count (Dynamic)
+      if (postListKey) {
+        queryClient.invalidateQueries({ queryKey: postListKey });
+      } else {
+        // Fallback for safety or legacy support
+        queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      }
+
       // Invalidate group/dept/institution posts if needed
       if (onSuccess) {
         onSuccess();
@@ -70,11 +83,12 @@ export const useDeleteComment = ({
   postId,
   targetModel,
   onSuccess,
+  postListKey, // New Prop: Dynamic Key
 }: {
   postId: string;
   targetModel: string;
   onSuccess?: () => void;
-}) => {
+} & CommentHookProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -82,7 +96,14 @@ export const useDeleteComment = ({
       commentService.deleteComment(commentId, targetModel),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-      queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+
+      // Dynamic Invalidation
+      if (postListKey) {
+        queryClient.invalidateQueries({ queryKey: postListKey });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      }
+
       if (onSuccess) {
         onSuccess();
       }
