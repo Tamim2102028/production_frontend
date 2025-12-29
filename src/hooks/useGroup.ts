@@ -36,7 +36,7 @@ export const useCreateGroup = () => {
 export const useMyGroups = () => {
   return useInfiniteQuery({
     queryKey: ["myGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) => groupService.getMyGroups(pageParam),
+    queryFn: ({ pageParam }) => groupService.getMyGroups(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -49,7 +49,8 @@ export const useMyGroups = () => {
 export const useUniversityGroups = () => {
   return useInfiniteQuery({
     queryKey: ["universityGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) => groupService.getUniversityGroups(pageParam),
+    queryFn: ({ pageParam }) =>
+      groupService.getUniversityGroups(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -62,7 +63,8 @@ export const useUniversityGroups = () => {
 export const useCareerGroups = () => {
   return useInfiniteQuery({
     queryKey: ["careerGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) => groupService.getCareerGroups(pageParam),
+    queryFn: ({ pageParam }) =>
+      groupService.getCareerGroups(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -75,7 +77,8 @@ export const useCareerGroups = () => {
 export const useSuggestedGroups = () => {
   return useInfiniteQuery({
     queryKey: ["suggestedGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) => groupService.getSuggestedGroups(pageParam),
+    queryFn: ({ pageParam }) =>
+      groupService.getSuggestedGroups(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -88,7 +91,8 @@ export const useSuggestedGroups = () => {
 export const useSentGroupRequests = () => {
   return useInfiniteQuery({
     queryKey: ["sentGroupRequests", "infinite"],
-    queryFn: ({ pageParam = 1 }) => groupService.getSentRequests(pageParam),
+    queryFn: ({ pageParam }) =>
+      groupService.getSentRequests(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -101,7 +105,8 @@ export const useSentGroupRequests = () => {
 export const useInvitedGroups = () => {
   return useInfiniteQuery({
     queryKey: ["invitedGroups", "infinite"],
-    queryFn: ({ pageParam = 1 }) => groupService.getInvitedGroups(pageParam),
+    queryFn: ({ pageParam }) =>
+      groupService.getInvitedGroups(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
@@ -114,9 +119,7 @@ export const useInvitedGroups = () => {
 export const useGroupDetails = (slug: string) => {
   return useQuery({
     queryKey: ["groupDetails", slug],
-    queryFn: async () => {
-      return await groupService.getGroupDetails(slug);
-    },
+    queryFn: async () => await groupService.getGroupDetails(slug),
     staleTime: 1000 * 60 * 10, // 10 minutes
     enabled: !!slug,
     retry: 1,
@@ -126,7 +129,7 @@ export const useGroupDetails = (slug: string) => {
 export const useGroupMembers = (groupId: string) => {
   return useInfiniteQuery({
     queryKey: ["groupMembers", groupId],
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam }) =>
       groupService.getGroupMembers(groupId, pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -145,10 +148,8 @@ export const useGroupMembers = (groupId: string) => {
 export const useGroupFeed = (groupId: string) => {
   return useInfiniteQuery({
     queryKey: ["groupFeed", groupId],
-    queryFn: async ({ pageParam }) => {
-      const page = Number(pageParam || 1);
-      return groupService.getGroupFeed(groupId, page);
-    },
+    queryFn: ({ pageParam }) =>
+      groupService.getGroupFeed(groupId, pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
