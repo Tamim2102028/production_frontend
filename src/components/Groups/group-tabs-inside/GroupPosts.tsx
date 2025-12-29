@@ -5,21 +5,17 @@ import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 import type { ApiError } from "../../../types";
 import type { AxiosError } from "axios";
 
-interface GroupPostsProps {
-  groupId: string;
-}
-
-const GroupPosts: React.FC<GroupPostsProps> = ({ groupId }) => {
+const GroupPosts: React.FC = () => {
   const {
-    data: postsData,
     isLoading,
     error,
-    fetchNextPage,
+    data,
     hasNextPage,
+    fetchNextPage,
     isFetchingNextPage,
-  } = useGroupPosts(groupId);
+  } = useGroupPosts();
 
-  const posts = postsData?.pages.flatMap((page) => page.data.posts) || [];
+  const posts = data?.pages.flatMap((page) => page.data.posts) || [];
 
   if (isLoading) {
     return (

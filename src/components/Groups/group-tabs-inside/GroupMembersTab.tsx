@@ -8,13 +8,11 @@ import { PROFILE_RELATION_STATUS } from "../../../constants";
 import type { FriendUser } from "../../../types";
 
 interface GroupMembersTabProps {
-  groupId: string;
   isOwner?: boolean;
   isAdmin?: boolean;
 }
 
 const GroupMembersTab: React.FC<GroupMembersTabProps> = ({
-  groupId,
   isOwner: isCurrentUserOwner,
   isAdmin: isCurrentUserAdmin,
 }) => {
@@ -25,7 +23,7 @@ const GroupMembersTab: React.FC<GroupMembersTabProps> = ({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useGroupMembers(groupId);
+  } = useGroupMembers();
 
   const members = data?.pages.flatMap((page) => page.data.members) || [];
 

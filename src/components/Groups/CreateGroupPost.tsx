@@ -21,30 +21,23 @@ import {
 } from "../../constants/post";
 import { useUser } from "../../hooks/useAuth";
 import { useCreateGroupPost } from "../../hooks/useGroup";
+import { useParams } from "react-router-dom";
 
 const createProfilePostSchema = z.object({
   content: z
     .string()
-    .trim()
-    .min(1, "Post content is required")
-    .max(5000, "Post cannot exceed 5000 characters"),
+    .min(1, "Post content cannot be empty")
+    .max(2000, "Post content is too long"),
   tags: z.string().optional(),
-  visibility: z.enum([
-    POST_VISIBILITY.PUBLIC,
-    POST_VISIBILITY.INTERNAL,
-    POST_VISIBILITY.CONNECTIONS,
-    POST_VISIBILITY.ONLY_ME,
-  ]),
+  visibility: z.string(),
 });
 
 type CreateProfilePostFormData = z.infer<typeof createProfilePostSchema>;
 
-interface CreateGroupPostProps {
-  groupId: string;
-}
-
-const CreateGroupPost: React.FC<CreateGroupPostProps> = ({ groupId }) => {
+const CreateGroupPost: React.FC = () => {
+  // Modified: groupId removed from destructuring
   const { user } = useUser();
+  const { slug } = useParams(); // Added: slug extracted from useParams
   const { mutate: createGroupPost, isPending } = useCreateGroupPost();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -78,9 +71,8 @@ const CreateGroupPost: React.FC<CreateGroupPostProps> = ({ groupId }) => {
 
     createGroupPost(
       {
-        content: data.content,
-        visibility: data.visibility,
-        postOnId: groupId,
+        ...data, // Spreads content, tags, visibility
+        postOnId: slug as string,
         postOnModel: POST_TARGET_MODELS.GROUP,
         type: POST_TYPES.GENERAL,
         attachments: [],

@@ -2,8 +2,8 @@ import GroupPostCard from "./../GroupPostCard";
 import { useGroupPinnedPosts } from "../../../hooks/useGroup";
 import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 
-const GroupPinnedPosts = ({ groupId }: { groupId: string }) => {
-  const { data: pinnedData, isLoading } = useGroupPinnedPosts(groupId);
+const GroupPinnedPosts = () => {
+  const { data: pinnedData, isLoading } = useGroupPinnedPosts();
   const posts = pinnedData?.data.posts || [];
 
   if (isLoading) {
