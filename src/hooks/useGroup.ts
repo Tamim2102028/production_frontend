@@ -21,7 +21,8 @@ export const useCreateGroup = () => {
     onSuccess: (data) => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
-      queryClient.invalidateQueries({ queryKey: ["groupDetails"] });
+      queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["careerGroups"] });
 
       const groupSlug = data.data.group?.slug;
       navigate(`/groups/${groupSlug}`);
@@ -114,8 +115,7 @@ export const useGroupDetails = (slug: string) => {
   return useQuery({
     queryKey: ["groupDetails", slug],
     queryFn: async () => {
-      const result = await groupService.getGroupDetails(slug);
-      return result;
+      return await groupService.getGroupDetails(slug);
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
     enabled: !!slug,
