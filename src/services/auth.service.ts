@@ -1,4 +1,7 @@
+// Axios Instance
 import api from "../lib/axios";
+
+// Types
 import type { LoginCredentials, User, ApiResponse } from "../types";
 
 export const authService = {
@@ -51,6 +54,18 @@ export const authService = {
   refreshToken: async (): Promise<ApiResponse<{ user: User }>> => {
     const response = await api.post<ApiResponse<{ user: User }>>(
       "/users/refresh-token"
+    );
+    return response.data;
+  },
+
+  // Change Password
+  changePassword: async (data: {
+    oldPassword: string;
+    newPassword: string;
+  }): Promise<ApiResponse<null>> => {
+    const response = await api.post<ApiResponse<null>>(
+      "/users/change-password",
+      data
     );
     return response.data;
   },

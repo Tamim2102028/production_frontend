@@ -1,4 +1,7 @@
+// Axios Instance
 import api from "../lib/axios";
+
+// Types
 import type {
   User,
   ApiResponse,
@@ -9,11 +12,11 @@ import type {
 
 export const profileService = {
   // Get Profile by Username
-  getProfile: async (
+  getProfileHeader: async (
     username: string
   ): Promise<ApiResponse<ProfileHeaderData>> => {
     const response = await api.get<ApiResponse<ProfileHeaderData>>(
-      `/users/p/${username}`
+      `/profile/${username}`
     );
     return response.data;
   },
@@ -21,7 +24,7 @@ export const profileService = {
   // Get Profile Details by Username
   getProfileDetails: async (username: string): Promise<ApiResponse<User>> => {
     const response = await api.get<ApiResponse<User>>(
-      `/users/details/${username}`
+      `/profile/details/${username}`
     );
     return response.data;
   },
@@ -31,7 +34,7 @@ export const profileService = {
     data: UpdateGeneralData
   ): Promise<ApiResponse<User>> => {
     const response = await api.patch<ApiResponse<User>>(
-      "/users/update-general",
+      "/profile/update-general",
       data
     );
     return response.data;
@@ -42,7 +45,7 @@ export const profileService = {
     data: UpdateAcademicData
   ): Promise<ApiResponse<User>> => {
     const response = await api.patch<ApiResponse<User>>(
-      "/users/update-academic",
+      "/profile/update-academic",
       data
     );
     return response.data;
@@ -51,7 +54,7 @@ export const profileService = {
   // Update Avatar Image
   updateAvatar: async (formData: FormData): Promise<ApiResponse<User>> => {
     const response = await api.patch<ApiResponse<User>>(
-      "/users/avatar",
+      "/profile/avatar",
       formData,
       {
         headers: {
@@ -65,25 +68,13 @@ export const profileService = {
   // Update Cover Image
   updateCoverImage: async (formData: FormData): Promise<ApiResponse<User>> => {
     const response = await api.patch<ApiResponse<User>>(
-      "/users/cover-image",
+      "/profile/cover-image",
       formData,
       {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       }
-    );
-    return response.data;
-  },
-
-  // Change Password
-  changePassword: async (data: {
-    oldPassword: string;
-    newPassword: string;
-  }): Promise<ApiResponse<null>> => {
-    const response = await api.post<ApiResponse<null>>(
-      "/users/change-password",
-      data
     );
     return response.data;
   },
