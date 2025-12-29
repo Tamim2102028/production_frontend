@@ -9,9 +9,8 @@ import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import type { ApiError, CommentsResponse } from "../../types";
 
-// Types for Dynamic Keys
 interface CommentHookProps {
-  postListKey?: (string | undefined)[]; // যেই পোস্ট লিস্টের কাউন্ট আপডেট করতে হবে (e.g., ["groupPosts", groupId])
+  invalidateKey?: (string | undefined)[] | (string | undefined)[][];
 }
 
 export const usePostComments = ({
@@ -43,7 +42,7 @@ export const useAddComment = ({
   postId,
   targetModel,
   onSuccess,
-  postListKey, // New Prop: Dynamic Key
+  invalidateKey,
 }: {
   postId: string;
   targetModel: string;
@@ -55,15 +54,21 @@ export const useAddComment = ({
     mutationFn: ({ content }: { content: string }) =>
       commentService.addComment(postId, content, targetModel),
     onSuccess: (response) => {
-      // Invalidate comments for this post
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
 
-      // Also invalidate posts list to update comment count (Dynamic)
-      if (postListKey) {
-        queryClient.invalidateQueries({ queryKey: postListKey });
+      if (invalidateKey) {
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey as (string | undefined)[],
+          });
+        }
       } else {
-        // Fallback for safety or legacy support
-        queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+        // Fallback or explicit check can be added if needed
+        // queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
       }
 
       // Invalidate group/dept/institution posts if needed
@@ -83,7 +88,7 @@ export const useDeleteComment = ({
   postId,
   targetModel,
   onSuccess,
-  postListKey, // New Prop: Dynamic Key
+  invalidateKey,
 }: {
   postId: string;
   targetModel: string;
@@ -98,10 +103,16 @@ export const useDeleteComment = ({
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
 
       // Dynamic Invalidation
-      if (postListKey) {
-        queryClient.invalidateQueries({ queryKey: postListKey });
-      } else {
-        queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
+      if (invalidateKey) {
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey as (string | undefined)[],
+          });
+        }
       }
 
       if (onSuccess) {
@@ -119,10 +130,11 @@ export const useDeleteComment = ({
 export const useUpdateComment = ({
   postId,
   targetModel,
+  invalidateKey,
 }: {
   postId: string;
   targetModel: string;
-}) => {
+} & CommentHookProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -135,6 +147,19 @@ export const useUpdateComment = ({
     }) => commentService.updateComment(commentId, content, targetModel),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+
+      // Dynamic Invalidation
+      if (invalidateKey) {
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey,
+          });
+        }
+      }
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -147,10 +172,11 @@ export const useUpdateComment = ({
 export const useToggleLikeComment = ({
   postId,
   targetModel,
+  invalidateKey,
 }: {
   postId: string;
   targetModel: string;
-}) => {
+} & CommentHookProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -213,6 +239,20 @@ export const useToggleLikeComment = ({
       }
       const message = error?.response?.data?.message;
       toast.error(message);
+    },
+    onSuccess: () => {
+      // Dynamic Invalidation
+      if (invalidateKey) {
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey,
+          });
+        }
+      }
     },
   });
 };

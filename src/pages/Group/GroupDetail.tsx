@@ -53,7 +53,7 @@ const GroupDetail: React.FC = () => {
                     {meta.isMember && (
                       <CreateGroupPost groupId={group._id} slug={group.slug} />
                     )}
-                    <GroupPosts groupId={group._id} slug={group.slug} />
+                    <GroupPosts groupId={group._id} />
                   </>
                 }
               />

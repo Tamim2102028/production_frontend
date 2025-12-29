@@ -1,17 +1,8 @@
-import React from "react";
 import GroupPostCard from "./../GroupPostCard";
 import { useGroupPinnedPosts } from "../../../hooks/useGroup";
 import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 
-interface GroupPinnedPostsProps {
-  groupId: string;
-  slug: string;
-}
-
-const GroupPinnedPosts: React.FC<GroupPinnedPostsProps> = ({
-  groupId,
-  slug,
-}) => {
+const GroupPinnedPosts = ({ groupId }: { groupId: string }) => {
   const { data: pinnedData, isLoading } = useGroupPinnedPosts(groupId);
   const posts = pinnedData?.data.posts || [];
 
@@ -34,12 +25,7 @@ const GroupPinnedPosts: React.FC<GroupPinnedPostsProps> = ({
   return (
     <div className="space-y-4">
       {posts.map((item) => (
-        <GroupPostCard
-          key={item.post._id}
-          post={item.post}
-          meta={item.meta}
-          slug={slug}
-        />
+        <GroupPostCard key={item.post._id} post={item.post} meta={item.meta} />
       ))}
     </div>
   );

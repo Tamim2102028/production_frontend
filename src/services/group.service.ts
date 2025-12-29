@@ -25,7 +25,7 @@ export const groupService = {
   },
 
   // Get Group Feed
-  getGroupFeed: async (groupId: string, page = 1): Promise<FeedResponse> => {
+  getGroupPosts: async (groupId: string, page = 1): Promise<FeedResponse> => {
     const limit = POST_LIMIT;
     const response = await api.get<FeedResponse>(`/groups/${groupId}/feed`, {
       params: { page, limit },

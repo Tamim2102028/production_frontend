@@ -16,7 +16,7 @@ export const useSendFriendRequest = () => {
     mutationFn: (userId: string) => friendService.sendRequest(userId),
     onSuccess: (response) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
@@ -36,7 +36,7 @@ export const useAcceptFriendRequest = () => {
       friendService.acceptRequest(requesterId),
     onSuccess: (response) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
     },
@@ -56,7 +56,7 @@ export const useRejectFriendRequest = () => {
       friendService.rejectRequest(requesterId),
     onSuccess: (response) => {
       toast.info(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
@@ -75,7 +75,7 @@ export const useCancelFriendRequest = () => {
       friendService.cancelRequest(recipientId),
     onSuccess: (response) => {
       toast.info(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
@@ -94,7 +94,7 @@ export const useUnfriendUser = () => {
     mutationFn: (friendId: string) => friendService.unfriend(friendId),
     onSuccess: (response) => {
       toast.info(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
@@ -113,7 +113,7 @@ export const useBlockUser = () => {
     mutationFn: (userId: string) => friendService.block(userId),
     onSuccess: (response) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
       queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
@@ -134,7 +134,7 @@ export const useUnblockUser = () => {
     mutationFn: (userId: string) => friendService.unblock(userId),
     onSuccess: (response) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
     },
     onError: (error: AxiosError<ApiError>) => {

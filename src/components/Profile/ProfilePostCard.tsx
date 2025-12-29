@@ -27,13 +27,6 @@ import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
 import type { Attachment, Post, PostMeta } from "../../types";
 import { useUser } from "../../hooks/useAuth";
 
-import {
-  usePostComments,
-  useAddComment,
-  useDeleteComment,
-  useToggleLikeComment,
-  useUpdateComment,
-} from "../../hooks/utils/useComment";
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
 import {
@@ -42,6 +35,11 @@ import {
   useToggleLikeProfilePost,
   useToggleReadStatusProfilePost,
   useUpdateProfilePost,
+  useProfilePostComments,
+  useAddProfileComment,
+  useDeleteProfileComment,
+  useUpdateProfileComment,
+  useToggleLikeProfileComment,
 } from "../../hooks/useProfile";
 
 interface ProfilePostCardProps {
@@ -77,27 +75,28 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = usePostComments({
+  } = useProfilePostComments({
     postId: post._id,
-    targetModel: post.postOnModel,
+    postOnModel: post.postOnModel,
     enabled: showCommentBox,
   });
 
-  const { mutate: addComment, isPending: isAddingComment } = useAddComment({
+  const { mutate: addComment, isPending: isAddingComment } =
+    useAddProfileComment({
+      postId: post._id,
+      postOnModel: post.postOnModel,
+    });
+  const { mutate: deleteComment } = useDeleteProfileComment({
     postId: post._id,
-    targetModel: post.postOnModel,
+    postOnModel: post.postOnModel,
   });
-  const { mutate: deleteComment } = useDeleteComment({
+  const { mutate: toggleLikeComment } = useToggleLikeProfileComment({
     postId: post._id,
-    targetModel: post.postOnModel,
+    postOnModel: post.postOnModel,
   });
-  const { mutate: toggleLikeComment } = useToggleLikeComment({
+  const { mutate: updateComment } = useUpdateProfileComment({
     postId: post._id,
-    targetModel: post.postOnModel,
-  });
-  const { mutate: updateComment } = useUpdateComment({
-    postId: post._id,
-    targetModel: post.postOnModel,
+    postOnModel: post.postOnModel,
   });
 
   const postComments =

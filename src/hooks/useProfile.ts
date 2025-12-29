@@ -22,6 +22,13 @@ import {
   useToggleReadStatus,
   useUpdatePost,
 } from "./utils/usePost";
+import {
+  usePostComments,
+  useAddComment,
+  useDeleteComment,
+  useUpdateComment,
+  useToggleLikeComment,
+} from "./utils/useComment";
 import { useToggleFollow } from "./utils/useFollow";
 import { useParams } from "react-router-dom";
 
@@ -36,7 +43,7 @@ const defaultProfileQueryOptions = {
 
 export const useProfileHeader = (username?: string) =>
   useQuery({
-    queryKey: ["profile_header", username],
+    queryKey: ["profileHeader", username],
     queryFn: async () => {
       if (!username) throw new Error("Username is required");
       const response = await profileService.getProfileHeader(username);
@@ -48,7 +55,7 @@ export const useProfileHeader = (username?: string) =>
 
 export const useProfileDetails = (username?: string) =>
   useQuery({
-    queryKey: ["profile_details", username],
+    queryKey: ["profileDetails", username],
     queryFn: async () => {
       if (!username) throw new Error("Username is required");
       const response = await profileService.getProfileDetails(username);
@@ -65,7 +72,7 @@ export const useUpdateGeneral = () => {
     mutationFn: (data: UpdateGeneralData) => profileService.updateGeneral(data),
     onSuccess: (response) => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -82,7 +89,7 @@ export const useUpdateAcademic = () => {
       profileService.updateAcademic(data),
     onSuccess: (response) => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -98,7 +105,7 @@ export const useUpdateAvatar = () => {
     mutationFn: (formData: FormData) => profileService.updateAvatar(formData),
     onSuccess: (response) => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -115,7 +122,7 @@ export const useUpdateCoverImage = () => {
       profileService.updateCoverImage(formData),
     onSuccess: (response) => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -127,30 +134,28 @@ export const useUpdateCoverImage = () => {
 };
 
 export const useProfilePosts = (username?: string) =>
-  useInfiniteQuery<ProfilePostsResponse>(
-    {
-      queryKey: ["profilePosts", username],
-      queryFn: async ({ pageParam }) => {
-        if (!username) throw new Error("Username is required");
-        const page = Number(pageParam ?? 1);
-        const response = await profileService.getProfilePosts(username, page);
-        return response;
-      },
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) => {
-        const { page, totalPages } = lastPage.data.pagination;
-        return page < totalPages ? page + 1 : undefined;
-      },
-      enabled: Boolean(username),
-      staleTime: FIVE_MIN,
+  useInfiniteQuery<ProfilePostsResponse>({
+    queryKey: ["profilePosts", username],
+    queryFn: async ({ pageParam }) => {
+      if (!username) throw new Error("Username is required");
+      const page = Number(pageParam ?? 1);
+      const response = await profileService.getProfilePosts(username, page);
+      return response;
     },
-    undefined
-  );
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled: Boolean(username),
+    staleTime: FIVE_MIN,
+  });
 
 export const useCreateProfilePost = () => {
+  const { username } = useParams();
   return useCreatePost({
-    queryKey: ["profilePosts"],
-    invalidateKey: ["profile_header"],
+    queryKey: ["profilePosts", username],
+    invalidateKey: ["profileHeader", username],
   });
 };
 
@@ -158,7 +163,7 @@ export const useToggleLikeProfilePost = () => {
   const { username } = useParams();
   return useToggleLikePost({
     queryKey: ["profilePosts", username],
-    invalidateKey: ["profile_header", username],
+    invalidateKey: ["profileHeader", username],
   });
 };
 
@@ -166,7 +171,7 @@ export const useDeleteProfilePost = () => {
   const { username } = useParams();
   return useDeletePost({
     queryKey: ["profilePosts", username],
-    invalidateKey: ["profile_header", username],
+    invalidateKey: ["profileHeader", username],
   });
 };
 
@@ -174,7 +179,7 @@ export const useUpdateProfilePost = () => {
   const { username } = useParams();
   return useUpdatePost({
     queryKey: ["profilePosts", username],
-    invalidateKey: ["profile_header", username],
+    invalidateKey: ["profileHeader", username],
   });
 };
 
@@ -182,7 +187,7 @@ export const useToggleReadStatusProfilePost = () => {
   const { username } = useParams();
   return useToggleReadStatus({
     queryKey: ["profilePosts", username],
-    invalidateKey: ["profile_header", username],
+    invalidateKey: ["profileHeader", username],
   });
 };
 
@@ -190,13 +195,86 @@ export const useToggleBookmarkProfilePost = () => {
   const { username } = useParams();
   return useToggleBookmark({
     queryKey: ["profilePosts", username],
-    invalidateKey: ["profile_header", username],
+    invalidateKey: ["profileHeader", username],
   });
 };
 
 export const useToggleFollowProfile = () => {
   const { username } = useParams();
   return useToggleFollow({
-    invalidateKey: ["profile_header", username],
+    invalidateKey: ["profileHeader", username],
+  });
+};
+
+// Comment Hooks
+export const useProfilePostComments = ({
+  postId,
+  postOnModel,
+  enabled,
+}: {
+  postId: string;
+  postOnModel: string;
+  enabled?: boolean;
+}) => {
+  return usePostComments({
+    postId,
+    targetModel: postOnModel,
+    enabled,
+  });
+};
+
+export const useAddProfileComment = ({
+  postId,
+  postOnModel,
+}: {
+  postId: string;
+  postOnModel: string;
+}) => {
+  const { username } = useParams();
+  return useAddComment({
+    postId,
+    targetModel: postOnModel,
+    invalidateKey: ["profilePosts", username],
+  });
+};
+
+export const useDeleteProfileComment = ({
+  postId,
+  postOnModel,
+}: {
+  postId: string;
+  postOnModel: string;
+}) => {
+  const { username } = useParams();
+  return useDeleteComment({
+    postId,
+    targetModel: postOnModel,
+    invalidateKey: ["profilePosts", username],
+  });
+};
+
+export const useUpdateProfileComment = ({
+  postId,
+  postOnModel,
+}: {
+  postId: string;
+  postOnModel: string;
+}) => {
+  return useUpdateComment({
+    postId,
+    targetModel: postOnModel,
+  });
+};
+
+export const useToggleLikeProfileComment = ({
+  postId,
+  postOnModel,
+}: {
+  postId: string;
+  postOnModel: string;
+}) => {
+  return useToggleLikeComment({
+    postId,
+    targetModel: postOnModel,
   });
 };

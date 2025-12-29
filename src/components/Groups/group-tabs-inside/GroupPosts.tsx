@@ -1,16 +1,15 @@
 import React from "react";
 import GroupPostCard from "./../GroupPostCard";
-import { useGroupFeed } from "../../../hooks/useGroup";
+import { useGroupPosts } from "../../../hooks/useGroup";
 import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 import type { ApiError } from "../../../types";
 import type { AxiosError } from "axios";
 
 interface GroupPostsProps {
   groupId: string;
-  slug: string;
 }
 
-const GroupPosts: React.FC<GroupPostsProps> = ({ groupId, slug }) => {
+const GroupPosts: React.FC<GroupPostsProps> = ({ groupId }) => {
   const {
     data: postsData,
     isLoading,
@@ -18,7 +17,7 @@ const GroupPosts: React.FC<GroupPostsProps> = ({ groupId, slug }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useGroupFeed(groupId);
+  } = useGroupPosts(groupId);
 
   const posts = postsData?.pages.flatMap((page) => page.data.posts) || [];
 
@@ -56,7 +55,6 @@ const GroupPosts: React.FC<GroupPostsProps> = ({ groupId, slug }) => {
               key={item.post._id}
               post={item.post}
               meta={item.meta}
-              slug={slug}
             />
           ))}
         </div>

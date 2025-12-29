@@ -8,7 +8,7 @@ import { groupService } from "../services/group.service";
 import { postService } from "../services/utils/post.service";
 import { POST_TARGET_MODELS } from "../constants";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import type { AxiosError } from "axios";
 import type { ApiError } from "../types";
 import {
@@ -19,6 +19,13 @@ import {
   useToggleReadStatus,
   useUpdatePost,
 } from "./utils/usePost";
+import {
+  usePostComments,
+  useAddComment,
+  useDeleteComment,
+  useUpdateComment,
+  useToggleLikeComment,
+} from "./utils/useComment";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
@@ -153,79 +160,88 @@ export const useGroupMembers = (groupId: string) => {
 // Group Feed & Posts
 // ====================================
 
-export const useGroupFeed = (groupId: string) => {
+export const useGroupPosts = (groupId: string) => {
+  const { slug } = useParams();
   return useInfiniteQuery({
-    queryKey: ["groupFeed", groupId],
+    queryKey: ["groupPosts", slug],
     queryFn: ({ pageParam }) =>
-      groupService.getGroupFeed(groupId, pageParam as number),
+      groupService.getGroupPosts(groupId, pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data.pagination;
       return page < totalPages ? page + 1 : undefined;
     },
-    enabled: !!groupId,
+    enabled: !!groupId && !!slug,
     staleTime: 1000 * 60 * 1, // 1 minute
   });
 };
 
 export const useGroupPinnedPosts = (groupId: string) => {
+  const { slug } = useParams();
   return useQuery({
-    queryKey: ["groupPinnedPosts", groupId],
+    queryKey: ["groupPinnedPosts", slug],
     queryFn: () => groupService.getGroupPinnedPosts(groupId),
-    enabled: !!groupId,
+    enabled: !!groupId && !!slug,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
-export const useCreateGroupPost = (groupId: string, slug: string) => {
+export const useCreateGroupPost = () => {
+  const { slug } = useParams();
   return useCreatePost({
     invalidateKey: [
-      ["groupFeed", groupId],
-      ["groupPinnedPosts", groupId],
+      ["groupPosts", slug],
+      ["groupPinnedPosts", slug],
       ["groupDetails", slug],
     ],
   });
 };
 
 // [REFACTORED] Using Generic Hook
-export const useToggleLikeGroupPost = (groupId: string) => {
+export const useToggleLikeGroupPost = () => {
+  const { slug } = useParams();
   return useToggleLikePost({
-    queryKey: ["groupFeed", groupId],
-    invalidateKey: ["groupPinnedPosts", groupId], // Pinned post sync করার জন্য
+    queryKey: ["groupPosts", slug],
+    invalidateKey: ["groupPinnedPosts", slug], // Pinned post sync করার জন্য
   });
 };
 
 // [REFACTORED] Using Generic Hook
-export const useDeleteGroupPost = (groupId: string, slug: string) => {
+export const useDeleteGroupPost = () => {
+  const { slug } = useParams();
   return useDeletePost({
-    queryKey: ["groupFeed", groupId],
+    queryKey: ["groupPosts", slug],
     invalidateKey: ["groupDetails", slug], // Post count sync করার জন্য
   });
 };
 
 // [REFACTORED] Using Generic Hook
-export const useUpdateGroupPost = (groupId: string) => {
+export const useUpdateGroupPost = () => {
+  const { slug } = useParams();
   return useUpdatePost({
-    queryKey: ["groupFeed", groupId],
+    queryKey: ["groupPosts", slug],
   });
 };
 
 // [REFACTORED] Using Generic Hook
-export const useToggleReadStatusGroupPost = (groupId: string) => {
+export const useToggleReadStatusGroupPost = () => {
+  const { slug } = useParams();
   return useToggleReadStatus({
-    queryKey: ["groupFeed", groupId],
+    queryKey: ["groupPosts", slug],
   });
 };
 
 // [REFACTORED] Using Generic Hook
-export const useToggleBookmarkGroupPost = (groupId: string) => {
+export const useToggleBookmarkGroupPost = () => {
+  const { slug } = useParams();
   return useToggleBookmark({
-    queryKey: ["groupFeed", groupId],
+    queryKey: ["groupPosts", slug],
   });
 };
 
 // [KEPT ORIGINAL] Generic hook does not have pin functionality yet
-export const useTogglePinGroupPost = (groupId: string, slug?: string) => {
+export const useTogglePinGroupPost = () => {
+  const { slug } = useParams();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -233,12 +249,12 @@ export const useTogglePinGroupPost = (groupId: string, slug?: string) => {
       postService.togglePin(postId, POST_TARGET_MODELS.GROUP),
     onSuccess: (response) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
+      queryClient.invalidateQueries({ queryKey: ["groupPosts", slug] });
       queryClient.invalidateQueries({
-        queryKey: ["groupPinnedPosts", groupId],
+        queryKey: ["groupPinnedPosts", slug],
       });
-      if (slug)
-        queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
+
+      queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
@@ -409,5 +425,55 @@ export const useRevokeGroupAdmin = () => {
       const message = error?.response?.data?.message;
       toast.error(message);
     },
+  });
+};
+
+// ====================================
+// Group Comment Hooks
+// ====================================
+
+export const useGroupPostComments = ({
+  postId,
+  enabled,
+}: {
+  postId: string;
+  enabled?: boolean;
+}) => {
+  return usePostComments({
+    postId,
+    targetModel: POST_TARGET_MODELS.GROUP,
+    enabled,
+  });
+};
+
+export const useAddGroupComment = ({ postId }: { postId: string }) => {
+  const { slug } = useParams();
+  return useAddComment({
+    postId,
+    targetModel: POST_TARGET_MODELS.GROUP,
+    invalidateKey: ["groupPosts", slug],
+  });
+};
+
+export const useDeleteGroupComment = ({ postId }: { postId: string }) => {
+  const { slug } = useParams();
+  return useDeleteComment({
+    postId,
+    targetModel: POST_TARGET_MODELS.GROUP,
+    invalidateKey: ["groupPosts", slug],
+  });
+};
+
+export const useUpdateGroupComment = ({ postId }: { postId: string }) => {
+  return useUpdateComment({
+    postId,
+    targetModel: POST_TARGET_MODELS.GROUP,
+  });
+};
+
+export const useToggleLikeGroupComment = ({ postId }: { postId: string }) => {
+  return useToggleLikeComment({
+    postId,
+    targetModel: POST_TARGET_MODELS.GROUP,
   });
 };
