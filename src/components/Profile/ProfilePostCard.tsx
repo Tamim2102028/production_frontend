@@ -64,21 +64,11 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const isOwnPost = meta.isMine;
 
   // Post hooks
-  const { mutate: likeMutate } = useToggleLikeProfilePost(
-    currentUser?.userName
-  );
-  const { mutate: deletePost, isPending: isDeleting } = useDeleteProfilePost(
-    currentUser?.userName
-  );
-  const { mutate: updatePost, isPending: isUpdating } = useUpdateProfilePost(
-    currentUser?.userName
-  );
-  const { mutate: toggleReadStatus } = useToggleReadStatusProfilePost(
-    currentUser?.userName
-  );
-  const { mutate: toggleBookmark } = useToggleBookmarkProfilePost(
-    currentUser?.userName
-  );
+  const { mutate: likeMutate } = useToggleLikeProfilePost();
+  const { mutate: deletePost, isPending: isDeleting } = useDeleteProfilePost();
+  const { mutate: updatePost, isPending: isUpdating } = useUpdateProfilePost();
+  const { mutate: toggleReadStatus } = useToggleReadStatusProfilePost();
+  const { mutate: toggleBookmark } = useToggleBookmarkProfilePost();
 
   // Comment hooks
   const {

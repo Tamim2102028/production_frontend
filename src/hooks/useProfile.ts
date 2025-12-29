@@ -23,6 +23,7 @@ import {
   useUpdatePost,
 } from "./utils/usePost";
 import { useToggleFollow } from "./utils/useFollow";
+import { useParams } from "react-router-dom";
 
 // Import Generic Utils
 
@@ -148,50 +149,54 @@ export const useProfilePosts = (username?: string) =>
 
 export const useCreateProfilePost = () => {
   return useCreatePost({
-    queryKey: ["profilePosts"],       
+    queryKey: ["profilePosts"],
     invalidateKey: ["profile_header"],
   });
 };
 
-export const useToggleLikeProfilePost = (username?: string) => {
+export const useToggleLikeProfilePost = () => {
+  const { username } = useParams();
   return useToggleLikePost({
     queryKey: ["profilePosts", username],
-
-    
     invalidateKey: ["profile_header", username],
   });
 };
 
-export const useDeleteProfilePost = (username?: string) => {
+export const useDeleteProfilePost = () => {
+  const { username } = useParams();
   return useDeletePost({
     queryKey: ["profilePosts", username],
     invalidateKey: ["profile_header", username],
   });
 };
 
-export const useUpdateProfilePost = (username?: string) => {
+export const useUpdateProfilePost = () => {
+  const { username } = useParams();
   return useUpdatePost({
     queryKey: ["profilePosts", username],
     invalidateKey: ["profile_header", username],
   });
 };
 
-export const useToggleReadStatusProfilePost = (username?: string) => {
+export const useToggleReadStatusProfilePost = () => {
+  const { username } = useParams();
   return useToggleReadStatus({
     queryKey: ["profilePosts", username],
     invalidateKey: ["profile_header", username],
   });
 };
 
-export const useToggleBookmarkProfilePost = (username?: string) => {
+export const useToggleBookmarkProfilePost = () => {
+  const { username } = useParams();
   return useToggleBookmark({
     queryKey: ["profilePosts", username],
     invalidateKey: ["profile_header", username],
   });
 };
 
-export const useToggleFollowProfile = (username?: string) => {
+export const useToggleFollowProfile = () => {
+  const { username } = useParams();
   return useToggleFollow({
-      invalidateKey: ["profile_header", username],
+    invalidateKey: ["profile_header", username],
   });
 };
