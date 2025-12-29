@@ -8,15 +8,7 @@ import type {
 } from "../types";
 
 export const profileService = {
-  /**
-   * profile_relation_status:
-   * - SELF: নিজের প্রোফাইল
-   * - FRIEND: বন্ধু
-   * - REQUEST_SENT: আমি request পাঠিয়েছি
-   * - REQUEST_RECEIVED: সে request পাঠিয়েছে
-   * - BLOCKED: ব্লক করা
-   * - NOT_FRIENDS: কোনো relation নেই
-   */
+  // Get Profile by Username
   getProfile: async (
     username: string
   ): Promise<ApiResponse<ProfileHeaderData>> => {
@@ -26,12 +18,7 @@ export const profileService = {
     return response.data;
   },
 
-  /**
-   * Get user details by username (Lightweight)
-   *
-   * @param username - User's unique username
-   * @returns User object without calculated stats/relations
-   */
+  // Get Profile Details by Username
   getProfileDetails: async (username: string): Promise<ApiResponse<User>> => {
     const response = await api.get<ApiResponse<User>>(
       `/users/details/${username}`
@@ -39,12 +26,7 @@ export const profileService = {
     return response.data;
   },
 
-  /**
-   * Update general profile info
-   *
-   * @param data - { fullName?, bio?, phoneNumber?, gender?, socialLinks?, skills?, interests? }
-   * @returns Updated user object
-   */
+  // Update General Info
   updateGeneral: async (
     data: UpdateGeneralData
   ): Promise<ApiResponse<User>> => {
@@ -55,13 +37,7 @@ export const profileService = {
     return response.data;
   },
 
-  /**
-   * Update academic info
-   *
-   * @param data - Student: { session?, section?, currentSemester? }
-   *               Teacher: { rank?, officeHours? }
-   * @returns Updated user object
-   */
+  // Update Academic Info
   updateAcademic: async (
     data: UpdateAcademicData
   ): Promise<ApiResponse<User>> => {
@@ -72,12 +48,7 @@ export const profileService = {
     return response.data;
   },
 
-  /**
-   * Update avatar image
-   *
-   * @param formData - FormData with 'avatar' file
-   * @returns Updated user with new avatar URL
-   */
+  // Update Avatar Image
   updateAvatar: async (formData: FormData): Promise<ApiResponse<User>> => {
     const response = await api.patch<ApiResponse<User>>(
       "/users/avatar",
@@ -91,12 +62,7 @@ export const profileService = {
     return response.data;
   },
 
-  /**
-   * Update cover image
-   *
-   * @param formData - FormData with 'coverImage' file
-   * @returns Updated user with new cover image URL
-   */
+  // Update Cover Image
   updateCoverImage: async (formData: FormData): Promise<ApiResponse<User>> => {
     const response = await api.patch<ApiResponse<User>>(
       "/users/cover-image",
@@ -110,12 +76,7 @@ export const profileService = {
     return response.data;
   },
 
-  /**
-   * Change password
-   *
-   * @param data - { oldPassword, newPassword }
-   * @returns Success message
-   */
+  // Change Password
   changePassword: async (data: {
     oldPassword: string;
     newPassword: string;
@@ -126,7 +87,8 @@ export const profileService = {
     );
     return response.data;
   },
-  // Get Profile Posts (paginated)
+
+  // Get Profile Posts
   getProfilePosts: async (username: string, page: number) => {
     const response = await api.get(`/profile/${username}/posts`, {
       params: { page, limit: 10 },

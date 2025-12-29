@@ -11,7 +11,7 @@ import type {
   FriendshipListData,
 } from "../types";
 
-export const friendshipApi = {
+export const friendService = {
   // ====================================
   // Friendship Actions API Endpoints
   // ====================================

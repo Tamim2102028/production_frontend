@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { friendshipApi } from "../services/friendship.service";
+import { friendService } from "../services/friendship.service";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import type { ApiError } from "../types";
@@ -13,7 +13,7 @@ export const useSendFriendRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => friendshipApi.sendRequest(userId),
+    mutationFn: (userId: string) => friendService.sendRequest(userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
@@ -33,7 +33,7 @@ export const useAcceptFriendRequest = () => {
 
   return useMutation({
     mutationFn: (requesterId: string) =>
-      friendshipApi.acceptRequest(requesterId),
+      friendService.acceptRequest(requesterId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
@@ -53,7 +53,7 @@ export const useRejectFriendRequest = () => {
 
   return useMutation({
     mutationFn: (requesterId: string) =>
-      friendshipApi.rejectRequest(requesterId),
+      friendService.rejectRequest(requesterId),
     onSuccess: (response) => {
       toast.info(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
@@ -72,7 +72,7 @@ export const useCancelFriendRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (recipientId: string) =>
-      friendshipApi.cancelRequest(recipientId),
+      friendService.cancelRequest(recipientId),
     onSuccess: (response) => {
       toast.info(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
@@ -91,7 +91,7 @@ export const useUnfriendUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (friendId: string) => friendshipApi.unfriend(friendId),
+    mutationFn: (friendId: string) => friendService.unfriend(friendId),
     onSuccess: (response) => {
       toast.info(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
@@ -110,7 +110,7 @@ export const useBlockUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => friendshipApi.block(userId),
+    mutationFn: (userId: string) => friendService.block(userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
@@ -131,7 +131,7 @@ export const useUnblockUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => friendshipApi.unblock(userId),
+    mutationFn: (userId: string) => friendService.unblock(userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profile_header"] });
@@ -153,7 +153,7 @@ export const useFriendsList = () => {
   return useQuery({
     queryKey: ["friends"],
     queryFn: async () => {
-      const response = await friendshipApi.getFriendsList();
+      const response = await friendService.getFriendsList();
       return response.data;
     },
   });
@@ -164,7 +164,7 @@ export const useReceivedRequests = () => {
   return useQuery({
     queryKey: ["friendRequests"],
     queryFn: async () => {
-      const response = await friendshipApi.getReceivedRequests();
+      const response = await friendService.getReceivedRequests();
       return response.data;
     },
   });
@@ -175,7 +175,7 @@ export const useSentRequests = () => {
   return useQuery({
     queryKey: ["sentRequests"],
     queryFn: async () => {
-      const response = await friendshipApi.getSentRequests();
+      const response = await friendService.getSentRequests();
       return response.data;
     },
   });
@@ -186,7 +186,7 @@ export const useFriendSuggestions = () => {
   return useQuery({
     queryKey: ["friendSuggestions"],
     queryFn: async () => {
-      const response = await friendshipApi.getSuggestions();
+      const response = await friendService.getSuggestions();
       return response.data;
     },
   });

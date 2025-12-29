@@ -1,39 +1,8 @@
 import api from "../lib/axios";
 import type { LoginCredentials, User, ApiResponse } from "../types";
 
-/**
- * ====================================
- * AUTH API SERVICE
- * ====================================
- *
- * সব Authentication related API calls এখানে।
- * Axios instance use করে যেটা withCredentials: true set করা।
- *
- * APIs:
- * - register: POST /users/register (multipart/form-data)
- * - login: POST /users/login (JSON)
- * - logout: POST /users/logout
- * - getCurrentUser: GET /users/current-user
- * - refreshToken: POST /users/refresh-token
- *
- * ⚠️ সব response এই format এ আসে:
- * {
- *   statusCode: 200,
- *   data: { ... },
- *   message: "...",
- *   success: true
- * }
- */
-
-export const authApi = {
-  /**
-   * Register new user
-   *
-   * @param formData - FormData with: fullName, email, userName, password, userType, avatar?
-   * @returns User object + tokens
-   *
-   * ⚠️ multipart/form-data কারণ avatar file upload আছে
-   */
+export const authService = {
+  // Register new user
   register: async (
     formData: FormData
   ): Promise<ApiResponse<{ user: User }>> => {
@@ -49,14 +18,7 @@ export const authApi = {
     return response.data;
   },
 
-  /**
-   * Login user
-   *
-   * @param credentials - { email OR userName, password }
-   * @returns User object + tokens (tokens cookie তে set হয়)
-   *
-   * ⚠️ Smart detection: @ থাকলে email, না থাকলে userName
-   */
+  // Login user
   login: async (
     credentials: LoginCredentials
   ): Promise<ApiResponse<{ user: User }>> => {
@@ -71,25 +33,13 @@ export const authApi = {
     return response.data;
   },
 
-  /**
-   * Logout user
-   *
-   * Backend cookie clear করে দেয়।
-   * Frontend এ Redux clear করতে হয়।
-   */
+  // Logout user
   logout: async (): Promise<ApiResponse<object>> => {
     const response = await api.post<ApiResponse<object>>("/users/logout");
     return response.data;
   },
 
-  /**
-   * Get current logged in user
-   *
-   * ⚠️ IMPORTANT: এটা app load এ call হয় (useAuthCheck hook)
-   *
-   * Cookie তে valid token থাকলে user data পাবে।
-   * Token invalid/expired হলে 401 পাবে।
-   */
+  // Get Current Logged-in User
   getCurrentUser: async (): Promise<ApiResponse<{ user: User }>> => {
     const response = await api.get<ApiResponse<{ user: User }>>(
       "/users/current-user"
@@ -97,15 +47,7 @@ export const authApi = {
     return response.data;
   },
 
-  /**
-   * Refresh access token
-   *
-   * ⚠️ এটা axios interceptor থেকে automatically call হয়
-   * 401 error পেলে এই API call করে নতুন token নেয়
-   *
-   * Backend refresh token cookie থেকে পড়ে,
-   * নতুন access token cookie তে set করে দেয়।
-   */
+  // Refresh access token
   refreshToken: async (): Promise<ApiResponse<{ user: User }>> => {
     const response = await api.post<ApiResponse<{ user: User }>>(
       "/users/refresh-token"
@@ -114,4 +56,4 @@ export const authApi = {
   },
 };
 
-export default authApi;
+export default authService;

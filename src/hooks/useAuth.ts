@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import authApi from "../services/auth.service";
+import authService from "../services/auth.service";
 import type { LoginCredentials, AuthState, ApiError } from "../types";
 import type { AxiosError } from "axios";
 
@@ -10,32 +10,13 @@ export const AUTH_KEYS = {
   currentUser: ["currentUser"] as const,
 };
 
-/**
- * ====================================
- * AUTH HOOKS - TanStack Query Only
- * ====================================
- *
- * This file contains all authentication related hooks.
- * It uses TanStack Query for state management, replacing Redux.
- *
- * Hooks:
- * - useUser: Access current user data (cached by React Query)
- * - useRegister: Register new user
- * - useLogin: User login
- * - useLogout: User logout
- */
-
-/**
- * useUser Hook
- * Fetches and caches user data using TanStack Query.
- * @returns { user, isAuthenticated, isCheckingAuth }
- */
+// useUser Hook
 export const useUser = (): AuthState => {
   const { data: user, isLoading } = useQuery({
     queryKey: AUTH_KEYS.currentUser,
     queryFn: async () => {
       try {
-        const response = await authApi.getCurrentUser();
+        const response = await authService.getCurrentUser();
         // The API returns ApiResponse<AuthResponse> which contains { user: User }
         // But our useUser hook expects User | null
         return response.data.user;
@@ -60,12 +41,7 @@ export const useUser = (): AuthState => {
   };
 };
 
-/**
- * useRegister Hook
- *
- * Handles user registration.
- * Updates query cache on success.
- */
+// useRegister Hook
 export const useRegister = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -73,7 +49,7 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: async (formData: FormData) => {
       // Step 1: Register API call
-      return await authApi.register(formData);
+      return await authService.register(formData);
     },
     onSuccess: (response) => {
       // ✅ Update Cache
@@ -88,12 +64,7 @@ export const useRegister = () => {
   });
 };
 
-/**
- * useLogin Hook
- *
- * Handles user login.
- * Updates query cache on success.
- */
+// useLogin Hook
 export const useLogin = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -101,7 +72,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
       // Step 1: Login API call
-      return await authApi.login(credentials);
+      return await authService.login(credentials);
     },
     onSuccess: (response) => {
       // ✅ Update Cache
@@ -116,18 +87,13 @@ export const useLogin = () => {
   });
 };
 
-/**
- * useLogout Hook
- *
- * Handles user logout.
- * Clears query cache on success.
- */
+// useLogout Hook
 export const useLogout = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => authApi.logout(),
+    mutationFn: () => authService.logout(),
     onSuccess: (response) => {
       // ✅ Clear Cache
       queryClient.setQueryData(AUTH_KEYS.currentUser, null);
