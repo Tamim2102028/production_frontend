@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
             {/* Create Post Section (Only for Own Profile) */}
             {isOwnProfile && currentUser?._id && (
               <div className="mb-4">
-                <CreateProfilePost currentUserId={currentUser._id} />
+                <CreateProfilePost />
               </div>
             )}
             <ProfilePosts

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { followService } from "../services/follow.service";
+import { followService } from "../services/utils/follow.service";
 import type { ApiError } from "../types";
 import type { AxiosError } from "axios";
 import { FOLLOW_TARGET_MODELS } from "../constants";
@@ -11,10 +11,10 @@ export const useToggleFollow = () => {
   return useMutation({
     mutationFn: ({
       targetId,
-      targetModel = FOLLOW_TARGET_MODELS.USER,
+      targetModel,
     }: {
       targetId: string;
-      targetModel?: (typeof FOLLOW_TARGET_MODELS)[keyof typeof FOLLOW_TARGET_MODELS];
+      targetModel: (typeof FOLLOW_TARGET_MODELS)[keyof typeof FOLLOW_TARGET_MODELS];
     }) => followService.toggleFollow(targetId, targetModel),
     onSuccess: (response) => {
       toast.success(response.message);
@@ -22,7 +22,7 @@ export const useToggleFollow = () => {
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(message || "Error from Frontend useToggleFollow");
     },
   });
 };

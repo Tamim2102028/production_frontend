@@ -57,7 +57,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
   const unblockUser = useUnblockUser();
 
   // Hook for follow actions
-  const toggleFollow = useToggleFollow();
+  const { mutate: toggleFollow } = useToggleFollow();
 
   // Calculate friendshipStatus from meta
   const friendshipStatus: FriendshipStatus =
@@ -113,7 +113,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
 
   // Handle follow actions
   const handleToggleFollow = (targetId: string) => {
-    toggleFollow.mutate({ targetId, targetModel: FOLLOW_TARGET_MODELS.USER });
+    toggleFollow({ targetId, targetModel: FOLLOW_TARGET_MODELS.USER });
   };
 
   const handleCopyLink = () => {

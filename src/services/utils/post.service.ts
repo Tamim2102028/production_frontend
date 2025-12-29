@@ -1,10 +1,10 @@
-import { POST_LIMIT, POST_TARGET_MODELS } from "../constants";
-import api from "../lib/axios";
+import { POST_LIMIT, POST_TARGET_MODELS } from "../../constants";
+import api from "../../lib/axios";
 import type {
   CreatePostRequest,
   FeedResponse,
   ProfilePostsResponse,
-} from "../types";
+} from "../../types";
 
 export const postService = {
   // Get News Feed

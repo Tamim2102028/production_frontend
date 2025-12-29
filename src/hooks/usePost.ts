@@ -1,36 +1,12 @@
 import {
-  useInfiniteQuery,
   useMutation,
   useQueryClient,
   type InfiniteData,
 } from "@tanstack/react-query";
-import { postService } from "../services/post.service";
-import type {
-  CreatePostRequest,
-  ApiError,
-  ProfilePostsResponse,
-} from "../types";
+import { postService } from "../services/utils/post.service";
+import type { ApiError, ProfilePostsResponse } from "../types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-
-export const useProfilePosts = (username: string | undefined) => {
-  return useInfiniteQuery<ProfilePostsResponse>({
-    queryKey: ["profilePosts", username],
-    queryFn: async ({ pageParam }) => {
-      if (!username) throw new Error("Username is required");
-      const page = Number(pageParam || 1);
-      const response = await postService.getProfilePosts(username, page);
-      return response;
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      const { page, totalPages } = lastPage.data.pagination;
-      return page < totalPages ? page + 1 : undefined;
-    },
-    enabled: !!username, // Only fetch when username exists
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-};
 
 export const useToggleLikePost = () => {
   const queryClient = useQueryClient();
@@ -238,50 +214,6 @@ export const useToggleBookmark = () => {
  * Profile এ নতুন পোস্ট তৈরি করার জন্য।
  * এটি User মডেলের উপর পোস্ট তৈরি করে।
  */
-export const useCreateProfilePost = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (payload: CreatePostRequest) => {
-      return postService.createPost(payload);
-    },
-    onSuccess: (response) => {
-      // Optimistic update: নতুন পোস্ট লিস্টের শুরুতে যোগ করা
-      queryClient.setQueriesData(
-        { queryKey: ["profilePosts"] },
-        (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
-          if (!oldData || oldData.pages.length === 0) return oldData;
-
-          const newItem = response.data; // { post, meta }
-
-          // Add to the first page
-          const firstPage = oldData.pages[0];
-          const updatedFirstPage = {
-            ...firstPage,
-            data: {
-              ...firstPage.data,
-              posts: [newItem, ...firstPage.data.posts],
-            },
-          };
-
-          return {
-            ...oldData,
-            pages: [updatedFirstPage, ...oldData.pages.slice(1)],
-          };
-        }
-      );
-      toast.success(response.message);
-
-      // Profile Header Invalidate করা (যাতে Post Count বাড়ে)
-      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      console.error("Create post error:", error);
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
-  });
-};
 
 /**
  * useUpdatePost Hook

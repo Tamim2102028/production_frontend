@@ -90,10 +90,6 @@ export interface ProfilePostsProps {
   isOwnProfile: boolean;
 }
 
-export interface CreateProfilePostProps {
-  currentUserId: string;
-}
-
 export interface CreatePostRequest {
   content: string;
   visibility: (typeof POST_VISIBILITY)[keyof typeof POST_VISIBILITY];

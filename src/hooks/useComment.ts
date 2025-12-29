@@ -4,7 +4,7 @@ import {
   useQueryClient,
   type InfiniteData,
 } from "@tanstack/react-query";
-import { commentService } from "../services/comment.service";
+import { commentService } from "../services/utils/comment.service";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import type { ApiError, CommentsResponse } from "../types";

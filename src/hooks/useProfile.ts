@@ -1,9 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AUTH_KEYS } from "./useAuth";
 import profileApi from "../services/profile.service";
-import type { UpdateGeneralData, UpdateAcademicData, ApiError } from "../types";
+import type { UpdateGeneralData, UpdateAcademicData, ApiError, ProfilePostsResponse, CreatePostRequest } from "../types";
 import type { AxiosError } from "axios";
+import { postService } from "../services/utils/post.service";
 
 /**
  * ====================================
@@ -179,6 +180,70 @@ export const useChangePassword = () => {
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message;
+      toast.error(message);
+    },
+  });
+};
+
+export const useProfilePosts = (username: string | undefined) => {
+  return useInfiniteQuery<ProfilePostsResponse>({
+    queryKey: ["profilePosts", username],
+    queryFn: async ({ pageParam }) => {
+      if (!username) throw new Error("Username is required");
+      const page = Number(pageParam || 1);
+      const response = await postService.getProfilePosts(username, page);
+      return response;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled: !!username, // Only fetch when username exists
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+export const useCreateProfilePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: CreatePostRequest) => {
+      return postService.createPost(payload);
+    },
+    onSuccess: (response) => {
+      // Optimistic update: নতুন পোস্ট লিস্টের শুরুতে যোগ করা
+      queryClient.setQueriesData(
+        { queryKey: ["profilePosts"] },
+        (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
+          if (!oldData || oldData.pages.length === 0) return oldData;
+
+          const newItem = response.data; // { post, meta }
+
+          // Add to the first page
+          const firstPage = oldData.pages[0];
+          const updatedFirstPage = {
+            ...firstPage,
+            data: {
+              ...firstPage.data,
+              posts: [newItem, ...firstPage.data.posts],
+            },
+          };
+
+          return {
+            ...oldData,
+            pages: [updatedFirstPage, ...oldData.pages.slice(1)],
+          };
+        }
+      );
+      toast.success(response.message);
+
+      // Profile Header Invalidate করা (যাতে Post Count বাড়ে)
+      queryClient.invalidateQueries({ queryKey: ["profile_header"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      console.error("Create post error:", error);
       const message = error?.response?.data?.message;
       toast.error(message);
     },

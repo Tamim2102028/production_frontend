@@ -20,8 +20,7 @@ import {
   POST_TARGET_MODELS,
 } from "../../constants/post";
 import { useUser } from "../../hooks/useAuth";
-import { useCreateProfilePost } from "../../hooks/usePost";
-import type { CreateProfilePostProps } from "../../types";
+import { useCreateProfilePost } from "../../hooks/useProfile";
 
 const createProfilePostSchema = z.object({
   content: z
@@ -40,11 +39,9 @@ const createProfilePostSchema = z.object({
 
 type CreateProfilePostFormData = z.infer<typeof createProfilePostSchema>;
 
-const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
-  currentUserId,
-}) => {
-  const { user } = useUser();
-  const { mutate, isPending } = useCreateProfilePost();
+const CreateProfilePost: React.FC = () => {
+  const { user: currentUser } = useUser();
+  const { mutate: createProfilePost, isPending } = useCreateProfilePost();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const {
@@ -67,8 +64,6 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
   const postContent = watch("content");
 
   const onSubmit = (data: CreateProfilePostFormData) => {
-    if (!currentUserId) return;
-
     // Process tags: split by comma or space, remove empty strings
     const processedTags = data.tags
       ? data.tags
@@ -77,11 +72,11 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
           .filter((tag) => tag.length > 0)
       : [];
 
-    mutate(
+    createProfilePost(
       {
         content: data.content,
         visibility: data.visibility,
-        postOnId: currentUserId,
+        postOnId: currentUser?._id || "",
         postOnModel: POST_TARGET_MODELS.USER,
         type: POST_TYPES.GENERAL,
         attachments: [],
@@ -165,8 +160,8 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
         {/* User Avatar and Input */}
         <div className="flex space-x-3">
           <img
-            src={user?.avatar || DEFAULT_AVATAR_MD}
-            alt={user?.fullName || "Your avatar"}
+            src={currentUser?.avatar || DEFAULT_AVATAR_MD}
+            alt={currentUser?.fullName || "Your avatar"}
             className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300 object-cover"
           />
           <div className="flex-1">
@@ -174,7 +169,7 @@ const CreateProfilePost: React.FC<CreateProfilePostProps> = ({
               <textarea
                 {...register("content")}
                 onFocus={() => setIsExpanded(true)}
-                placeholder={`What's on your mind, ${user?.fullName?.split(" ")[0]}?`}
+                placeholder={`What's on your mind, ${currentUser?.fullName?.split(" ")[0]}?`}
                 className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 rows={isExpanded ? 4 : 1}
                 maxLength={5000}

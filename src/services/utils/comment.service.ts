@@ -1,6 +1,6 @@
-import { COMMENT_LIMIT, POST_TARGET_MODELS } from "../constants";
-import api from "../lib/axios";
-import type { CommentsResponse, AddCommentResponse } from "../types";
+import { COMMENT_LIMIT, POST_TARGET_MODELS } from "../../constants";
+import api from "../../lib/axios";
+import type { CommentsResponse, AddCommentResponse } from "../../types";
 
 export const commentService = {
   // Get comments for a post

@@ -6,7 +6,7 @@ import {
   type InfiniteData,
 } from "@tanstack/react-query";
 import { groupService } from "../services/group.service";
-import { postService } from "../services/post.service";
+import { postService } from "../services/utils/post.service";
 import { POST_TARGET_MODELS } from "../constants";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -174,8 +174,7 @@ export const useCreateGroupPost = (groupId: string, slug: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreatePostRequest) =>
-      groupService.createGroupPost(groupId, data),
+    mutationFn: (data: CreatePostRequest) => postService.createPost(data),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupFeed", groupId] });
@@ -205,7 +204,9 @@ export const useToggleLikeGroupPost = (groupId: string) => {
 
     onMutate: async ({ postId }) => {
       await queryClient.cancelQueries({ queryKey: ["groupFeed", groupId] });
-      await queryClient.cancelQueries({ queryKey: ["groupPinnedPosts", groupId] });
+      await queryClient.cancelQueries({
+        queryKey: ["groupPinnedPosts", groupId],
+      });
 
       const previousGroupFeed = queryClient.getQueriesData({
         queryKey: ["groupFeed", groupId],
@@ -296,7 +297,10 @@ export const useToggleLikeGroupPost = (groupId: string) => {
       }
 
       if (context?.previousPinned) {
-        queryClient.setQueryData(["groupPinnedPosts", groupId], context.previousPinned);
+        queryClient.setQueryData(
+          ["groupPinnedPosts", groupId],
+          context.previousPinned
+        );
       }
 
       const message = error?.response?.data?.message;

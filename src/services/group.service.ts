@@ -8,17 +8,10 @@ import type {
   MyGroupsResponse,
   GroupMembersResponse,
   FeedResponse,
-  CreatePostRequest,
   GroupDetailsResponse,
 } from "../types";
 
 export const groupService = {
-  // Create Group Post
-  createGroupPost: async (groupId: string, data: CreatePostRequest) => {
-    const response = await api.post(`/groups/${groupId}/post`, data);
-    return response.data;
-  },
-
   // Create Group
   createGroup: async (data: FormData) => {
     const response = await api.post("/groups", data, {
