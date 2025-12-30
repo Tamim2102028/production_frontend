@@ -4,6 +4,7 @@ import {
   useQueryClient,
   useInfiniteQuery,
 } from "@tanstack/react-query";
+// import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { profileService } from "../services/profile.service";
 import type {
@@ -69,13 +70,15 @@ export const useProfileDetails = (username?: string) =>
 
 export const useUpdateGeneral = () => {
   const queryClient = useQueryClient();
+  // const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (data: UpdateGeneralData) => profileService.updateGeneral(data),
     onSuccess: (response) => {
-      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
       queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       toast.success(response.message);
+      // navigate(`/profile/${response.data.user.userName}`);
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error?.response?.data?.message ?? "Update General failed");
@@ -85,14 +88,16 @@ export const useUpdateGeneral = () => {
 
 export const useUpdateAcademic = () => {
   const queryClient = useQueryClient();
+  // const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (data: UpdateAcademicData) =>
       profileService.updateAcademic(data),
     onSuccess: (response) => {
-      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
       queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       toast.success(response.message);
+      // navigate(`/profile/${response.data.user.userName}`);
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error?.response?.data?.message ?? "Update Academic failed");
@@ -102,13 +107,15 @@ export const useUpdateAcademic = () => {
 
 export const useUpdateAvatar = () => {
   const queryClient = useQueryClient();
+  // const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (formData: FormData) => profileService.updateAvatar(formData),
     onSuccess: (response) => {
-      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
       queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       toast.success(response.message);
+      // navigate(`/profile/${response.data.user.userName}`);
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(error?.response?.data?.message ?? "Update Avatar failed");
@@ -118,14 +125,16 @@ export const useUpdateAvatar = () => {
 
 export const useUpdateCoverImage = () => {
   const queryClient = useQueryClient();
+  // const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (formData: FormData) =>
       profileService.updateCoverImage(formData),
     onSuccess: (response) => {
-      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data);
+      queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
       queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
       toast.success(response.message);
+      // navigate(`/profile/${response.data.user.userName}`);
     },
     onError: (error: AxiosError<ApiError>) => {
       toast.error(

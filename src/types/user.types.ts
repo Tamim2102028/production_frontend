@@ -38,11 +38,13 @@ export interface Department {
   _id: string;
   name: string;
   code: string;
+  logo?: string;
 }
 
 export interface Institution {
   _id: string;
   name: string;
+  code: string;
   logo: string;
 }
 
@@ -52,7 +54,7 @@ export interface Institution {
 
 // Common fields for both
 interface BaseAcademicInfo {
-  department?: string | Department;
+  department?: Department;
 }
 
 // Student-specific fields
@@ -136,7 +138,7 @@ export interface User {
 
   // Institutional
   userType: UserType;
-  institution?: string | Institution;
+  institution?: Institution;
   institutionType?: string;
   academicInfo?: AcademicInfo;
 

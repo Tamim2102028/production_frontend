@@ -14,7 +14,7 @@ const ProfileBlocked: React.FC<ProfileBlockedProps> = ({
 }) => {
   if (isBlockedByMe) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-10 text-center shadow-sm">
+      <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-10 text-center shadow-sm">
         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50 text-red-500">
           <FaBan className="h-10 w-10" />
         </div>
@@ -38,8 +38,8 @@ const ProfileBlocked: React.FC<ProfileBlockedProps> = ({
   }
 
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-10 text-center shadow-sm">
-      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 text-gray-400">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-10 text-center shadow-sm">
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 text-gray-500">
         <FaBan className="h-10 w-10" />
       </div>
       <h2 className="mb-2 text-2xl font-bold text-gray-900">

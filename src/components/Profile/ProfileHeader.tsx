@@ -27,17 +27,8 @@ import {
   useBlockUser,
   useUnblockUser,
 } from "../../hooks/useFriendship";
-import {
-  FOLLOW_TARGET_MODELS,
-  PROFILE_RELATION_STATUS,
-  USER_TYPES,
-} from "../../constants";
-import type {
-  Institution,
-  Department,
-  FriendshipStatus,
-  ProfileHeaderData,
-} from "../../types";
+import { FOLLOW_TARGET_MODELS, PROFILE_RELATION_STATUS } from "../../constants";
+import type { FriendshipStatus, ProfileHeaderData } from "../../types";
 import { toast } from "sonner";
 import { useToggleFollowProfile } from "../../hooks/useProfile";
 
@@ -46,6 +37,9 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
   const { isOwnProfile } = meta;
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
+
+  const institutionName = userData.institution?.name;
+  const departmentName = userData.academicInfo?.department?.name;
 
   // Hooks for friendship actions
   const sendFriendRequest = useSendFriendRequest();
@@ -64,16 +58,6 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
     meta.profile_relation_status || null;
 
   const isFollowing = meta.isFollowing || false;
-
-  // Helper to get institution name
-  const getInstitutionName = (): string => {
-    return (userData.institution as Institution)?.name || "";
-  };
-
-  // Helper to get department name
-  const getDepartmentName = (): string => {
-    return (userData.academicInfo?.department as Department)?.name || "";
-  };
 
   const handleMessage = (userId: string) => {
     // TODO: Replace with API call to set selected conversation
@@ -329,47 +313,28 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
             </h1>
 
             {/* Institution & Department */}
-            {getInstitutionName() || getDepartmentName() ? (
-              <div className="mt-1 space-y-1">
-                <p className="flex items-center gap-2 text-sm text-gray-600 md:text-base">
-                  <FaUniversity className="h-4 w-4 text-blue-600" />
-                  <span className="font-medium text-gray-800">
-                    {getInstitutionName() || "Institution not set"}
-                  </span>
-                </p>
-                <p className="flex items-center gap-2 text-sm text-gray-600 md:text-base">
-                  <FaGraduationCap className="h-4 w-4 text-green-600" />
-                  <span className="font-medium text-gray-800">
-                    {getDepartmentName() || "Department not set"}
-                    {userData.userType === USER_TYPES.STUDENT &&
-                      userData.academicInfo?.section && (
-                        <span className="text-gray-600">
-                          {" "}
-                          (Section: {userData.academicInfo.section})
-                        </span>
-                      )}
-                  </span>
-                </p>
-              </div>
-            ) : (
-              <p className="flex items-center gap-2 text-sm text-gray-400 italic md:text-lg">
-                <FaUniversity className="h-4 w-4 text-gray-400" />
-                <span>No institution added yet</span>
+            <div className="mt-1 space-y-1">
+              <p className="flex items-center gap-2 text-sm text-gray-600 md:text-base">
+                <FaUniversity className="h-4 w-4 text-blue-700" />
+                <span className={`font-medium text-gray-500 italic`}>
+                  {institutionName || "No institution added"}
+                </span>
               </p>
-            )}
+              <p className="flex items-center gap-2 text-sm text-gray-600 md:text-base">
+                <FaGraduationCap className="h-4 w-4 text-green-700" />
+                <span className={`font-medium text-gray-500 italic`}>
+                  {departmentName || "No department added"}
+                </span>
+              </p>
+            </div>
 
             {/* Bio */}
-            {userData.bio ? (
-              <p className="mt-3 max-w-prose text-base leading-relaxed text-gray-700">
-                {userData.bio}
-              </p>
-            ) : (
-              <p className="mt-3 max-w-prose text-base leading-relaxed text-gray-400 italic">
-                {isOwnProfile
-                  ? "Add a bio to tell people about yourself..."
-                  : "No bio added yet"}
-              </p>
-            )}
+            <p className="mt-3 max-w-prose text-base leading-relaxed font-medium text-gray-500">
+              {userData.bio ||
+                (isOwnProfile
+                  ? "Add a bio to tell people about yourself"
+                  : "No bio added yet")}
+            </p>
 
             {/* Profile Stats */}
             <div className="mt-4 grid grid-cols-4 divide-x divide-gray-200 rounded-lg border border-gray-200 bg-white py-2 shadow-sm">

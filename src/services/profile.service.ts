@@ -33,8 +33,8 @@ export const profileService = {
   // Update General Info
   updateGeneral: async (
     data: UpdateGeneralData
-  ): Promise<ApiResponse<User>> => {
-    const response = await api.patch<ApiResponse<User>>(
+  ): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.patch<ApiResponse<{ user: User }>>(
       "/profile/update-general",
       data
     );
@@ -44,8 +44,8 @@ export const profileService = {
   // Update Academic Info
   updateAcademic: async (
     data: UpdateAcademicData
-  ): Promise<ApiResponse<User>> => {
-    const response = await api.patch<ApiResponse<User>>(
+  ): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.patch<ApiResponse<{ user: User }>>(
       "/profile/update-academic",
       data
     );
@@ -53,8 +53,10 @@ export const profileService = {
   },
 
   // Update Avatar Image
-  updateAvatar: async (formData: FormData): Promise<ApiResponse<User>> => {
-    const response = await api.patch<ApiResponse<User>>(
+  updateAvatar: async (
+    formData: FormData
+  ): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.patch<ApiResponse<{ user: User }>>(
       "/profile/avatar",
       formData,
       {
@@ -67,8 +69,10 @@ export const profileService = {
   },
 
   // Update Cover Image
-  updateCoverImage: async (formData: FormData): Promise<ApiResponse<User>> => {
-    const response = await api.patch<ApiResponse<User>>(
+  updateCoverImage: async (
+    formData: FormData
+  ): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.patch<ApiResponse<{ user: User }>>(
       "/profile/cover-image",
       formData,
       {
