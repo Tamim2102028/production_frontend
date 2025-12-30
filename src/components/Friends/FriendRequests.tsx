@@ -5,8 +5,6 @@ import FriendCardSkeleton from "../shared/skeletons/FriendCardSkeleton";
 import { useReceivedRequests } from "../../hooks/useFriendship";
 import { toast } from "sonner";
 
-import { FRIENDS_LIMIT } from "../../constants/pagination";
-
 const FriendRequests: React.FC = () => {
   const {
     data,
@@ -15,12 +13,12 @@ const FriendRequests: React.FC = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useReceivedRequests(FRIENDS_LIMIT);
+  } = useReceivedRequests();
 
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[...Array(FRIENDS_LIMIT)].map((_, i) => (
+        {[...Array(3)].map((_, i) => (
           <FriendCardSkeleton key={i} />
         ))}
       </div>

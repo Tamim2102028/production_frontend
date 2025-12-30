@@ -156,11 +156,11 @@ export const useUnblockUser = () => {
 // ====================================
 
 // 8. Get Friends List Hook
-export const useFriendsList = (limit = 10) => {
+export const useFriendsList = () => {
   return useInfiniteQuery({
-    queryKey: ["friends", limit],
+    queryKey: ["friends"],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await friendService.getFriendsList(pageParam, limit);
+      const response = await friendService.getFriendsList(pageParam);
       return response.data;
     },
     initialPageParam: 1,
@@ -172,14 +172,11 @@ export const useFriendsList = (limit = 10) => {
 };
 
 // 9. Get Received Requests Hook
-export const useReceivedRequests = (limit = 10) => {
+export const useReceivedRequests = () => {
   return useInfiniteQuery({
-    queryKey: ["friendRequests", limit],
+    queryKey: ["friendRequests"],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await friendService.getReceivedRequests(
-        pageParam,
-        limit
-      );
+      const response = await friendService.getReceivedRequests(pageParam);
       return response.data;
     },
     initialPageParam: 1,
@@ -191,11 +188,11 @@ export const useReceivedRequests = (limit = 10) => {
 };
 
 // 10. Get Sent Requests Hook
-export const useSentRequests = (limit = 10) => {
+export const useSentRequests = () => {
   return useInfiniteQuery({
-    queryKey: ["sentRequests", limit],
+    queryKey: ["sentRequests"],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await friendService.getSentRequests(pageParam, limit);
+      const response = await friendService.getSentRequests(pageParam);
       return response.data;
     },
     initialPageParam: 1,
@@ -207,11 +204,11 @@ export const useSentRequests = (limit = 10) => {
 };
 
 // 11. Get Suggestions Hook
-export const useFriendSuggestions = (limit = 10) => {
+export const useFriendSuggestions = () => {
   return useInfiniteQuery({
-    queryKey: ["friendSuggestions", limit],
+    queryKey: ["friendSuggestions"],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await friendService.getSuggestions(pageParam, limit);
+      const response = await friendService.getSuggestions(pageParam);
       return response.data;
     },
     initialPageParam: 1,
