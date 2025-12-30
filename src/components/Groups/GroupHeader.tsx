@@ -35,48 +35,46 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
     useCancelJoinRequest();
 
   const handleJoin = () => {
-    joinGroup(group._id);
+    joinGroup({ slug: group.slug });
   };
 
   const handleLeave = async () => {
     setShowMenu(false);
-    if (
-      await confirm({
-        title: "Leave Group?",
-        text: "Are you sure you want to leave this group?",
-        confirmButtonText: "Yes, leave",
-      })
-    ) {
+    const ok = await confirm({
+      title: "Leave Group?",
+      text: "Are you sure you want to leave this group?",
+      confirmButtonText: "Yes, leave",
+    });
+
+    if (ok) {
       if (group?._id) {
-        leaveGroup(group._id);
+        leaveGroup({ slug: group.slug });
       }
     }
   };
 
   const handleDelete = async () => {
     setShowMenu(false);
-    if (
-      await confirm({
-        title: "Delete Group?",
-        text: "Are you sure you want to delete this group? This action cannot be undone.",
-        confirmButtonText: "Yes, delete",
-        confirmButtonColor: "#d33",
-        isDanger: true,
-      })
-    ) {
-      if (group?._id) {
-        deleteGroup(group._id);
-      }
+    const ok = await confirm({
+      title: "Delete Group?",
+      text: "Are you sure you want to delete this group? This action cannot be undone.",
+      confirmButtonText: "Yes, delete",
+      confirmButtonColor: "#d33",
+      isDanger: true,
+    });
+
+    if (ok) {
+      deleteGroup({ slug: group.slug });
     }
   };
 
   const handleCancelJoin = () => {
-    cancelJoinRequest(group._id);
+    cancelJoinRequest({ slug: group.slug });
   };
 
   const handleCopyLink = async () => {
-    const slugOrId = group.slug || group._id;
-    const url = `${window.location.origin}/groups/${slugOrId}`;
+    const slug = group.slug;
+    const url = `${window.location.origin}/groups/${slug}`;
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Group link copied to clipboard");

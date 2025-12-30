@@ -1,11 +1,11 @@
 import React from "react";
-import { useGroupMembers } from "./hooks/useGroup";
 import FriendCard from "../../shared/friends/FriendCard";
 import FriendCardSkeleton from "../../shared/skeletons/FriendCardSkeleton";
 import { showActionMenu } from "../../../utils/customModals";
 import { toast } from "sonner";
 import { PROFILE_RELATION_STATUS } from "../../../constants";
 import type { FriendUser } from "../../../types";
+import { useGroupMembers } from "../../../hooks/useGroup";
 
 interface GroupMembersTabProps {
   isOwner?: boolean;

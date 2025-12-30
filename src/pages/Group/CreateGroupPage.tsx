@@ -78,7 +78,7 @@ const CreateGroupPage: React.FC = () => {
       formData.append("avatar", data.avatar[0]);
     }
 
-    createGroup(formData);
+    createGroup({ formData });
   };
 
   const groupTypes = [

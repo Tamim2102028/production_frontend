@@ -32,7 +32,8 @@ export const useCreateGroup = () => {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (data: FormData) => groupService.createGroup(data),
+    mutationFn: ({ formData }: { formData: FormData }) =>
+      groupService.createGroup(formData),
     onSuccess: (data) => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
@@ -258,14 +259,13 @@ export const useTogglePinGroupPost = () => {
 // ====================================
 
 export const useJoinGroup = () => {
-  const { slug } = useParams();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (targetSlug?: string) =>
-      groupService.joinGroup(targetSlug || (slug as string)),
-    onSuccess: (response) => {
+    mutationFn: ({ slug }: { slug: string }) => groupService.joinGroup(slug),
+    onSuccess: (response, variables) => {
       toast.success(response.message);
+      const { slug } = variables;
       queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
       queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
       queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
@@ -282,20 +282,19 @@ export const useJoinGroup = () => {
 };
 
 export const useLeaveGroup = () => {
-  const { slug } = useParams();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (targetSlug?: string) =>
-      groupService.leaveGroup(targetSlug || (slug as string)),
-    onSuccess: (response) => {
-      toast.success(response.message);
+    mutationFn: ({ slug }: { slug: string }) => groupService.leaveGroup(slug),
 
-      // Invalidate relevant queries
+    onSuccess: (response, variables) => {
+      toast.success(response.message);
+      const { slug } = variables;
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
       queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
       queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
     },
+
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
       toast.error(message);
@@ -304,14 +303,15 @@ export const useLeaveGroup = () => {
 };
 
 export const useCancelJoinRequest = () => {
-  const { slug } = useParams();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (targetSlug?: string) =>
-      groupService.cancelJoinRequest(targetSlug || (slug as string)),
-    onSuccess: (response) => {
+    mutationFn: ({ slug }: { slug: string }) =>
+      groupService.cancelJoinRequest(slug),
+
+    onSuccess: (response, variables) => {
       toast.success(response.message);
+      const { slug } = variables;
       queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
       queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
       queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
@@ -320,6 +320,7 @@ export const useCancelJoinRequest = () => {
       queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
     },
+
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
       toast.error(message);
@@ -328,14 +329,14 @@ export const useCancelJoinRequest = () => {
 };
 
 export const useDeleteGroup = () => {
-  const { slug } = useParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: () => groupService.deleteGroup(slug as string),
-    onSuccess: (response) => {
+    mutationFn: ({ slug }: { slug: string }) => groupService.deleteGroup(slug),
+    onSuccess: (response, variables) => {
       toast.success(response.message);
+      const { slug } = variables;
       queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
       queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
       queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
@@ -353,15 +354,21 @@ export const useDeleteGroup = () => {
 };
 
 export const useInviteMembers = () => {
-  const { slug } = useParams();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ targetUserIds }: { targetUserIds: string[] }) =>
-      groupService.inviteMembers(slug as string, targetUserIds),
-    onSuccess: (response) => {
+    mutationFn: ({
+      slug,
+      targetUserIds,
+    }: {
+      slug: string;
+      targetUserIds: string[];
+    }) => groupService.inviteMembers(slug, targetUserIds),
+    onSuccess: (response, variables) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupDetails", variables.slug],
+      });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
@@ -371,15 +378,16 @@ export const useInviteMembers = () => {
 };
 
 export const useRemoveGroupMember = () => {
-  const { slug } = useParams();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId }: { userId: string }) =>
-      groupService.removeMember(slug as string, userId),
-    onSuccess: (response) => {
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.removeMember(slug, userId),
+    onSuccess: (response, variables) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
@@ -389,15 +397,16 @@ export const useRemoveGroupMember = () => {
 };
 
 export const useAssignGroupAdmin = () => {
-  const { slug } = useParams();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId }: { userId: string }) =>
-      groupService.assignAdmin(slug as string, userId),
-    onSuccess: (response) => {
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.assignAdmin(slug, userId),
+    onSuccess: (response, variables) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;
@@ -407,15 +416,16 @@ export const useAssignGroupAdmin = () => {
 };
 
 export const useRevokeGroupAdmin = () => {
-  const { slug } = useParams();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId }: { userId: string }) =>
-      groupService.revokeAdmin(slug as string, userId),
-    onSuccess: (response) => {
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.revokeAdmin(slug, userId),
+    onSuccess: (response, variables) => {
       toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error?.response?.data?.message;

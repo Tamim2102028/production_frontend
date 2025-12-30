@@ -99,7 +99,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
     commentsData?.pages.flatMap((page) => page.data.comments) || [];
 
   const handleLike = () => {
-    likeMutate(post._id);
+    likeMutate({ postId: post._id });
     setShowMenu(false);
   };
 
@@ -131,7 +131,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
   };
 
   const handleToggleBookmark = () => {
-    toggleBookmark(post._id);
+    toggleBookmark({ postId: post._id });
     setShowMenu(false);
   };
 
@@ -145,7 +145,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
     });
 
     if (isConfirmed) {
-      deletePost(post._id);
+      deletePost({ postId: post._id });
     }
   };
 
@@ -204,7 +204,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => toggleReadStatus(post._id)}
+            onClick={() => toggleReadStatus({ postId: post._id })}
             className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
               meta.isRead ? "text-blue-600" : "text-gray-500"
             }`}
@@ -277,7 +277,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
                       {/* pin/unpin button */}
                       <button
                         onClick={() => {
-                          togglePin(post._id);
+                          togglePin({ postId: post._id });
                           setShowMenu(false);
                         }}
                         className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${

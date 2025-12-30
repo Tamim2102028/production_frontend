@@ -30,27 +30,27 @@ const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {
   const handleJoin = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    joinGroup(group._id);
+    joinGroup({ slug: group.slug });
   };
 
   const handleCancel = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    cancelJoin(group._id);
+    cancelJoin({ slug: group.slug });
   };
 
   const handleAccept = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // Accepting an invite is effectively joining the group
-    joinGroup(group._id);
+    joinGroup({ slug: group.slug });
   };
 
   const handleReject = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // Rejecting an invite is effectively leaving the potential relationship
-    leaveGroup(group._id);
+    leaveGroup({ slug: group.slug });
   };
 
   const isLoading = isJoining || isLeaving || isCancelling;

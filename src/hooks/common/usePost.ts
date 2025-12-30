@@ -76,10 +76,11 @@ export const useToggleLikePost = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (postId: string) => postService.togglePostLike(postId),
+    mutationFn: ({ postId }: { postId: string }) =>
+      postService.togglePostLike(postId),
 
     // ১. ক্লিক করার সাথে সাথে রান হবে (Optimistic Update)
-    onMutate: async (postId) => {
+    onMutate: async ({ postId }: { postId: string }) => {
       // ব্যাকগ্রাউন্ড ফেচ আটকানো (Safety)
       await queryClient.cancelQueries({ queryKey: queryKey }); // Dynamic Key
 
@@ -127,13 +128,15 @@ export const useToggleLikePost = ({ queryKey }: UsePostMutationProps) => {
       // স্ন্যাপশট রিটার্ন করা
       return { previousPosts };
     },
-    onError: (error: AxiosError<ApiError>, _variables, context) => {
+    onError: (error: AxiosError<ApiError>, variables, context) => {
       // আগের অবস্থায় ফিরিয়ে নেওয়া (Rollback)
       if (context?.previousPosts) {
         context.previousPosts.forEach(([key, data]) => {
           queryClient.setQueryData(key, data);
         });
       }
+      const { postId } = variables;
+      console.error(`Error toggling like for post ${postId}:`, error);
       const message = error?.response?.data?.message;
       toast.error(message || "Error from useToggleLikePost");
     },
@@ -146,12 +149,12 @@ export const useToggleLikePost = ({ queryKey }: UsePostMutationProps) => {
 
 export const useToggleReadStatus = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (postId: string) => postService.togglePostRead(postId),
+    mutationFn: ({ postId }: { postId: string }) =>
+      postService.togglePostRead(postId),
 
     // Optimistic Update
-    onMutate: async (postId) => {
+    onMutate: async ({ postId }: { postId: string }) => {
       await queryClient.cancelQueries({ queryKey: queryKey });
 
       const previousPosts = queryClient.getQueriesData({
@@ -190,12 +193,14 @@ export const useToggleReadStatus = ({ queryKey }: UsePostMutationProps) => {
       return { previousPosts };
     },
 
-    onError: (error: AxiosError<ApiError>, _variables, context) => {
+    onError: (error: AxiosError<ApiError>, variables, context) => {
       if (context?.previousPosts) {
         context.previousPosts.forEach(([key, data]) => {
           queryClient.setQueryData(key, data);
         });
       }
+      const { postId } = variables;
+      console.error(`Error toggling read status for post ${postId}:`, error);
       const message = error?.response?.data?.message;
       toast.error(message || "Error from useToggleReadStatus");
     },
@@ -204,12 +209,12 @@ export const useToggleReadStatus = ({ queryKey }: UsePostMutationProps) => {
 
 export const useToggleBookmark = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (postId: string) => postService.toggleBookmark(postId),
+    mutationFn: ({ postId }: { postId: string }) =>
+      postService.toggleBookmark(postId),
 
     // Optimistic Update
-    onMutate: async (postId) => {
+    onMutate: async ({ postId }: { postId: string }) => {
       await queryClient.cancelQueries({ queryKey: queryKey });
 
       const previousPosts = queryClient.getQueriesData({
@@ -248,14 +253,14 @@ export const useToggleBookmark = ({ queryKey }: UsePostMutationProps) => {
       return { previousPosts };
     },
 
-    onError: (error: AxiosError<ApiError>, _postId, context) => {
+    onError: (error: AxiosError<ApiError>, variables, context) => {
       if (context?.previousPosts) {
         context.previousPosts.forEach(([key, data]) => {
           queryClient.setQueryData(key, data);
         });
       }
-      const message = error?.response?.data?.message;
-      toast.error(message || "Error from useToggleBookmark");
+      const { postId } = variables;
+      console.error(`Error toggling bookmark for post ${postId}:`, error);
     },
   });
 };
@@ -310,11 +315,12 @@ export const useDeletePost = ({
   invalidateKey,
 }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (postId: string) => postService.deletePost(postId),
+    mutationFn: ({ postId }: { postId: string }) =>
+      postService.deletePost(postId),
 
-    onSuccess: (_data, postId) => {
+    onSuccess: (response, variables) => {
+      const { postId } = variables;
       // 1. Dynamic Posts List থেকে পোস্টটি রিমুভ করা
       queryClient.setQueriesData(
         { queryKey: queryKey },
@@ -341,7 +347,7 @@ export const useDeletePost = ({
         queryClient.invalidateQueries({ queryKey: invalidateKey });
       }
 
-      toast.success(_data?.message || "Post deleted successfully");
+      toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
       console.error("Delete post error:", error);
@@ -352,11 +358,11 @@ export const useDeletePost = ({
 };
 export const useTogglePin = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (postId: string) => postService.togglePin(postId),
+    mutationFn: ({ postId }: { postId: string }) =>
+      postService.togglePin(postId),
 
-    onMutate: async (postId) => {
+    onMutate: async ({ postId }) => {
       await queryClient.cancelQueries({ queryKey: queryKey });
 
       const previousPosts = queryClient.getQueriesData({
@@ -384,9 +390,6 @@ export const useTogglePin = ({ queryKey }: UsePostMutationProps) => {
                       },
                     };
                   }
-                  // If pining a new post, unpin other posts (if we only want one pinned post per profile/group)
-                  // For now, let's allow multiple or trust backend to handle logic.
-                  // In this codebase, usually multiple are allowed unless specific logic exists.
                   return item;
                 }),
               },
@@ -402,12 +405,14 @@ export const useTogglePin = ({ queryKey }: UsePostMutationProps) => {
       toast.success(response.message);
     },
 
-    onError: (error: AxiosError<ApiError>, _variables, context) => {
+    onError: (error: AxiosError<ApiError>, variables, context) => {
       if (context?.previousPosts) {
         context.previousPosts.forEach(([key, data]) => {
           queryClient.setQueryData(key, data);
         });
       }
+      const { postId } = variables;
+      console.error(`Error toggling pin for post ${postId}:`, error);
       const message = error?.response?.data?.message;
       toast.error(message || "Error from useTogglePin");
     },

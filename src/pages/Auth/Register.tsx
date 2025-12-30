@@ -80,15 +80,18 @@ const Register = () => {
     formData.append("password", data.password);
     formData.append("userType", data.userType);
 
-    register(formData, {
-      onError: (error: AxiosError<ApiError>) => {
-        const message =
-          error.response?.data?.message ||
-          "Registration failed. Please try again.";
-        setServerError(message);
-        toast.error(message);
-      },
-    });
+    register(
+      { formData },
+      {
+        onError: (error: AxiosError<ApiError>) => {
+          const message =
+            error.response?.data?.message ||
+            "Registration failed. Please try again.";
+          setServerError(message);
+          toast.error(message);
+        },
+      }
+    );
   };
 
   return (

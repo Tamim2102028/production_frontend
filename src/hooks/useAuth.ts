@@ -47,7 +47,8 @@ export const useRegister = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (formData: FormData) => authService.register(formData),
+    mutationFn: ({ formData }: { formData: FormData }) =>
+      authService.register(formData),
     onSuccess: (response) => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
       toast.success(response.message);
@@ -65,7 +66,7 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (credentials: LoginCredentials) =>
+    mutationFn: ({ credentials }: { credentials: LoginCredentials }) =>
       authService.login(credentials),
     onSuccess: (response) => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
@@ -73,7 +74,9 @@ export const useLogin = () => {
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error?.response?.data?.message ?? "Login failed");
+      toast.error(
+        error?.response?.data?.message ?? "Login failed, please try again"
+      );
     },
   });
 };

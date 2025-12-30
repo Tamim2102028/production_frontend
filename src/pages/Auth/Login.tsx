@@ -63,7 +63,7 @@ const Login = () => {
     }
 
     login(
-      { email: data.email, password: data.password },
+      { credentials: { email: data.email, password: data.password } },
       {
         onError: (error: AxiosError<ApiError>) => {
           const message = error.response?.data?.message;
