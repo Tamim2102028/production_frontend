@@ -19,8 +19,8 @@ import {
   POST_TYPES,
   POST_TARGET_MODELS,
 } from "../../constants/post";
-import { useUser } from "../hooks/common/useAuth";
-import { useCreateGroupPost } from "../hooks/common/useGroup";
+import { useUser } from "../../hooks/useAuth";
+import { useCreateGroupPost } from "../../hooks/useGroup";
 
 const createProfilePostSchema = z.object({
   content: z

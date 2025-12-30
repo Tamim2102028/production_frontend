@@ -3,7 +3,7 @@ import ProfilePostCard from "./ProfilePostCard";
 import PostSkeleton from "../shared/skeletons/PostSkeleton";
 import type { ProfilePostsProps, ApiError } from "../../types";
 import type { AxiosError } from "axios";
-import { useProfilePosts } from "../hooks/common/useProfile";
+import { useProfilePosts } from "../../hooks/useProfile";
 
 const ProfilePosts: React.FC<ProfilePostsProps> = ({
   username,

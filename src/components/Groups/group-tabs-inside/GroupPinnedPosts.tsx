@@ -1,5 +1,5 @@
 import GroupPostCard from "./../GroupPostCard";
-import { useGroupPinnedPosts } from "../hooks/common/useGroup";
+import { useGroupPinnedPosts } from "./hooks/useGroup";
 import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 
 const GroupPinnedPosts = () => {

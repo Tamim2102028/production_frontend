@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { friendService } from "../../services/friendship.service";
+import { friendService } from "../services/friendship.service";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../../types";
+import type { ApiError } from "../types";
 
 // ====================================
 // Friendship Actions Hooks

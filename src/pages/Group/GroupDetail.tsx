@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import GroupMediaTab from "../../components/Groups/group-tabs-inside/GroupMediaTab";
 import GroupAboutTab from "../../components/Groups/group-tabs-inside/GroupAboutTab";
-import { useGroupDetails } from "../hooks/common/useGroup";
+import { useGroupDetails } from "./hooks/useGroup";
 import GroupAccessDenied from "../../components/Groups/utils/GroupAccessDenied";
 import GroupHeader from "../../components/Groups/GroupHeader";
 import GroupNavBar from "../../components/Groups/GroupNavBar";

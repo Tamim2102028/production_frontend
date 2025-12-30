@@ -17,7 +17,7 @@ import {
   FaHeart,
 } from "react-icons/fa";
 
-import { useUpdateGeneral } from "../hooks/common/useProfile";
+import { useUpdateGeneral } from "../../hooks/useProfile";
 import { GENDERS, RELIGIONS } from "../../constants";
 import type { User } from "../../types";
 

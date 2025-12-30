@@ -26,7 +26,7 @@ import {
   useUnfriendUser,
   useBlockUser,
   useUnblockUser,
-} from "../hooks/common/useFriendship";
+} from "../../hooks/useFriendship";
 import { useToggleFollow } from "../hooks/common/useFollow";
 import {
   FOLLOW_TARGET_MODELS,

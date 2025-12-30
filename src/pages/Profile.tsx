@@ -8,8 +8,8 @@ import {
   CreateProfilePost,
   ProfileNotFound,
 } from "../components/Profile";
-import { useUser } from "../hooks/common/useAuth";
-import { useProfileHeader } from "../hooks/common/useProfile";
+import { useUser } from "../hooks/useAuth";
+import { useProfileHeader } from "../hooks/useProfile";
 import ProfileHeaderSkeleton from "../components/shared/skeletons/ProfileHeaderSkeleton";
 
 const Profile: React.FC = () => {

@@ -25,7 +25,7 @@ import CommentSkeleton from "../shared/skeletons/CommentSkeleton";
 import PostContent from "../shared/PostContent";
 import { DEFAULT_AVATAR_SM, DEFAULT_AVATAR_MD } from "../../constants/images";
 import type { Attachment, Post, PostMeta } from "../../types";
-import { useUser } from "../hooks/common/useAuth";
+import { useUser } from "../../hooks/useAuth";
 import {
   useToggleLikeGroupPost,
   useDeleteGroupPost,
@@ -38,7 +38,7 @@ import {
   useDeleteGroupComment,
   useUpdateGroupComment,
   useToggleLikeGroupComment,
-} from "../hooks/common/useGroup";
+} from "../../hooks/useGroup";
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
 

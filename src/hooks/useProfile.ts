@@ -5,14 +5,13 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AUTH_KEYS } from "./useAuth";
-import { profileService } from "../../services/profile.service";
+import { profileService } from "../services/profile.service";
 import type {
   UpdateGeneralData,
   UpdateAcademicData,
   ApiError,
   ProfilePostsResponse,
-} from "../../types";
+} from "../types";
 import type { AxiosError } from "axios";
 import {
   useCreatePost,
@@ -22,7 +21,7 @@ import {
   useToggleReadStatus,
   useUpdatePost,
   useTogglePin,
-} from "./usePost";
+} from "./common/usePost";
 
 import {
   usePostComments,
@@ -30,9 +29,10 @@ import {
   useDeleteComment,
   useUpdateComment,
   useToggleLikeComment,
-} from "./useComment";
-import { useToggleFollow } from "./useFollow";
+} from "./common/useComment";
+import { useToggleFollow } from "./common/useFollow";
 import { useParams } from "react-router-dom";
+import { AUTH_KEYS } from "./useAuth";
 
 // Import Generic Utils
 

@@ -3,12 +3,12 @@ import {
   useQueryClient,
   type InfiniteData,
 } from "@tanstack/react-query";
-import { postService } from "../../../services/common/post.service";
+import { postService } from "../../services/common/post.service";
 import type {
   ApiError,
   CreatePostRequest,
   ProfilePostsResponse,
-} from "../../../types";
+} from "../../types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 // ইন্টারফেস ডিফাইন করা হলো

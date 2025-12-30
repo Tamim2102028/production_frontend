@@ -4,11 +4,11 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { groupService } from "../../services/group.service";
+import { groupService } from "../services/group.service";
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../../types";
+import type { ApiError } from "../types";
 import {
   useCreatePost,
   useDeletePost,
@@ -17,14 +17,15 @@ import {
   useToggleReadStatus,
   useUpdatePost,
   useTogglePin,
-} from "./usePost";
+} from "./common/usePost";
+
 import {
   usePostComments,
   useAddComment,
   useDeleteComment,
   useUpdateComment,
   useToggleLikeComment,
-} from "./useComment";
+} from "./common/useComment";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();

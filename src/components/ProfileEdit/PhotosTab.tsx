@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { FaCamera, FaImage, FaSpinner, FaTrash } from "react-icons/fa";
-import { useUpdateAvatar, useUpdateCoverImage } from "../hooks/common/useProfile";
+import { useUpdateAvatar, useUpdateCoverImage } from "../../hooks/useProfile";
 import { DEFAULT_AVATAR_LG, DEFAULT_COVER } from "../../constants/images";
 
 interface PhotosTabProps {

@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import Sidebar from "./layout/Sidebar";
 import SidebarRight from "./layout/SidebarRight";
 import MainContent from "./layout/MainContent";
-import { useUser, AUTH_KEYS } from "./hooks/common/useAuth";
+import { useUser, AUTH_KEYS } from "./hooks/useAuth";
 
 /**
  * ====================================
