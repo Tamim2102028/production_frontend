@@ -76,16 +76,10 @@ export const useToggleLikePost = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      postId,
-      targetModel,
-    }: {
-      postId: string;
-      targetModel?: string;
-    }) => postService.togglePostLike(postId, targetModel),
+    mutationFn: (postId: string) => postService.togglePostLike(postId),
 
     // ১. ক্লিক করার সাথে সাথে রান হবে (Optimistic Update)
-    onMutate: async ({ postId }) => {
+    onMutate: async (postId) => {
       // ব্যাকগ্রাউন্ড ফেচ আটকানো (Safety)
       await queryClient.cancelQueries({ queryKey: queryKey }); // Dynamic Key
 
@@ -154,16 +148,10 @@ export const useToggleReadStatus = ({ queryKey }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      postId,
-      targetModel,
-    }: {
-      postId: string;
-      targetModel?: string;
-    }) => postService.toggleReadStatus(postId, targetModel),
+    mutationFn: (postId: string) => postService.togglePostRead(postId),
 
     // Optimistic Update
-    onMutate: async ({ postId }) => {
+    onMutate: async (postId) => {
       await queryClient.cancelQueries({ queryKey: queryKey });
 
       const previousPosts = queryClient.getQueriesData({
@@ -279,14 +267,13 @@ export const useUpdatePost = ({ queryKey }: UsePostMutationProps) => {
     mutationFn: async ({
       postId,
       data,
-      targetModel,
     }: {
       postId: string;
       data: { content: string; tags?: string[]; visibility?: string };
-      targetModel?: string;
     }) => {
-      return postService.updatePost(postId, data, targetModel);
+      return postService.updatePost(postId, data);
     },
+
     onSuccess: (data) => {
       // Optimistic update
       queryClient.setQueriesData(
@@ -325,15 +312,9 @@ export const useDeletePost = ({
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      postId,
-      targetModel,
-    }: {
-      postId: string;
-      targetModel?: string;
-    }) => postService.deletePost(postId, targetModel),
+    mutationFn: (postId: string) => postService.deletePost(postId),
 
-    onSuccess: (_data, { postId }) => {
+    onSuccess: (_data, postId) => {
       // 1. Dynamic Posts List থেকে পোস্টটি রিমুভ করা
       queryClient.setQueriesData(
         { queryKey: queryKey },
@@ -366,6 +347,69 @@ export const useDeletePost = ({
       console.error("Delete post error:", error);
       const message = error?.response?.data?.message;
       toast.error(message || "Error from useDeletePost");
+    },
+  });
+};
+export const useTogglePin = ({ queryKey }: UsePostMutationProps) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) => postService.togglePin(postId),
+
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: queryKey });
+
+      const previousPosts = queryClient.getQueriesData({
+        queryKey: queryKey,
+      });
+
+      queryClient.setQueriesData(
+        { queryKey: queryKey },
+        (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              data: {
+                ...page.data,
+                posts: page.data.posts.map((item) => {
+                  if (item.post._id === postId) {
+                    return {
+                      ...item,
+                      post: {
+                        ...item.post,
+                        isPinned: !item.post.isPinned,
+                      },
+                    };
+                  }
+                  // If pining a new post, unpin other posts (if we only want one pinned post per profile/group)
+                  // For now, let's allow multiple or trust backend to handle logic.
+                  // In this codebase, usually multiple are allowed unless specific logic exists.
+                  return item;
+                }),
+              },
+            })),
+          };
+        }
+      );
+
+      return { previousPosts };
+    },
+
+    onSuccess: (response) => {
+      toast.success(response.message);
+    },
+
+    onError: (error: AxiosError<ApiError>, _variables, context) => {
+      if (context?.previousPosts) {
+        context.previousPosts.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
+        });
+      }
+      const message = error?.response?.data?.message;
+      toast.error(message || "Error from useTogglePin");
     },
   });
 };

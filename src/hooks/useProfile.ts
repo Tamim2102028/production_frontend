@@ -21,7 +21,9 @@ import {
   useToggleLikePost,
   useToggleReadStatus,
   useUpdatePost,
+  useTogglePin,
 } from "./utils/usePost";
+
 import {
   usePostComments,
   useAddComment,
@@ -199,6 +201,14 @@ export const useToggleBookmarkProfilePost = () => {
   });
 };
 
+export const useTogglePinProfilePost = () => {
+  const { username } = useParams();
+  return useTogglePin({
+    queryKey: ["profilePosts", username],
+    invalidateKey: ["profileHeader", username],
+  });
+};
+
 export const useToggleFollowProfile = () => {
   const { username } = useParams();
   return useToggleFollow({
@@ -209,72 +219,60 @@ export const useToggleFollowProfile = () => {
 // Comment Hooks
 export const useProfilePostComments = ({
   postId,
-  postOnModel,
   enabled,
 }: {
   postId: string;
-  postOnModel: string;
+  postOnModel?: string; // Keep for signature compatibility if needed
   enabled?: boolean;
 }) => {
   return usePostComments({
     postId,
-    targetModel: postOnModel,
     enabled,
   });
 };
 
 export const useAddProfileComment = ({
   postId,
-  postOnModel,
 }: {
   postId: string;
-  postOnModel: string;
+  postOnModel?: string;
 }) => {
-  const { username } = useParams();
   return useAddComment({
     postId,
-    targetModel: postOnModel,
-    invalidateKey: ["profilePosts", username],
+    invalidateKey: ["profilePosts"],
   });
 };
 
 export const useDeleteProfileComment = ({
   postId,
-  postOnModel,
 }: {
   postId: string;
-  postOnModel: string;
+  postOnModel?: string;
 }) => {
-  const { username } = useParams();
   return useDeleteComment({
     postId,
-    targetModel: postOnModel,
-    invalidateKey: ["profilePosts", username],
+    invalidateKey: ["profilePosts"],
   });
 };
 
 export const useUpdateProfileComment = ({
   postId,
-  postOnModel,
 }: {
   postId: string;
-  postOnModel: string;
+  postOnModel?: string;
 }) => {
   return useUpdateComment({
     postId,
-    targetModel: postOnModel,
   });
 };
 
 export const useToggleLikeProfileComment = ({
   postId,
-  postOnModel,
 }: {
   postId: string;
-  postOnModel: string;
+  postOnModel?: string;
 }) => {
   return useToggleLikeComment({
     postId,
-    targetModel: postOnModel,
   });
 };

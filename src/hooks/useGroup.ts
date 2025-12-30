@@ -5,8 +5,6 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { groupService } from "../services/group.service";
-import { postService } from "../services/utils/post.service";
-import { POST_TARGET_MODELS } from "../constants";
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
 import type { AxiosError } from "axios";
@@ -18,6 +16,7 @@ import {
   useToggleLikePost,
   useToggleReadStatus,
   useUpdatePost,
+  useTogglePin,
 } from "./utils/usePost";
 import {
   usePostComments,
@@ -241,27 +240,15 @@ export const useToggleBookmarkGroupPost = () => {
   });
 };
 
-// [KEPT ORIGINAL] Generic hook does not have pin functionality yet
+// [REFACTORED] Using Generic Hook
 export const useTogglePinGroupPost = () => {
   const { slug } = useParams();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (postId: string) =>
-      postService.togglePin(postId, POST_TARGET_MODELS.GROUP),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["groupPosts", slug] });
-      queryClient.invalidateQueries({
-        queryKey: ["groupPinnedPosts", slug],
-      });
-
-      queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
+  return useTogglePin({
+    queryKey: ["groupPosts", slug],
+    invalidateKey: [
+      ["groupPinnedPosts", slug],
+      ["groupDetails", slug],
+    ],
   });
 };
 
@@ -449,7 +436,6 @@ export const useGroupPostComments = ({
 }) => {
   return usePostComments({
     postId,
-    targetModel: POST_TARGET_MODELS.GROUP,
     enabled,
   });
 };
@@ -458,7 +444,6 @@ export const useAddGroupComment = ({ postId }: { postId: string }) => {
   const { slug } = useParams();
   return useAddComment({
     postId,
-    targetModel: POST_TARGET_MODELS.GROUP,
     invalidateKey: ["groupPosts", slug],
   });
 };
@@ -467,7 +452,6 @@ export const useDeleteGroupComment = ({ postId }: { postId: string }) => {
   const { slug } = useParams();
   return useDeleteComment({
     postId,
-    targetModel: POST_TARGET_MODELS.GROUP,
     invalidateKey: ["groupPosts", slug],
   });
 };
@@ -475,13 +459,11 @@ export const useDeleteGroupComment = ({ postId }: { postId: string }) => {
 export const useUpdateGroupComment = ({ postId }: { postId: string }) => {
   return useUpdateComment({
     postId,
-    targetModel: POST_TARGET_MODELS.GROUP,
   });
 };
 
 export const useToggleLikeGroupComment = ({ postId }: { postId: string }) => {
   return useToggleLikeComment({
     postId,
-    targetModel: POST_TARGET_MODELS.GROUP,
   });
 };

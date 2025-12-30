@@ -15,17 +15,15 @@ interface CommentHookProps {
 
 export const usePostComments = ({
   postId,
-  targetModel,
   enabled = true,
 }: {
   postId: string;
-  targetModel: string;
   enabled?: boolean;
 }) => {
   return useInfiniteQuery({
-    queryKey: ["comments", postId, targetModel],
+    queryKey: ["comments", postId],
     queryFn: ({ pageParam = 1 }) =>
-      commentService.getPostComments(postId, targetModel, Number(pageParam)),
+      commentService.getPostComments(postId, Number(pageParam)),
     getNextPageParam: (lastPage) => {
       if (lastPage.data.pagination.hasNextPage) {
         return lastPage.data.pagination.page + 1;
@@ -33,26 +31,24 @@ export const usePostComments = ({
       return undefined;
     },
     initialPageParam: 1,
-    enabled: !!postId && !!targetModel && enabled,
+    enabled: !!postId && enabled,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 };
 
 export const useAddComment = ({
   postId,
-  targetModel,
   onSuccess,
   invalidateKey,
 }: {
   postId: string;
-  targetModel: string;
   onSuccess?: () => void;
 } & CommentHookProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ content }: { content: string }) =>
-      commentService.addComment(postId, content, targetModel),
+      commentService.addComment(postId, content),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
 
@@ -66,9 +62,6 @@ export const useAddComment = ({
             queryKey: invalidateKey as (string | undefined)[],
           });
         }
-      } else {
-        // Fallback or explicit check can be added if needed
-        // queryClient.invalidateQueries({ queryKey: ["profilePosts"] });
       }
 
       // Invalidate group/dept/institution posts if needed
@@ -86,19 +79,16 @@ export const useAddComment = ({
 
 export const useDeleteComment = ({
   postId,
-  targetModel,
   onSuccess,
   invalidateKey,
 }: {
   postId: string;
-  targetModel: string;
   onSuccess?: () => void;
 } & CommentHookProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (commentId: string) =>
-      commentService.deleteComment(commentId, targetModel),
+    mutationFn: (commentId: string) => commentService.deleteComment(commentId),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
 
@@ -129,11 +119,9 @@ export const useDeleteComment = ({
 
 export const useUpdateComment = ({
   postId,
-  targetModel,
   invalidateKey,
 }: {
   postId: string;
-  targetModel: string;
 } & CommentHookProps) => {
   const queryClient = useQueryClient();
 
@@ -144,7 +132,7 @@ export const useUpdateComment = ({
     }: {
       commentId: string;
       content: string;
-    }) => commentService.updateComment(commentId, content, targetModel),
+    }) => commentService.updateComment(commentId, content),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
 
@@ -171,17 +159,15 @@ export const useUpdateComment = ({
 
 export const useToggleLikeComment = ({
   postId,
-  targetModel,
   invalidateKey,
 }: {
   postId: string;
-  targetModel: string;
 } & CommentHookProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (commentId: string) =>
-      commentService.toggleLikeComment(commentId, targetModel),
+      commentService.toggleLikeComment(commentId),
 
     onMutate: async (commentId) => {
       // Cancel queries

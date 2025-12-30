@@ -99,7 +99,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
     commentsData?.pages.flatMap((page) => page.data.comments) || [];
 
   const handleLike = () => {
-    likeMutate({ postId: post._id, targetModel: post.postOnModel });
+    likeMutate(post._id);
     setShowMenu(false);
   };
 
@@ -145,7 +145,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
     });
 
     if (isConfirmed) {
-      deletePost({ postId: post._id, targetModel: post.postOnModel });
+      deletePost(post._id);
     }
   };
 
@@ -166,7 +166,8 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
     visibility: string;
   }) => {
     updatePost(
-      { postId: post._id, data, targetModel: post.postOnModel },
+      { postId: post._id, data },
+
       {
         onSuccess: () => {
           setIsEditing(false);
@@ -203,12 +204,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={() =>
-              toggleReadStatus({
-                postId: post._id,
-                targetModel: post.postOnModel,
-              })
-            }
+            onClick={() => toggleReadStatus(post._id)}
             className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
               meta.isRead ? "text-blue-600" : "text-gray-500"
             }`}

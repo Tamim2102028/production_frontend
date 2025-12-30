@@ -34,6 +34,7 @@ import {
   useToggleBookmarkProfilePost,
   useToggleLikeProfilePost,
   useToggleReadStatusProfilePost,
+  useTogglePinProfilePost,
   useUpdateProfilePost,
   useProfilePostComments,
   useAddProfileComment,
@@ -67,6 +68,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const { mutate: updatePost, isPending: isUpdating } = useUpdateProfilePost();
   const { mutate: toggleReadStatus } = useToggleReadStatusProfilePost();
   const { mutate: toggleBookmark } = useToggleBookmarkProfilePost();
+  const { mutate: togglePin } = useTogglePinProfilePost();
 
   // Comment hooks
   const {
@@ -103,7 +105,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     commentsData?.pages.flatMap((page) => page.data.comments) || [];
 
   const handleLike = () => {
-    likeMutate({ postId: post._id, targetModel: post.postOnModel });
+    likeMutate(post._id);
     setShowMenu(false);
   };
 
@@ -149,7 +151,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     });
 
     if (isConfirmed) {
-      deletePost({ postId: post._id, targetModel: post.postOnModel });
+      deletePost(post._id);
     }
   };
 
@@ -170,7 +172,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     visibility: string;
   }) => {
     updatePost(
-      { postId: post._id, data, targetModel: post.postOnModel },
+      { postId: post._id, data },
+
       {
         onSuccess: () => {
           setIsEditing(false);
@@ -207,12 +210,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={() =>
-              toggleReadStatus({
-                postId: post._id,
-                targetModel: post.postOnModel,
-              })
-            }
+            onClick={() => toggleReadStatus(post._id)}
             className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
               meta.isRead ? "text-blue-600" : "text-gray-500"
             }`}
@@ -275,6 +273,23 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
                         <FaEdit className="h-4 w-4 flex-shrink-0" />
                         <span className="font-medium">Edit post</span>
                       </button>
+
+                      {/* pin/unpin button */}
+                      <button
+                        onClick={() => {
+                          togglePin(post._id);
+                          setShowMenu(false);
+                        }}
+                        className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                          post.isPinned ? "text-yellow-600" : "text-gray-700"
+                        }`}
+                      >
+                        <FaFlag className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">
+                          {post.isPinned ? "Unpin post" : "Pin post"}
+                        </span>
+                      </button>
+
                       {/* delete button */}
                       <button
                         onClick={handleDelete}
