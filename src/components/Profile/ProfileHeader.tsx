@@ -250,63 +250,73 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
   };
 
   return (
-    <div className="relative rounded-lg border border-gray-300 bg-white p-5 shadow-sm">
-      {/* 3-Dot Menu */}
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 focus:outline-none"
-        >
-          <FaEllipsisV className="h-5 w-5" />
-        </button>
+    <div className="relative overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm">
+      {/* Cover Image */}
+      <div className="relative h-48 w-full bg-gradient-to-r from-blue-500 to-purple-600 md:h-64">
+        <img
+          src={userData.coverImage}
+          alt="Cover"
+          className="h-full w-full object-cover"
+        />
 
-        {showMenu && (
-          <>
-            {/* Backdrop to close menu */}
-            <div
-              className="fixed inset-0 z-10"
-              onClick={() => setShowMenu(false)}
-            ></div>
+        {/* 3-Dot Menu - positioned over cover */}
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="rounded-full bg-white/90 p-2 text-gray-700 shadow-md backdrop-blur-sm transition-all hover:bg-white focus:outline-none"
+          >
+            <FaEllipsisV className="h-5 w-5" />
+          </button>
 
-            {/* Dropdown content */}
-            <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
-              <div className="py-1">
-                <button
-                  onClick={handleCopyLink}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                >
-                  <FaLink className="h-4 w-4 flex-shrink-0 text-gray-400" />
-                  <span className="font-medium">Copy profile link</span>
-                </button>
-                {!isOwnProfile &&
-                  !meta.isBlockedByMe &&
-                  !meta.isBlockedByTarget && (
-                    <button
-                      onClick={handleBlock}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
-                    >
-                      <FaBan className="h-4 w-4 flex-shrink-0" />
-                      <span className="font-medium">Block user</span>
-                    </button>
-                  )}
+          {showMenu && (
+            <>
+              {/* Backdrop to close menu */}
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setShowMenu(false)}
+              ></div>
+
+              {/* Dropdown content */}
+              <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
+                <div className="py-1">
+                  <button
+                    onClick={handleCopyLink}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                  >
+                    <FaLink className="h-4 w-4 flex-shrink-0 text-gray-400" />
+                    <span className="font-medium">Copy profile link</span>
+                  </button>
+                  {!isOwnProfile &&
+                    !meta.isBlockedByMe &&
+                    !meta.isBlockedByTarget && (
+                      <button
+                        onClick={handleBlock}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
+                      >
+                        <FaBan className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">Block user</span>
+                      </button>
+                    )}
+                </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-start space-x-5">
-        {/* Avatar */}
-        <div className="flex-shrink-0">
+      {/* Profile Content */}
+      <div className="relative px-5 pb-5">
+        {/* Avatar - overlaying the cover */}
+        <div className="relative -mt-16 mb-4 md:-mt-20">
           <img
             src={userData.avatar}
             alt={userData.fullName}
-            className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg"
+            className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-xl md:h-40 md:w-40"
           />
         </div>
 
         {/* Profile Info */}
-        <div className="flex-1">
+        <div>
           <div>
             <h1 className="mb-1 text-3xl leading-tight font-bold text-gray-900">
               {userData.fullName}
