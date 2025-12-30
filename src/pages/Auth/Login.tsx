@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { useLogin } from "./hooks/useAuth";
 import type { AxiosError } from "axios";
+import { useLogin } from "../../hooks/useAuth";
 import type { ApiError } from "../../types";
 
 // ✅ Zod Schema for Login
@@ -66,10 +66,9 @@ const Login = () => {
       { email: data.email, password: data.password },
       {
         onError: (error: AxiosError<ApiError>) => {
-          const message =
-            error.response?.data?.message || "Invalid email or password";
-          setServerError(message);
-          toast.error(message);
+          const message = error.response?.data?.message;
+          setServerError(message || "Error from server");
+          toast.error(message || "Error from server");
         },
       }
     );

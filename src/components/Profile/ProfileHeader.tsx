@@ -27,7 +27,6 @@ import {
   useBlockUser,
   useUnblockUser,
 } from "../../hooks/useFriendship";
-import { useToggleFollow } from "../hooks/common/useFollow";
 import {
   FOLLOW_TARGET_MODELS,
   PROFILE_RELATION_STATUS,
@@ -40,6 +39,7 @@ import type {
   ProfileHeaderData,
 } from "../../types";
 import { toast } from "sonner";
+import { useToggleFollow } from "../../hooks/common/useFollow";
 
 const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
   const { user: userData, meta } = data;

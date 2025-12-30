@@ -17,7 +17,7 @@ import {
   useRejectFriendRequest,
   useSendFriendRequest,
   useUnfriendUser,
-} from "./hooks/useFriendship";
+} from "../../../hooks/useFriendship";
 
 interface FriendCardProps {
   friend: FriendUser;
