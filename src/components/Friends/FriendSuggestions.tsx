@@ -49,10 +49,11 @@ const FriendSuggestions: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-3">
-          {suggestions.map((suggestion) => (
+          {suggestions.map((item) => (
             <FriendCard
-              key={suggestion._id}
-              friend={suggestion}
+              key={item.user._id}
+              friend={item.user}
+              meta={item.meta}
               type="suggestion"
             />
           ))}

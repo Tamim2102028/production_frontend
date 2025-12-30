@@ -114,7 +114,7 @@ const GroupMembersTab: React.FC<GroupMembersTabProps> = ({
                   ? PROFILE_RELATION_STATUS.REQUEST_SENT
                   : meta.hasPendingRequest
                     ? PROFILE_RELATION_STATUS.REQUEST_RECEIVED
-                    : PROFILE_RELATION_STATUS.NOT_FRIENDS,
+                    : null,
             };
 
             // Determine card type for buttons

@@ -49,7 +49,7 @@ export interface UnblockData {
 // ====================================
 
 export interface FriendshipListData {
-  users: FriendUser[];
+  users: FriendshipMappedUser[];
   pagination: Pagination;
 }
 
@@ -59,14 +59,24 @@ export interface FriendUser {
   fullName: string;
   avatar: string;
   institution: {
-    _id?: string;
+    _id: string;
     name: string;
   } | null;
   userType: string;
   department: {
-    _id?: string;
+    _id: string;
     name: string;
   } | null;
-  friendshipStatus: (typeof PROFILE_RELATION_STATUS)[keyof typeof PROFILE_RELATION_STATUS];
-  friendshipId?: string;
+}
+
+export interface FriendshipMeta {
+  friendshipStatus:
+    | (typeof PROFILE_RELATION_STATUS)[keyof typeof PROFILE_RELATION_STATUS]
+    | null;
+  friendshipId: string | null;
+}
+
+export interface FriendshipMappedUser {
+  user: FriendUser;
+  meta: FriendshipMeta;
 }

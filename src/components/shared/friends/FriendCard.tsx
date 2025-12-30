@@ -10,7 +10,7 @@ import {
 } from "./FriendActions";
 import { BsThreeDots } from "react-icons/bs";
 import confirm from "../../../utils/sweetAlert";
-import type { FriendUser } from "../../../types";
+import type { FriendUser, FriendshipMeta } from "../../../types";
 import {
   useAcceptFriendRequest,
   useCancelFriendRequest,
@@ -21,22 +21,16 @@ import {
 
 interface FriendCardProps {
   friend: FriendUser;
+  meta?: FriendshipMeta;
   type: "friend" | "request" | "suggestion" | "sent";
-  isOwner?: boolean;
-  isAdmin?: boolean;
   canShowMenu?: boolean;
-  handleMemberMenu?: (
-    userId: string,
-    userName?: string,
-    isAdmin?: boolean
-  ) => void;
+  handleMemberMenu?: (userId: string, userName?: string) => void;
 }
 
 const FriendCard: React.FC<FriendCardProps> = ({
   friend,
+  meta,
   type,
-  isOwner,
-  isAdmin,
   canShowMenu,
   handleMemberMenu,
 }) => {
@@ -88,19 +82,8 @@ const FriendCard: React.FC<FriendCardProps> = ({
     }
   };
 
-  let roleLabel = "";
-  if (isOwner && isAdmin) {
-    roleLabel = " • Owner • Admin";
-  } else if (isOwner) {
-    roleLabel = " • Owner";
-  } else if (isAdmin) {
-    roleLabel = " • Admin";
-  }
-
   // Handle Institution Name safely
-  const institutionName = friend.institution
-    ? friend.institution.name + roleLabel
-    : "No Institution" + roleLabel;
+  const institutionName = friend.institution?.name || "No Institution";
 
   const renderActions = () => {
     if (type === "friend") {
@@ -135,7 +118,11 @@ const FriendCard: React.FC<FriendCardProps> = ({
   };
 
   return (
-    <div className="flex items-center space-x-3 rounded-lg border border-gray-300 bg-white p-2 shadow-sm">
+    <div
+      className="flex items-center space-x-3 rounded-lg border border-gray-300 bg-white p-2 shadow-sm"
+      data-friendship-id={meta?.friendshipId || ""}
+      data-status={meta?.friendshipStatus || ""}
+    >
       <NavLink to={`/profile/${friend.userName}`}>
         <img
           src={friend.avatar}
@@ -158,9 +145,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
         {renderActions()}
         {canShowMenu && (
           <button
-            onClick={() =>
-              handleMemberMenu?.(friend._id, friend.fullName, isAdmin)
-            }
+            onClick={() => handleMemberMenu?.(friend._id, friend.fullName)}
             className="p-1 text-gray-500 hover:text-gray-800"
             aria-label="Member menu"
           >

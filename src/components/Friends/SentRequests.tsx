@@ -49,8 +49,13 @@ const SentRequests: React.FC = () => {
             </p>
           </div>
         ) : (
-          requests.map((request) => (
-            <FriendCard key={request._id} friend={request} type="sent" />
+          requests.map((item) => (
+            <FriendCard
+              key={item.user._id}
+              friend={item.user}
+              meta={item.meta}
+              type="sent"
+            />
           ))
         )}
       </div>

@@ -60,8 +60,8 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
   const { mutate: toggleFollow } = useToggleFollowProfile();
 
   // Calculate friendshipStatus from meta
-  const friendshipStatus: FriendshipStatus =
-    meta.profile_relation_status || PROFILE_RELATION_STATUS.NOT_FRIENDS;
+  const friendshipStatus: FriendshipStatus | null =
+    meta.profile_relation_status || null;
 
   const isFollowing = meta.isFollowing || false;
 
@@ -177,8 +177,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
         </span>
       );
     }
-
-    if (friendshipStatus === PROFILE_RELATION_STATUS.SELF || isOwnProfile) {
+    if (isOwnProfile) {
       return (
         <>
           {/* edit and details buttons */}
@@ -230,8 +229,8 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
           </>
         )}
 
-        {/* NOT_FRIENDS - Add Friend */}
-        {friendshipStatus === PROFILE_RELATION_STATUS.NOT_FRIENDS && (
+        {/* No Relation - Add Friend */}
+        {!friendshipStatus && (
           <AddFriendButton onClick={() => handleAddFriend(userData._id)} />
         )}
 
@@ -306,18 +305,6 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
                       <span className="font-medium">Block user</span>
                     </button>
                   )}
-                {meta.isBlockedByMe && (
-                  <button
-                    onClick={() => {
-                      setShowMenu(false);
-                      handleUnblock();
-                    }}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                  >
-                    <FaBan className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Unblock user</span>
-                  </button>
-                )}
               </div>
             </div>
           </>

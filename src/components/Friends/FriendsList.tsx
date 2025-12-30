@@ -49,8 +49,13 @@ const FriendsList: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-3">
-          {friends.map((friend) => (
-            <FriendCard key={friend._id} friend={friend} type="friend" />
+          {friends.map((item) => (
+            <FriendCard
+              key={item.user._id}
+              friend={item.user}
+              meta={item.meta}
+              type="friend"
+            />
           ))}
         </div>
       )}
