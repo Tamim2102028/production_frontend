@@ -21,7 +21,6 @@ import {
 } from "../../constants/post";
 import { useUser } from "../../hooks/useAuth";
 import { useCreateGroupPost } from "../../hooks/useGroup";
-import { useParams } from "react-router-dom";
 
 const createProfilePostSchema = z.object({
   content: z
@@ -34,10 +33,9 @@ const createProfilePostSchema = z.object({
 
 type CreateProfilePostFormData = z.infer<typeof createProfilePostSchema>;
 
-const CreateGroupPost: React.FC = () => {
+const CreateGroupPost: React.FC<{ groupId: string }> = ({ groupId }) => {
   // Modified: groupId removed from destructuring
   const { user } = useUser();
-  const { slug } = useParams(); // Added: slug extracted from useParams
   const { mutate: createGroupPost, isPending } = useCreateGroupPost();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -71,8 +69,8 @@ const CreateGroupPost: React.FC = () => {
 
     createGroupPost(
       {
-        ...data, // Spreads content, tags, visibility
-        postOnId: slug as string,
+        ...data,
+        postOnId: groupId,
         postOnModel: POST_TARGET_MODELS.GROUP,
         type: POST_TYPES.GENERAL,
         attachments: [],

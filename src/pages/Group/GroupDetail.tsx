@@ -48,7 +48,7 @@ const GroupDetail: React.FC = () => {
                 index
                 element={
                   <>
-                    {meta.isMember && <CreateGroupPost />}
+                    {meta.isMember && <CreateGroupPost groupId={group._id} />}
                     <GroupPosts />
                   </>
                 }

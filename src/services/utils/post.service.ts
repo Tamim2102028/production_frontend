@@ -5,28 +5,7 @@ import type { CreatePostRequest } from "../../types";
 export const postService = {
   // Create Post
   createPost: async (reqData: CreatePostRequest) => {
-    let url = "/profile/post"; // Default to User Profile
-    const { postOnModel, postOnId } = reqData;
-
-    switch (postOnModel) {
-      case POST_TARGET_MODELS.USER:
-        url = "/profile/post";
-        break;
-      case POST_TARGET_MODELS.GROUP:
-        url = `/groups/${postOnId}/post`;
-        break;
-      case POST_TARGET_MODELS.DEPARTMENT:
-        url = `/depts/${postOnId}/post`;
-        break;
-      case POST_TARGET_MODELS.INSTITUTION:
-        url = `/institutions/${postOnId}/post`;
-        break;
-      case POST_TARGET_MODELS.CR_CORNER:
-        url = `/cr-corner/post`;
-        break;
-    }
-
-    const response = await api.post(url, reqData);
+    const response = await api.post("/posts", reqData);
     return response.data;
   },
 

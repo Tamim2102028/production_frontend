@@ -369,14 +369,8 @@ export const useInviteMembers = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      slug: targetSlug,
-      targetUserIds,
-    }: {
-      slug?: string;
-      targetUserIds: string | string[];
-    }) =>
-      groupService.inviteMembers(targetSlug || (slug as string), targetUserIds),
+    mutationFn: ({ targetUserIds }: { targetUserIds: string[] }) =>
+      groupService.inviteMembers(slug as string, targetUserIds),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
@@ -393,13 +387,8 @@ export const useRemoveGroupMember = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      slug: targetSlug,
-      userId,
-    }: {
-      slug?: string;
-      userId: string;
-    }) => groupService.removeMember(targetSlug || (slug as string), userId),
+    mutationFn: ({ userId }: { userId: string }) =>
+      groupService.removeMember(slug as string, userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
@@ -416,13 +405,8 @@ export const useAssignGroupAdmin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      slug: targetSlug,
-      userId,
-    }: {
-      slug?: string;
-      userId: string;
-    }) => groupService.assignAdmin(targetSlug || (slug as string), userId),
+    mutationFn: ({ userId }: { userId: string }) =>
+      groupService.assignAdmin(slug as string, userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
@@ -439,13 +423,8 @@ export const useRevokeGroupAdmin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      slug: targetSlug,
-      userId,
-    }: {
-      slug?: string;
-      userId: string;
-    }) => groupService.revokeAdmin(targetSlug || (slug as string), userId),
+    mutationFn: ({ userId }: { userId: string }) =>
+      groupService.revokeAdmin(slug as string, userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
