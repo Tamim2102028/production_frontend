@@ -223,6 +223,7 @@ export const useUpdateGroupPost = () => {
   const { slug } = useParams();
   return useUpdatePost({
     queryKey: ["groupPosts", slug],
+    invalidateKey: ["groupPinnedPosts", slug],
   });
 };
 
@@ -231,6 +232,7 @@ export const useToggleReadStatusGroupPost = () => {
   const { slug } = useParams();
   return useToggleReadStatus({
     queryKey: ["groupPosts", slug],
+    invalidateKey: ["groupPinnedPosts", slug],
   });
 };
 

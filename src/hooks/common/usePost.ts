@@ -72,7 +72,10 @@ export const useCreatePost = ({
   });
 };
 
-export const useToggleLikePost = ({ queryKey }: UsePostMutationProps) => {
+export const useToggleLikePost = ({
+  queryKey,
+  invalidateKey,
+}: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -128,6 +131,7 @@ export const useToggleLikePost = ({ queryKey }: UsePostMutationProps) => {
       // স্ন্যাপশট রিটার্ন করা
       return { previousPosts };
     },
+
     onError: (error: AxiosError<ApiError>, variables, context) => {
       // আগের অবস্থায় ফিরিয়ে নেওয়া (Rollback)
       if (context?.previousPosts) {
@@ -141,13 +145,17 @@ export const useToggleLikePost = ({ queryKey }: UsePostMutationProps) => {
       toast.error(message || "Error from useToggleLikePost");
     },
     onSettled: () => {
-      // ডেটা সিঙ্ক ঠিক রাখার জন্য একবার রিফ্রেশ করা (Optional if needed)
-      // queryClient.invalidateQueries({ queryKey });
+      if (invalidateKey) {
+        queryClient.invalidateQueries({ queryKey: invalidateKey });
+      }
     },
   });
 };
 
-export const useToggleReadStatus = ({ queryKey }: UsePostMutationProps) => {
+export const useToggleReadStatus = ({
+  queryKey,
+  invalidateKey,
+}: UsePostMutationProps) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ postId }: { postId: string }) =>
@@ -203,6 +211,12 @@ export const useToggleReadStatus = ({ queryKey }: UsePostMutationProps) => {
       console.error(`Error toggling read status for post ${postId}:`, error);
       const message = error?.response?.data?.message;
       toast.error(message || "Error from useToggleReadStatus");
+    },
+
+    onSettled: () => {
+      if (invalidateKey) {
+        queryClient.invalidateQueries({ queryKey: invalidateKey });
+      }
     },
   });
 };
@@ -265,7 +279,10 @@ export const useToggleBookmark = ({ queryKey }: UsePostMutationProps) => {
   });
 };
 
-export const useUpdatePost = ({ queryKey }: UsePostMutationProps) => {
+export const useUpdatePost = ({
+  queryKey,
+  invalidateKey,
+}: UsePostMutationProps) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -300,6 +317,12 @@ export const useUpdatePost = ({ queryKey }: UsePostMutationProps) => {
           };
         }
       );
+
+      // Invalidate additional queries if specified (e.g., pinned posts)
+      if (invalidateKey) {
+        queryClient.invalidateQueries({ queryKey: invalidateKey });
+      }
+
       toast.success(data.message || data.data?.message);
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -358,6 +381,7 @@ export const useDeletePost = ({
     },
   });
 };
+
 export const useTogglePin = ({
   queryKey,
   invalidateKey,
