@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { FaCamera, FaImage, FaSpinner, FaTrash } from "react-icons/fa";
+import { FaCamera, FaImage, FaSpinner } from "react-icons/fa";
 import { useUpdateAvatar, useUpdateCoverImage } from "../../hooks/useProfile";
 import { DEFAULT_AVATAR_LG, DEFAULT_COVER } from "../../constants/images";
 
@@ -107,7 +107,7 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ avatar, coverImage }) => {
               />
             </div>
             {avatarPreview && (
-              <div className="absolute -top-2 -right-2 rounded-full bg-green-500 px-2 py-1 text-xs text-white">
+              <div className="absolute -top-2 -right-2 rounded-full bg-green-500 px-2 py-1 text-xs font-medium text-white">
                 New
               </div>
             )}
@@ -141,7 +141,7 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ avatar, coverImage }) => {
                   type="button"
                   onClick={handleAvatarUpload}
                   disabled={isAvatarPending}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 disabled:bg-blue-400"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 disabled:bg-blue-400"
                 >
                   {isAvatarPending ? (
                     <>
@@ -156,14 +156,14 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ avatar, coverImage }) => {
                   type="button"
                   onClick={cancelAvatarPreview}
                   disabled={isAvatarPending}
-                  className="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-100"
+                  className="rounded-lg border border-red-100 bg-red-50 px-4 py-2 text-red-600 shadow-sm transition-all hover:bg-red-500 hover:text-white hover:shadow-md active:scale-95 disabled:opacity-50"
                 >
-                  <FaTrash />
+                  Remove
                 </button>
               </div>
             )}
 
-            <p className="text-sm text-gray-500">
+            <p className="text-center text-sm font-medium text-gray-500">
               Recommended: Square image, at least 400×400px
             </p>
           </div>
@@ -188,7 +188,7 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ avatar, coverImage }) => {
               />
             </div>
             {coverPreview && (
-              <div className="absolute top-2 right-2 rounded-full bg-green-500 px-3 py-1 text-sm text-white">
+              <div className="absolute top-2 right-2 rounded-full bg-green-500 px-3 py-1 text-sm font-medium text-white">
                 New Preview
               </div>
             )}
@@ -204,24 +204,28 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ avatar, coverImage }) => {
           />
 
           {!coverPreview ? (
-            <button
-              type="button"
-              onClick={() => coverInputRef.current?.click()}
-              className="rounded-lg border-2 border-dashed border-gray-300 px-6 py-4 text-gray-600 transition-colors hover:border-purple-400 hover:bg-purple-50"
-            >
-              <FaImage className="mx-auto mb-2 text-2xl text-gray-400" />
-              <span className="block font-medium">Choose Cover Image</span>
-              <span className="text-sm text-gray-500">
+            <>
+              <button
+                type="button"
+                onClick={() => coverInputRef.current?.click()}
+                className="rounded-lg border-2 border-dashed border-gray-300 px-6 py-4 text-gray-600 transition-colors hover:border-purple-400 hover:bg-purple-50"
+              >
+                <FaImage className="mx-auto mb-2 text-2xl text-gray-400" />
+                <span className="block text-center font-medium text-black">
+                  Choose Cover Image
+                </span>
+              </button>
+              <span className="text-center text-sm font-medium text-gray-500">
                 Recommended: 1500×500px for best display
               </span>
-            </button>
+            </>
           ) : (
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={handleCoverUpload}
                 disabled={isCoverPending}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700 disabled:bg-purple-400"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white transition-all hover:bg-purple-700 hover:shadow-lg hover:shadow-purple-500/30 active:scale-95 disabled:bg-purple-400"
               >
                 {isCoverPending ? (
                   <>
@@ -236,9 +240,9 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ avatar, coverImage }) => {
                 type="button"
                 onClick={cancelCoverPreview}
                 disabled={isCoverPending}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-100"
+                className="rounded-lg border border-red-100 bg-red-50 px-6 py-2 text-sm font-medium text-red-600 shadow-sm transition-all hover:bg-red-500 hover:text-white hover:shadow-md active:scale-95 disabled:opacity-50"
               >
-                <FaTrash />
+                Remove
               </button>
             </div>
           )}
