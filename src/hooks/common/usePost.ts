@@ -322,25 +322,27 @@ export const useDeletePost = ({
     onSuccess: (response, variables) => {
       const { postId } = variables;
       // 1. Dynamic Posts List থেকে পোস্টটি রিমুভ করা
-      queryClient.setQueriesData(
-        { queryKey: queryKey },
-        (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
-          if (!oldData) return oldData;
+      if (queryKey) {
+        queryClient.setQueriesData(
+          { queryKey: queryKey },
+          (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
+            if (!oldData) return oldData;
 
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              data: {
-                ...page.data,
-                posts: page.data.posts.filter(
-                  (item) => item.post._id !== postId
-                ),
-              },
-            })),
-          };
-        }
-      );
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) => ({
+                ...page,
+                data: {
+                  ...page.data,
+                  posts: page.data.posts.filter(
+                    (item) => item.post._id !== postId
+                  ),
+                },
+              })),
+            };
+          }
+        );
+      }
 
       // 2. Dynamic Header Invalidate করা (যদি Key থাকে)
       if (invalidateKey) {
@@ -356,7 +358,10 @@ export const useDeletePost = ({
     },
   });
 };
-export const useTogglePin = ({ queryKey }: UsePostMutationProps) => {
+export const useTogglePin = ({
+  queryKey,
+  invalidateKey,
+}: UsePostMutationProps) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ postId }: { postId: string }) =>
@@ -402,6 +407,16 @@ export const useTogglePin = ({ queryKey }: UsePostMutationProps) => {
     },
 
     onSuccess: (response) => {
+      // Invalidate related queries (e.g., pinnedPosts, groupDetails)
+      if (invalidateKey) {
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({ queryKey: invalidateKey });
+        }
+      }
       toast.success(response.message);
     },
 
