@@ -121,14 +121,12 @@ export interface User {
   skills?: string[];
   interests?: string[];
 
-  // Stats
-  stats?: {
-    postsCount: number;
-    friendsCount: number;
-    followersCount: number;
-    followingCount: number;
-    publicFilesCount: number;
-  };
+  // Stats (from backend model)
+  postsCount: number;
+  connectionsCount: number;
+  followersCount: number;
+  followingCount: number;
+  publicFilesCount: number;
 
   // Friendship
   profile_relation_status?: string;

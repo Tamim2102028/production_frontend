@@ -340,36 +340,34 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
             <div className="mt-4 grid grid-cols-4 divide-x divide-gray-200 rounded-lg border border-gray-200 bg-white py-2 shadow-sm">
               <div className="text-center">
                 <p className="text-lg font-bold text-gray-900">
-                  {meta.stats?.postsCount || 0}
+                  {userData.postsCount || 0}
                 </p>
                 <p className="text-xs font-medium text-gray-500">
-                  {meta.stats?.postsCount === 1 ? "Post" : "Posts"}
+                  {userData.postsCount === 1 ? "Post" : "Posts"}
                 </p>
               </div>
               <div className="text-center">
                 <p className="text-lg font-bold text-gray-900">
-                  {meta.stats?.friendsCount || 0}
+                  {userData.connectionsCount || 0}
                 </p>
                 <p className="text-xs font-medium text-gray-500">
-                  {meta.stats?.friendsCount === 1 ? "Friend" : "Friends"}
+                  {userData.connectionsCount === 1 ? "Friend" : "Friends"}
                 </p>
               </div>
               <div className="text-center">
                 <p className="text-lg font-bold text-gray-900">
-                  {meta.stats?.followersCount || 0}
+                  {userData.followersCount || 0}
                 </p>
                 <p className="text-xs font-medium text-gray-500">
-                  {meta.stats?.followersCount === 1 ? "Follower" : "Followers"}
+                  {userData.followersCount === 1 ? "Follower" : "Followers"}
                 </p>
               </div>
               <div className="text-center">
                 <p className="text-lg font-bold text-gray-900">
-                  {meta.stats?.followingCount || 0}
+                  {userData.followingCount || 0}
                 </p>
                 <p className="text-xs font-medium text-gray-500">
-                  {meta.stats?.followingCount === 1
-                    ? "Following"
-                    : "Followings"}
+                  {userData.followingCount === 1 ? "Following" : "Followings"}
                 </p>
               </div>
             </div>

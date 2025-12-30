@@ -16,8 +16,8 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   isOwnProfile,
   data,
 }) => {
-  const postsCount = data.meta.stats?.postsCount || 0;
-  const publicFilesCount = data.meta.stats?.publicFilesCount || 0;
+  const postsCount = data.user.postsCount || 0;
+  const publicFilesCount = data.user.publicFilesCount || 0;
 
   return (
     <div className="rounded-t-lg border-b border-gray-200 bg-white">

@@ -10,13 +10,6 @@ export interface ProfileMeta {
   isBlockedByMe: boolean;
   isBlockedByTarget: boolean;
   isOwnProfile: boolean;
-  stats: {
-    postsCount: number;
-    friendsCount: number;
-    followersCount: number;
-    followingCount: number;
-    publicFilesCount: number;
-  };
 }
 
 export interface ProfileHeaderData {
