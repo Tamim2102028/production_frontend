@@ -10,9 +10,9 @@ import {
   FaRegBookmark,
   FaEdit,
   FaTrash,
-  FaFlag,
   FaLink,
   FaCheckDouble,
+  FaThumbtack,
 } from "react-icons/fa";
 import {
   formatPostDate,
@@ -255,7 +255,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
                     <span className="font-medium">Copy link</span>
                   </button>
 
-                  {isOwnPost ? (
+                  {isOwnPost && (
                     <>
                       {/* edit button */}
                       <button
@@ -279,7 +279,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
                           post.isPinned ? "text-yellow-600" : "text-gray-700"
                         }`}
                       >
-                        <FaFlag className="h-4 w-4 flex-shrink-0" />
+                        <FaThumbtack className="h-4 w-4 flex-shrink-0" />
                         <span className="font-medium">
                           {post.isPinned ? "Unpin post" : "Pin post"}
                         </span>
@@ -295,13 +295,6 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
                         <span className="font-medium">
                           {isDeleting ? "Deleting..." : "Delete post"}
                         </span>
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50">
-                        <FaFlag className="h-4 w-4 flex-shrink-0" />
-                        <span className="font-medium">Report post</span>
                       </button>
                     </>
                   )}

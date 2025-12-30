@@ -10,9 +10,9 @@ import {
   FaRegBookmark,
   FaEdit,
   FaTrash,
-  FaFlag,
   FaLink,
   FaCheckDouble,
+  FaThumbtack,
 } from "react-icons/fa";
 import {
   formatPostDate,
@@ -284,7 +284,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
                           post.isPinned ? "text-yellow-600" : "text-gray-700"
                         }`}
                       >
-                        <FaFlag className="h-4 w-4 flex-shrink-0" />
+                        <FaThumbtack className="h-4 w-4 flex-shrink-0" />
                         <span className="font-medium">
                           {post.isPinned ? "Unpin post" : "Pin post"}
                         </span>
