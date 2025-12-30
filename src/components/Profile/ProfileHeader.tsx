@@ -302,6 +302,44 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
             </>
           )}
         </div>
+
+        {/* Profile Stats - positioned on right side of cover */}
+        <div className="absolute right-4 bottom-4 hidden md:block">
+          <div className="grid grid-cols-4 divide-x divide-gray-200 rounded-lg border border-gray-200 bg-white/95 py-2 shadow-lg backdrop-blur-sm">
+            <div className="px-4 text-center">
+              <p className="text-lg font-bold text-gray-900">
+                {userData.postsCount || 0}
+              </p>
+              <p className="text-xs font-medium text-gray-500">
+                {userData.postsCount === 1 ? "Post" : "Posts"}
+              </p>
+            </div>
+            <div className="px-4 text-center">
+              <p className="text-lg font-bold text-gray-900">
+                {userData.connectionsCount || 0}
+              </p>
+              <p className="text-xs font-medium text-gray-500">
+                {userData.connectionsCount === 1 ? "Friend" : "Friends"}
+              </p>
+            </div>
+            <div className="px-4 text-center">
+              <p className="text-lg font-bold text-gray-900">
+                {userData.followersCount || 0}
+              </p>
+              <p className="text-xs font-medium text-gray-500">
+                {userData.followersCount === 1 ? "Follower" : "Followers"}
+              </p>
+            </div>
+            <div className="px-4 text-center">
+              <p className="text-lg font-bold text-gray-900">
+                {userData.followingCount || 0}
+              </p>
+              <p className="text-xs font-medium text-gray-500">
+                {userData.followingCount === 1 ? "Following" : "Followings"}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Profile Content */}
@@ -346,8 +384,8 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
                   : "No bio added yet")}
             </p>
 
-            {/* Profile Stats */}
-            <div className="mt-4 grid grid-cols-4 divide-x divide-gray-200 rounded-lg border border-gray-200 bg-white py-2 shadow-sm">
+            {/* Profile Stats - Mobile Only */}
+            <div className="mt-4 grid grid-cols-4 divide-x divide-gray-200 rounded-lg border border-gray-200 bg-white py-2 shadow-sm md:hidden">
               <div className="text-center">
                 <p className="text-lg font-bold text-gray-900">
                   {userData.postsCount || 0}
