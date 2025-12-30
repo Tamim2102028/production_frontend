@@ -3,7 +3,7 @@ import {
   useQueryClient,
   type InfiniteData,
 } from "@tanstack/react-query";
-import { postService } from "../../services/utils/post.service";
+import { postService } from "../../services/common/post.service";
 import type {
   ApiError,
   CreatePostRequest,
