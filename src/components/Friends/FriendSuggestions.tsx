@@ -5,13 +5,22 @@ import FriendCardSkeleton from "../shared/skeletons/FriendCardSkeleton";
 import { useFriendSuggestions } from "../../hooks/useFriendship";
 import { toast } from "sonner";
 
+import { FRIENDS_LIMIT } from "../../constants/pagination";
+
 const FriendSuggestions: React.FC = () => {
-  const { data, isLoading, error } = useFriendSuggestions();
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useFriendSuggestions(FRIENDS_LIMIT);
 
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[...Array(5)].map((_, i) => (
+        {[...Array(FRIENDS_LIMIT)].map((_, i) => (
           <FriendCardSkeleton key={i} />
         ))}
       </div>
@@ -28,12 +37,13 @@ const FriendSuggestions: React.FC = () => {
     );
   }
 
-  const suggestions = data?.users || [];
+  const suggestions = data?.pages.flatMap((page) => page.users) || [];
+  const totalDocs = data?.pages[0]?.pagination?.totalDocs || 0;
 
   return (
     <div>
       <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        Suggestions ({data?.pagination?.totalDocs || 0})
+        Suggestions ({totalDocs})
       </h2>
       {suggestions.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-12 text-center">
@@ -57,6 +67,18 @@ const FriendSuggestions: React.FC = () => {
               type="suggestion"
             />
           ))}
+
+          {hasNextPage && (
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="rounded-full bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md disabled:bg-blue-300"
+              >
+                {isFetchingNextPage ? "Loading more..." : "Load More"}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

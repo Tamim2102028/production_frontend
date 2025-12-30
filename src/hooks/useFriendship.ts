@@ -1,4 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { friendService } from "../services/friendship.service";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
@@ -152,45 +156,68 @@ export const useUnblockUser = () => {
 // ====================================
 
 // 8. Get Friends List Hook
-export const useFriendsList = () => {
-  return useQuery({
-    queryKey: ["friends"],
-    queryFn: async () => {
-      const response = await friendService.getFriendsList();
+export const useFriendsList = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["friends", limit],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await friendService.getFriendsList(pageParam, limit);
       return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
     },
   });
 };
 
 // 9. Get Received Requests Hook
-export const useReceivedRequests = () => {
-  return useQuery({
-    queryKey: ["friendRequests"],
-    queryFn: async () => {
-      const response = await friendService.getReceivedRequests();
+export const useReceivedRequests = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["friendRequests", limit],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await friendService.getReceivedRequests(
+        pageParam,
+        limit
+      );
       return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
     },
   });
 };
 
 // 10. Get Sent Requests Hook
-export const useSentRequests = () => {
-  return useQuery({
-    queryKey: ["sentRequests"],
-    queryFn: async () => {
-      const response = await friendService.getSentRequests();
+export const useSentRequests = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["sentRequests", limit],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await friendService.getSentRequests(pageParam, limit);
       return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
     },
   });
 };
 
 // 11. Get Suggestions Hook
-export const useFriendSuggestions = () => {
-  return useQuery({
-    queryKey: ["friendSuggestions"],
-    queryFn: async () => {
-      const response = await friendService.getSuggestions();
+export const useFriendSuggestions = (limit = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["friendSuggestions", limit],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await friendService.getSuggestions(pageParam, limit);
       return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
     },
   });
 };

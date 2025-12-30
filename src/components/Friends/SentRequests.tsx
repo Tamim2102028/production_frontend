@@ -5,13 +5,22 @@ import FriendCardSkeleton from "../shared/skeletons/FriendCardSkeleton";
 import { useSentRequests } from "../../hooks/useFriendship";
 import { toast } from "sonner";
 
+import { FRIENDS_LIMIT } from "../../constants/pagination";
+
 const SentRequests: React.FC = () => {
-  const { data, isLoading, error } = useSentRequests();
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useSentRequests(FRIENDS_LIMIT);
 
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[...Array(5)].map((_, i) => (
+        {[...Array(FRIENDS_LIMIT)].map((_, i) => (
           <FriendCardSkeleton key={i} />
         ))}
       </div>
@@ -28,12 +37,13 @@ const SentRequests: React.FC = () => {
     );
   }
 
-  const requests = data?.users || [];
+  const requests = data?.pages.flatMap((page) => page.users) || [];
+  const totalDocs = data?.pages[0]?.pagination?.totalDocs || 0;
 
   return (
     <div>
       <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        Sent Requests ({data?.pagination?.totalDocs || 0})
+        Sent Requests ({totalDocs})
       </h2>
       <div className="space-y-3">
         {requests.length === 0 ? (
@@ -49,14 +59,28 @@ const SentRequests: React.FC = () => {
             </p>
           </div>
         ) : (
-          requests.map((item) => (
-            <FriendCard
-              key={item.user._id}
-              friend={item.user}
-              meta={item.meta}
-              type="sent"
-            />
-          ))
+          <>
+            {requests.map((item) => (
+              <FriendCard
+                key={item.user._id}
+                friend={item.user}
+                meta={item.meta}
+                type="sent"
+              />
+            ))}
+
+            {hasNextPage && (
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  className="rounded-full bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md disabled:bg-blue-300"
+                >
+                  {isFetchingNextPage ? "Loading more..." : "Load More"}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

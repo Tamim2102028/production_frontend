@@ -77,26 +77,46 @@ export const friendService = {
   // ====================================
 
   // 8. Get Friends List
-  getFriendsList: async (): Promise<ApiResponse<FriendshipListData>> => {
-    const response = await api.get("/friendships/list");
+  getFriendsList: async (
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<FriendshipListData>> => {
+    const response = await api.get("/friendships/list", {
+      params: { page, limit },
+    });
     return response.data;
   },
 
   // 9. Get Received Requests
-  getReceivedRequests: async (): Promise<ApiResponse<FriendshipListData>> => {
-    const response = await api.get("/friendships/requests/received");
+  getReceivedRequests: async (
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<FriendshipListData>> => {
+    const response = await api.get("/friendships/requests/received", {
+      params: { page, limit },
+    });
     return response.data;
   },
 
   // 10. Get Sent Requests
-  getSentRequests: async (): Promise<ApiResponse<FriendshipListData>> => {
-    const response = await api.get("/friendships/requests/sent");
+  getSentRequests: async (
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<FriendshipListData>> => {
+    const response = await api.get("/friendships/requests/sent", {
+      params: { page, limit },
+    });
     return response.data;
   },
 
   // 11. Get Suggestions
-  getSuggestions: async (): Promise<ApiResponse<FriendshipListData>> => {
-    const response = await api.get("/friendships/suggestions");
+  getSuggestions: async (
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<FriendshipListData>> => {
+    const response = await api.get("/friendships/suggestions", {
+      params: { page, limit },
+    });
     return response.data;
   },
 };
