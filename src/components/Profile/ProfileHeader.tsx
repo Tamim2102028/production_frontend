@@ -383,42 +383,6 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
                   ? "Add a bio to tell people about yourself"
                   : "No bio added yet")}
             </p>
-
-            {/* Profile Stats - Mobile Only */}
-            <div className="mt-4 grid grid-cols-4 divide-x divide-gray-200 rounded-lg border border-gray-200 bg-white py-2 shadow-sm md:hidden">
-              <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">
-                  {userData.postsCount || 0}
-                </p>
-                <p className="text-xs font-medium text-gray-500">
-                  {userData.postsCount === 1 ? "Post" : "Posts"}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">
-                  {userData.connectionsCount || 0}
-                </p>
-                <p className="text-xs font-medium text-gray-500">
-                  {userData.connectionsCount === 1 ? "Friend" : "Friends"}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">
-                  {userData.followersCount || 0}
-                </p>
-                <p className="text-xs font-medium text-gray-500">
-                  {userData.followersCount === 1 ? "Follower" : "Followers"}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">
-                  {userData.followingCount || 0}
-                </p>
-                <p className="text-xs font-medium text-gray-500">
-                  {userData.followingCount === 1 ? "Following" : "Followings"}
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Action Buttons */}
