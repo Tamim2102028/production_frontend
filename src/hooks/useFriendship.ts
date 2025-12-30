@@ -13,7 +13,8 @@ export const useSendFriendRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => friendService.sendRequest(userId),
+    mutationFn: ({ userId }: { userId: string }) =>
+      friendService.sendRequest(userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
@@ -32,7 +33,7 @@ export const useAcceptFriendRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (requesterId: string) =>
+    mutationFn: ({ requesterId }: { requesterId: string }) =>
       friendService.acceptRequest(requesterId),
     onSuccess: (response) => {
       toast.success(response.message);
@@ -52,7 +53,7 @@ export const useRejectFriendRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (requesterId: string) =>
+    mutationFn: ({ requesterId }: { requesterId: string }) =>
       friendService.rejectRequest(requesterId),
     onSuccess: (response) => {
       toast.info(response.message);
@@ -71,7 +72,7 @@ export const useRejectFriendRequest = () => {
 export const useCancelFriendRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (recipientId: string) =>
+    mutationFn: ({ recipientId }: { recipientId: string }) =>
       friendService.cancelRequest(recipientId),
     onSuccess: (response) => {
       toast.info(response.message);
@@ -91,7 +92,8 @@ export const useUnfriendUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (friendId: string) => friendService.unfriend(friendId),
+    mutationFn: ({ friendId }: { friendId: string }) =>
+      friendService.unfriend(friendId),
     onSuccess: (response) => {
       toast.info(response.message);
       queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
@@ -110,7 +112,7 @@ export const useBlockUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => friendService.block(userId),
+    mutationFn: ({ userId }: { userId: string }) => friendService.block(userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
@@ -131,7 +133,8 @@ export const useUnblockUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => friendService.unblock(userId),
+    mutationFn: ({ userId }: { userId: string }) =>
+      friendService.unblock(userId),
     onSuccess: (response) => {
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ["profileHeader"] });

@@ -222,7 +222,6 @@ export const useProfilePostComments = ({
   enabled,
 }: {
   postId: string;
-  postOnModel?: string; // Keep for signature compatibility if needed
   enabled?: boolean;
 }) => {
   return usePostComments({
@@ -231,47 +230,27 @@ export const useProfilePostComments = ({
   });
 };
 
-export const useAddProfileComment = ({
-  postId,
-}: {
-  postId: string;
-  postOnModel?: string;
-}) => {
+export const useAddProfileComment = ({ postId }: { postId: string }) => {
   return useAddComment({
     postId,
     invalidateKey: ["profilePosts"],
   });
 };
 
-export const useDeleteProfileComment = ({
-  postId,
-}: {
-  postId: string;
-  postOnModel?: string;
-}) => {
+export const useDeleteProfileComment = ({ postId }: { postId: string }) => {
   return useDeleteComment({
     postId,
     invalidateKey: ["profilePosts"],
   });
 };
 
-export const useUpdateProfileComment = ({
-  postId,
-}: {
-  postId: string;
-  postOnModel?: string;
-}) => {
+export const useUpdateProfileComment = ({ postId }: { postId: string }) => {
   return useUpdateComment({
     postId,
   });
 };
 
-export const useToggleLikeProfileComment = ({
-  postId,
-}: {
-  postId: string;
-  postOnModel?: string;
-}) => {
+export const useToggleLikeProfileComment = ({ postId }: { postId: string }) => {
   return useToggleLikeComment({
     postId,
   });

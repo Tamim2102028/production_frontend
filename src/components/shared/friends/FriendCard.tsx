@@ -56,22 +56,22 @@ const FriendCard: React.FC<FriendCardProps> = ({
 
   // Handle friend actions
   const handleAccept = (senderId: string) => {
-    acceptRequest(senderId);
+    acceptRequest({ requesterId: senderId });
   };
 
   // Handle decline action
   const handleDecline = (senderId: string) => {
-    rejectRequest(senderId);
+    rejectRequest({ requesterId: senderId });
   };
 
   // Handle add friend action
   const handleAddFriend = (receiverId: string) => {
-    sendRequest(receiverId);
+    sendRequest({ userId: receiverId });
   };
 
   // Handle cancel request action
   const handleCancelRequest = (receiverId: string) => {
-    cancelRequest(receiverId);
+    cancelRequest({ recipientId: receiverId });
   };
 
   // Handle unfriend action
@@ -84,7 +84,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
     });
 
     if (ok) {
-      unfriend(friendId);
+      unfriend({ friendId });
     }
   };
 

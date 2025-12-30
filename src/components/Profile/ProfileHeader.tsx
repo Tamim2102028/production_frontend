@@ -39,7 +39,7 @@ import type {
   ProfileHeaderData,
 } from "../../types";
 import { toast } from "sonner";
-import { useToggleFollow } from "../../hooks/common/useFollow";
+import { useToggleFollowProfile } from "../../hooks/useProfile";
 
 const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
   const { user: userData, meta } = data;
@@ -57,7 +57,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
   const unblockUser = useUnblockUser();
 
   // Hook for follow actions
-  const { mutate: toggleFollow } = useToggleFollow();
+  const { mutate: toggleFollow } = useToggleFollowProfile();
 
   // Calculate friendshipStatus from meta
   const friendshipStatus: FriendshipStatus =
@@ -83,19 +83,19 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
 
   // Handle friend actions
   const handleAccept = (senderId: string) => {
-    acceptFriendRequest.mutate(senderId);
+    acceptFriendRequest.mutate({ requesterId: senderId });
   };
 
   const handleDecline = (senderId: string) => {
-    rejectFriendRequest.mutate(senderId);
+    rejectFriendRequest.mutate({ requesterId: senderId });
   };
 
   const handleAddFriend = (receiverId: string) => {
-    sendFriendRequest.mutate(receiverId);
+    sendFriendRequest.mutate({ userId: receiverId });
   };
 
   const handleCancelRequest = (receiverId: string) => {
-    cancelFriendRequest.mutate(receiverId);
+    cancelFriendRequest.mutate({ recipientId: receiverId });
   };
 
   const handleUnfriend = async (friendId: string) => {
@@ -107,7 +107,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
     });
 
     if (ok) {
-      unfriendUser.mutate(friendId);
+      unfriendUser.mutate({ friendId });
     }
   };
 
@@ -132,7 +132,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
     });
 
     if (ok) {
-      blockUser.mutate(userData._id);
+      blockUser.mutate({ userId: userData._id });
       setShowMenu(false);
     }
   };
@@ -146,7 +146,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
     });
 
     if (ok) {
-      unblockUser.mutate(userData._id);
+      unblockUser.mutate({ userId: userData._id });
     }
   };
 
