@@ -386,7 +386,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4">{renderActionButtons()}</div>
+          <div className="pt-3">{renderActionButtons()}</div>
         </div>
       </div>
     </div>
