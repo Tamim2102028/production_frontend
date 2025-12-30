@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import UseTicketCard from "../../components/Gaming/Achievements/UseTicketCard";
 import PartnerRestaurants from "../../components/Gaming/Achievements/PartnerRestaurants";
 import TicketsTabs from "../../components/Gaming/Achievements/TicketsTabs";
@@ -43,7 +43,7 @@ const Achievements: React.FC = () => {
     <div className="space-y-5">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900">
-          🏆 Tournament Rewards
+          ?? Tournament Rewards
         </h2>
         <p className="mt-2 text-gray-600">
           Use your winning tickets at partner restaurants

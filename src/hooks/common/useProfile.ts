@@ -6,13 +6,13 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AUTH_KEYS } from "./useAuth";
-import { profileService } from "../services/profile.service";
+import { profileService } from "../../services/profile.service";
 import type {
   UpdateGeneralData,
   UpdateAcademicData,
   ApiError,
   ProfilePostsResponse,
-} from "../types";
+} from "../../types";
 import type { AxiosError } from "axios";
 import {
   useCreatePost,
@@ -22,7 +22,7 @@ import {
   useToggleReadStatus,
   useUpdatePost,
   useTogglePin,
-} from "./utils/usePost";
+} from "./usePost";
 
 import {
   usePostComments,
@@ -30,8 +30,8 @@ import {
   useDeleteComment,
   useUpdateComment,
   useToggleLikeComment,
-} from "./utils/useComment";
-import { useToggleFollow } from "./utils/useFollow";
+} from "./useComment";
+import { useToggleFollow } from "./useFollow";
 import { useParams } from "react-router-dom";
 
 // Import Generic Utils

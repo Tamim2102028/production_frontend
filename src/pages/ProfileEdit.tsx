@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaCamera, FaUser, FaGraduationCap, FaArrowLeft } from "react-icons/fa";
 
 import PageLoader from "./Fallbacks/PageLoader";
-import { useUser } from "../hooks/useAuth";
+import { useUser } from "../hooks/common/useAuth";
 import { PhotosTab, GeneralTab, AcademicTab } from "../components/ProfileEdit";
 
 // ====================================

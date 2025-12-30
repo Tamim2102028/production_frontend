@@ -9,7 +9,7 @@ import {
   useJoinGroup,
   useLeaveGroup,
   useCancelJoinRequest,
-} from "../../../hooks/useGroup";
+} from "../hooks/common/useGroup";
 import type { GroupCardResponse } from "../../../types";
 
 const GroupCard: React.FC<GroupCardResponse> = ({ group, meta }) => {

@@ -18,7 +18,7 @@ import {
   useJoinGroup,
   useLeaveGroup,
   useDeleteGroup,
-} from "../../hooks/useGroup";
+} from "../hooks/common/useGroup";
 
 interface GroupHeaderProps {
   group: Group;

@@ -2,7 +2,7 @@ import { FaEnvelope } from "react-icons/fa";
 import GroupCard from "../utils/GroupCard";
 import GroupEmptyState from "../utils/GroupEmptyState";
 import GroupErrorState from "../utils/GroupErrorState";
-import { useInvitedGroups } from "../../../hooks/useGroup";
+import { useInvitedGroups } from "../hooks/common/useGroup";
 
 const InvitedGroup = () => {
   const {

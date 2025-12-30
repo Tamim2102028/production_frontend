@@ -2,7 +2,7 @@ import { FaUsers } from "react-icons/fa";
 import GroupCard from "../utils/GroupCard";
 import GroupEmptyState from "../utils/GroupEmptyState";
 import GroupErrorState from "../utils/GroupErrorState";
-import { useMyGroups } from "../../../hooks/useGroup";
+import { useMyGroups } from "../hooks/common/useGroup";
 
 const MyGroups = () => {
   const {

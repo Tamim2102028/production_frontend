@@ -13,7 +13,7 @@ import {
   FaUniversity,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useCreateGroup } from "../../hooks/useGroup";
+import { useCreateGroup } from "../hooks/common/useGroup";
 
 // Zod Schema
 const createGroupSchema = z.object({

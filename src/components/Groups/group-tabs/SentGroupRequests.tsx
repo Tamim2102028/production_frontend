@@ -2,7 +2,7 @@ import { FaPaperPlane } from "react-icons/fa";
 import GroupCard from "../utils/GroupCard";
 import GroupEmptyState from "../utils/GroupEmptyState";
 import GroupErrorState from "../utils/GroupErrorState";
-import { useSentGroupRequests } from "../../../hooks/useGroup";
+import { useSentGroupRequests } from "../hooks/common/useGroup";
 import { GROUP_LIMIT } from "../../../constants";
 
 const SentGroupRequests = () => {

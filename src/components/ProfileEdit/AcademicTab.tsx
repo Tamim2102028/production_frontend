@@ -17,7 +17,7 @@ import {
   FaBuilding,
 } from "react-icons/fa";
 
-import { useUpdateAcademic } from "../../hooks/useProfile";
+import { useUpdateAcademic } from "../hooks/common/useProfile";
 import { USER_TYPES, TEACHER_RANKS } from "../../constants";
 import type { User, Institution, Department } from "../../types";
 

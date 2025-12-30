@@ -18,7 +18,7 @@ import {
 } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { prefetchRoute } from "../routes/prefetch";
-import { useLogout, useUser } from "../hooks/useAuth";
+import { useLogout, useUser } from "../hooks/common/useAuth";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();

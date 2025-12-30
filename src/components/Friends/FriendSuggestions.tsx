@@ -2,7 +2,7 @@ import React from "react";
 import { FaMagic } from "react-icons/fa";
 import FriendCard from "../shared/friends/FriendCard";
 import FriendCardSkeleton from "../shared/skeletons/FriendCardSkeleton";
-import { useFriendSuggestions } from "../../hooks/useFriendship";
+import { useFriendSuggestions } from "../hooks/common/useFriendship";
 import { toast } from "sonner";
 
 const FriendSuggestions: React.FC = () => {

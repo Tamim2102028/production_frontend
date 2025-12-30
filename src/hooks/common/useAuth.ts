@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import authService from "../services/auth.service";
-import type { LoginCredentials, AuthState, ApiError } from "../types";
+import authService from "../../services/auth.service";
+import type { LoginCredentials, AuthState, ApiError } from "../../types";
 import type { AxiosError } from "axios";
 
 // Query Keys

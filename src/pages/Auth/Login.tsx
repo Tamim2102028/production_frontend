@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { useLogin } from "../../hooks/useAuth";
+import { useLogin } from "../hooks/common/useAuth";
 import type { AxiosError } from "axios";
 import type { ApiError } from "../../types";
 

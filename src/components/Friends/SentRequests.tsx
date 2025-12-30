@@ -2,7 +2,7 @@ import React from "react";
 import { FaPaperPlane } from "react-icons/fa";
 import FriendCard from "../shared/friends/FriendCard";
 import FriendCardSkeleton from "../shared/skeletons/FriendCardSkeleton";
-import { useSentRequests } from "../../hooks/useFriendship";
+import { useSentRequests } from "../hooks/common/useFriendship";
 import { toast } from "sonner";
 
 const SentRequests: React.FC = () => {

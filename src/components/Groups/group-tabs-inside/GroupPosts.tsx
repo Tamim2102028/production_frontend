@@ -1,6 +1,6 @@
 import React from "react";
 import GroupPostCard from "./../GroupPostCard";
-import { useGroupPosts } from "../../../hooks/useGroup";
+import { useGroupPosts } from "../hooks/common/useGroup";
 import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 import type { ApiError } from "../../../types";
 import type { AxiosError } from "axios";

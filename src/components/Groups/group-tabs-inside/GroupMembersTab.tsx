@@ -1,5 +1,5 @@
 import React from "react";
-import { useGroupMembers } from "../../../hooks/useGroup";
+import { useGroupMembers } from "../hooks/common/useGroup";
 import FriendCard from "../../shared/friends/FriendCard";
 import FriendCardSkeleton from "../../shared/skeletons/FriendCardSkeleton";
 import { showActionMenu } from "../../../utils/customModals";
