@@ -97,6 +97,25 @@ export interface PrivacySettings {
 }
 
 // ====================================
+// ACTIVITY RESTRICTIONS
+// ====================================
+
+export interface RestrictionDetail {
+  reason?: string;
+  restrictedAt?: string;
+  restrictedBy?: string;
+}
+
+export interface UserRestrictions {
+  isCommentBlocked: boolean;
+  isPostBlocked: boolean;
+  isMessageBlocked: boolean;
+  commentRestriction?: RestrictionDetail;
+  postRestriction?: RestrictionDetail;
+  messageRestriction?: RestrictionDetail;
+}
+
+// ====================================
 // USER MODEL
 // ====================================
 
@@ -143,6 +162,7 @@ export interface User {
   // Status & Settings
   accountStatus: AccountStatus;
   privacySettings?: PrivacySettings;
+  restrictions?: UserRestrictions;
   isStudentEmail: boolean;
 
   // Timestamps

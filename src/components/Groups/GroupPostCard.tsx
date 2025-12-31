@@ -502,41 +502,52 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
 
           {/* Create Comment Input */}
           <div className="border-t border-gray-100 p-4">
-            <div className="flex items-center space-x-3">
-              <img
-                src={currentUser?.avatar || DEFAULT_AVATAR_SM}
-                alt="Your avatar"
-                className="h-8 w-8 rounded-full bg-gray-300 object-cover"
-              />
-              <textarea
-                ref={textareaRef}
-                value={commentText}
-                onChange={(e) => {
-                  setCommentText(e.target.value);
-                  // Auto-resize
-                  e.target.style.height = "auto";
-                  e.target.style.height = e.target.scrollHeight + "px";
-                }}
-                placeholder="Write a comment (max 1000 chars)..."
-                className="max-h-32 flex-1 resize-none overflow-y-auto rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                rows={1}
-                style={{ minHeight: "38px" }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleAddComment(e);
-                  }
-                }}
-                maxLength={1000}
-              />
-              <button
-                onClick={handleAddComment}
-                disabled={!commentText.trim() || isAddingComment}
-                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isAddingComment ? "Sending..." : "Send"}
-              </button>
-            </div>
+            {currentUser?.restrictions?.isCommentBlocked ? (
+              <div className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-600">
+                You are restricted from commenting.
+                {currentUser.restrictions.commentRestriction?.reason && (
+                  <span className="block text-xs text-red-500">
+                    Reason: {currentUser.restrictions.commentRestriction.reason}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <img
+                  src={currentUser?.avatar || DEFAULT_AVATAR_SM}
+                  alt="Your avatar"
+                  className="h-8 w-8 rounded-full bg-gray-300 object-cover"
+                />
+                <textarea
+                  ref={textareaRef}
+                  value={commentText}
+                  onChange={(e) => {
+                    setCommentText(e.target.value);
+                    // Auto-resize
+                    e.target.style.height = "auto";
+                    e.target.style.height = e.target.scrollHeight + "px";
+                  }}
+                  placeholder="Write a comment (max 1000 chars)..."
+                  className="max-h-32 flex-1 resize-none overflow-y-auto rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  rows={1}
+                  style={{ minHeight: "38px" }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleAddComment(e);
+                    }
+                  }}
+                  maxLength={1000}
+                />
+                <button
+                  onClick={handleAddComment}
+                  disabled={!commentText.trim() || isAddingComment}
+                  className="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isAddingComment ? "Sending..." : "Send"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

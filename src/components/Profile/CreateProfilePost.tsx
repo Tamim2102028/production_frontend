@@ -156,130 +156,143 @@ const CreateProfilePost: React.FC = () => {
 
   return (
     <div className="rounded-lg border border-gray-400 bg-white p-4 shadow">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* User Avatar and Input */}
-        <div className="flex space-x-3">
-          <img
-            src={currentUser?.avatar || DEFAULT_AVATAR_MD}
-            alt={currentUser?.fullName || "Your avatar"}
-            className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300 object-cover"
-          />
-          <div className="flex-1">
-            <div className="relative">
-              <textarea
-                {...register("content")}
-                onFocus={() => setIsExpanded(true)}
-                placeholder={`What's on your mind, ${currentUser?.fullName?.split(" ")[0]}?`}
-                className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                rows={isExpanded ? 4 : 1}
-                maxLength={5000}
-              />
-            </div>
-            {/* Tags Input (Only visible when expanded) */}
-            {isExpanded && (
-              <input
-                type="text"
-                {...register("tags")}
-                placeholder="Add tags (separated by space or comma)"
-                className="mt-2 w-full rounded-lg border border-gray-300 p-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            )}
-          </div>
+      {currentUser?.restrictions?.isPostBlocked ? (
+        <div className="rounded-lg bg-red-50 p-4 text-center">
+          <p className="text-sm font-medium text-red-600">
+            You are restricted from posting.
+          </p>
+          {currentUser.restrictions.postRestriction?.reason && (
+            <p className="mt-1 text-xs text-red-500">
+              Reason: {currentUser.restrictions.postRestriction.reason}
+            </p>
+          )}
         </div>
-
-        {/* Expanded Options */}
-        {isExpanded && (
-          <div className="mt-4">
-            {/* Media & Privacy Options */}
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center space-x-4">
-                {mediaOptions
-                  .filter((opt) => opt.show)
-                  .map((option) => (
-                    <button
-                      key={option.label}
-                      type="button"
-                      onClick={option.onClick}
-                      className="flex items-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
-                    >
-                      <option.Icon className={`h-5 w-5 ${option.color}`} />
-                      <span className="text-sm font-medium">
-                        {option.label}
-                      </span>
-                    </button>
-                  ))}
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* User Avatar and Input */}
+          <div className="flex space-x-3">
+            <img
+              src={currentUser?.avatar || DEFAULT_AVATAR_MD}
+              alt={currentUser?.fullName || "Your avatar"}
+              className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300 object-cover"
+            />
+            <div className="flex-1">
+              <div className="relative">
+                <textarea
+                  {...register("content")}
+                  onFocus={() => setIsExpanded(true)}
+                  placeholder={`What's on your mind, ${currentUser?.fullName?.split(" ")[0]}?`}
+                  className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  rows={isExpanded ? 4 : 1}
+                  maxLength={5000}
+                />
               </div>
-
-              {/* Privacy Selector */}
-              <div className="flex items-center space-x-2">
-                {privacyOptions
-                  .filter((opt) => opt.show)
-                  .map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() =>
-                        setValue("visibility", opt.value, {
-                          shouldValidate: true,
-                        })
-                      }
-                      aria-pressed={privacy === opt.value}
-                      className={`flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
-                        privacy === opt.value
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                    >
-                      <opt.Icon className="h-4 w-4" />
-                      <span className="hidden sm:inline">{opt.label}</span>
-                    </button>
-                  ))}
-              </div>
+              {/* Tags Input (Only visible when expanded) */}
+              {isExpanded && (
+                <input
+                  type="text"
+                  {...register("tags")}
+                  placeholder="Add tags (separated by space or comma)"
+                  className="mt-2 w-full rounded-lg border border-gray-300 p-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              )}
             </div>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => {
-                  reset();
-                  setIsExpanded(false);
-                }}
-                className="flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:border-red-200 hover:bg-red-50"
-              >
-                <span>Cancel</span>
-              </button>
+          {/* Expanded Options */}
+          {isExpanded && (
+            <div className="mt-4">
+              {/* Media & Privacy Options */}
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center space-x-4">
+                  {mediaOptions
+                    .filter((opt) => opt.show)
+                    .map((option) => (
+                      <button
+                        key={option.label}
+                        type="button"
+                        onClick={option.onClick}
+                        className="flex items-center space-x-2 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
+                      >
+                        <option.Icon className={`h-5 w-5 ${option.color}`} />
+                        <span className="text-sm font-medium">
+                          {option.label}
+                        </span>
+                      </button>
+                    ))}
+                </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-400">
-                  {postContent?.length || 0}/5000
-                </span>
+                {/* Privacy Selector */}
+                <div className="flex items-center space-x-2">
+                  {privacyOptions
+                    .filter((opt) => opt.show)
+                    .map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() =>
+                          setValue("visibility", opt.value, {
+                            shouldValidate: true,
+                          })
+                        }
+                        aria-pressed={privacy === opt.value}
+                        className={`flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
+                          privacy === opt.value
+                            ? "bg-blue-50 text-blue-600"
+                            : "text-gray-600 hover:bg-gray-100"
+                        }`}
+                      >
+                        <opt.Icon className="h-4 w-4" />
+                        <span className="hidden sm:inline">{opt.label}</span>
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between">
                 <button
-                  type="submit"
-                  disabled={!isValid || isPending}
-                  className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  type="button"
+                  onClick={() => {
+                    reset();
+                    setIsExpanded(false);
+                  }}
+                  className="flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:border-red-200 hover:bg-red-50"
                 >
-                  <span>{isPending ? "Posting..." : "Post"}</span>
+                  <span>Cancel</span>
                 </button>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400">
+                    {postContent?.length || 0}/5000
+                  </span>
+                  <button
+                    type="submit"
+                    disabled={!isValid || isPending}
+                    className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <span>{isPending ? "Posting..." : "Post"}</span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Simple Post Button (when not expanded) */}
-        {!isExpanded && postContent && (
-          <div className="mt-3 flex justify-end">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-            >
-              <FaPaperPlane className="h-4 w-4" />
-              <span>{isPending ? "Posting..." : "Post"}</span>
-            </button>
-          </div>
-        )}
-      </form>
+          {/* Simple Post Button (when not expanded) */}
+          {!isExpanded && postContent && (
+            <div className="mt-3 flex justify-end">
+              <button
+                type="submit"
+                disabled={isPending}
+                className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+              >
+                <FaPaperPlane className="h-4 w-4" />
+                <span>{isPending ? "Posting..." : "Post"}</span>
+              </button>
+            </div>
+          )}
+        </form>
+      )}
     </div>
   );
 };
