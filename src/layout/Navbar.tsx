@@ -1,7 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaUniversity, FaSearch, FaEnvelope, FaHome } from "react-icons/fa";
-import { IoExtensionPuzzleOutline } from "react-icons/io5";
+import {
+  FaUniversity,
+  FaEnvelope,
+  FaHome,
+  FaBullhorn,
+  FaGraduationCap,
+} from "react-icons/fa";
 
 const Navbar: React.FC = () => {
   // TODO: Replace with actual auth state from API
@@ -13,9 +18,9 @@ const Navbar: React.FC = () => {
 
   const navItems = [
     { to: "/", icon: FaHome, label: "Home" },
-    { to: "/gaming", icon: IoExtensionPuzzleOutline, label: "Gaming" },
     { to: "/university", icon: FaUniversity, label: "University" },
-    { to: "/search", icon: FaSearch, label: "Search" },
+    { to: "/department", icon: FaGraduationCap, label: "Department" },
+    { to: "/university/crcorner", icon: FaBullhorn, label: "CR Corner" },
     { to: "/messages", icon: FaEnvelope, label: "Messages", badge: 2 },
   ];
 

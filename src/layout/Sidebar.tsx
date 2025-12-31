@@ -15,6 +15,8 @@ import {
   FaSignOutAlt,
   FaBookOpen,
   FaUserFriends,
+  FaSearch,
+  FaTrophy,
 } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { prefetchRoute } from "../routes/prefetch";
@@ -29,6 +31,18 @@ const Sidebar: React.FC = () => {
   const profilePath = user?.userName ? `/profile/${user.userName}` : "/profile";
 
   const navigationItems = [
+    {
+      icon: FaSearch,
+      label: "Search",
+      path: "/search",
+      active: location.pathname === "/search",
+    },
+    {
+      icon: FaTrophy,
+      label: "Competition",
+      path: "/gaming",
+      active: location.pathname === "/gaming",
+    },
     {
       icon: FaLayerGroup,
       label: "Groups",

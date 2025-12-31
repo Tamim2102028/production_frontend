@@ -5,7 +5,6 @@ import {
   FaCalendarAlt,
   FaClipboardList,
   FaClock,
-  FaBullhorn,
   FaFolder,
   FaTag,
   FaEllipsisH,
@@ -35,12 +34,6 @@ const navItems = [
     label: "Academic Timeline",
     icon: FaClock,
     path: "/university/academictimeline",
-  },
-  {
-    id: "crcorner",
-    label: "CR Corner",
-    icon: FaBullhorn,
-    path: "/university/crcorner",
   },
   {
     id: "teacherscorner",
