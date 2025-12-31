@@ -21,4 +21,5 @@ export interface Pagination {
   totalPages: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
+  hasMore?: boolean;
 }

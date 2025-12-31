@@ -28,7 +28,12 @@ export const useSearch = () => {
 
   // Search function
   const search = useCallback(
-    async (searchQuery: string, type: string = "all", page: number = 1) => {
+    async (
+      searchQuery: string,
+      type: string = "all",
+      page: number = 1,
+      append: boolean = false
+    ) => {
       if (!searchQuery.trim()) {
         setResults(null);
         return;
@@ -41,9 +46,36 @@ export const useSearch = () => {
         const response = await searchService.globalSearch(
           searchQuery,
           type,
-          page
+          page,
+          type === "all" ? 5 : 15 // Limit to 5 for 'all', 15 for specific
         );
-        setResults(response.data);
+
+        const newResultsData = response.data;
+
+        if (append) {
+          // Merge results for the specific type
+          setResults((prev) => {
+            if (!prev) return newResultsData;
+
+            if (type === "all") return newResultsData; // Should not happen in append mode
+            const key = type as keyof typeof prev.results;
+
+            return {
+              ...newResultsData,
+              results: {
+                ...prev.results,
+                [key]: [
+                  ...(prev.results[key] || []),
+                  ...(newResultsData.results[key] || []),
+                ],
+              },
+              counts: newResultsData.counts,
+              pagination: newResultsData.pagination,
+            };
+          });
+        } else {
+          setResults(newResultsData);
+        }
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error ? err.message : "Search failed";
@@ -55,6 +87,10 @@ export const useSearch = () => {
     },
     []
   );
+
+  const resetResults = useCallback(() => {
+    setResults(null);
+  }, []);
 
   // Fetch suggestions when query changes (debounced)
   useEffect(() => {
@@ -83,6 +119,7 @@ export const useSearch = () => {
     loading,
     error,
     search,
+    resetResults,
   };
 };
 
