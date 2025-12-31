@@ -70,6 +70,16 @@ export const routes: RouteConfig[] = [
     },
   },
   {
+    path: "/department",
+    component: lazy(() => import("../pages/Department")),
+    requireAuth: true,
+    title: "Department",
+    category: "education",
+    meta: {
+      description: "Your department page - posts, announcements, and community",
+    },
+  },
+  {
     path: "/teachers-corner",
     component: lazy(() => import("../pages/TeachersCorner")),
     requireAuth: true,
