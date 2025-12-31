@@ -68,6 +68,7 @@ export const useProfileDetails = (username?: string) =>
     ...defaultProfileQueryOptions,
   });
 
+// Update hooks
 export const useUpdateGeneral = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -144,6 +145,7 @@ export const useUpdateCoverImage = () => {
   });
 };
 
+// Post hooks
 export const useProfilePosts = (username?: string) =>
   useInfiniteQuery<ProfilePostsResponse>({
     queryKey: ["profilePosts", username],
@@ -218,14 +220,7 @@ export const useTogglePinProfilePost = () => {
   });
 };
 
-export const useToggleFollowProfile = () => {
-  const { username } = useParams();
-  return useToggleFollow({
-    invalidateKey: ["profileHeader", username],
-  });
-};
-
-// Comment Hooks
+// Comment hooks
 export const useProfilePostComments = ({
   postId,
   enabled,
@@ -262,5 +257,13 @@ export const useUpdateProfileComment = ({ postId }: { postId: string }) => {
 export const useToggleLikeProfileComment = ({ postId }: { postId: string }) => {
   return useToggleLikeComment({
     postId,
+  });
+};
+
+// Follow hooks
+export const useToggleFollowProfile = () => {
+  const { username } = useParams();
+  return useToggleFollow({
+    invalidateKey: ["profileHeader", username],
   });
 };
