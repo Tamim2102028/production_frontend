@@ -1,20 +1,11 @@
 import React from "react";
 import GroupCard from "../Groups/utils/GroupCard";
-
-// TODO: Replace with API data
-interface Group {
-  id: string;
-  name: string;
-  description?: string;
-  coverImage?: string;
-  profileImage?: string;
-  membersCount?: number;
-  privacy?: string;
-}
+import type { SearchGroup } from "../../types";
+import { GROUP_PRIVACY, GROUP_TYPES } from "../../constants";
 
 interface GroupsResultsProps {
   isVisible: boolean;
-  groups?: Group[];
+  groups?: SearchGroup[];
 }
 
 const GroupsResults: React.FC<GroupsResultsProps> = ({
@@ -32,10 +23,21 @@ const GroupsResults: React.FC<GroupsResultsProps> = ({
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {groups.map((group) => (
           <GroupCard
-            key={group.id}
-            group={group}
-            showJoinButton={true}
-            showCancelButton={true}
+            key={group._id}
+            group={{
+              _id: group._id,
+              name: group.name,
+              slug: group.slug, // Now requested from backend
+              description: group.description,
+              coverImage: group.avatar,
+              type: group.type || GROUP_TYPES.GENERAL,
+              privacy: group.privacy || GROUP_PRIVACY.PUBLIC,
+              membersCount: group.membersCount,
+              postsCount: group.postsCount,
+            }}
+            meta={{
+              status: group.userMembership || null,
+            }}
           />
         ))}
       </div>

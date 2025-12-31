@@ -1,17 +1,10 @@
 import React from "react";
 import FriendCard from "../shared/friends/FriendCard";
-
-// TODO: Replace with API data
-interface Person {
-  id: string;
-  name: string;
-  profileImage?: string;
-  relationStatus?: "friend" | "request" | "suggestion" | "sent";
-}
+import type { SearchUser } from "../../types";
 
 interface PeopleResultsProps {
   isVisible: boolean;
-  people?: Person[];
+  people?: SearchUser[];
 }
 
 const PeopleResults: React.FC<PeopleResultsProps> = ({
@@ -41,8 +34,26 @@ const PeopleResults: React.FC<PeopleResultsProps> = ({
       <div className="space-y-4">
         {filteredPeople.map((person) => (
           <FriendCard
-            key={person.id}
-            friend={person}
+            key={person._id}
+            friend={{
+              _id: person._id,
+              fullName: person.fullName,
+              userName: person.userName,
+              avatar: person.avatar || "",
+              userType: person.userType || "student",
+              institution: person.institution
+                ? {
+                    _id: person.institution._id,
+                    name: person.institution.name,
+                  }
+                : null,
+              department: person.academicInfo?.department
+                ? {
+                    _id: person.academicInfo.department._id,
+                    name: person.academicInfo.department.name,
+                  }
+                : null,
+            }}
             type={getCardType(person.relationStatus)}
           />
         ))}
