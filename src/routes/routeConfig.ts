@@ -60,6 +60,26 @@ export const routes: RouteConfig[] = [
     meta: { description: "Gaming hub and competitions" },
   },
   {
+    path: "/cr-corner",
+    component: lazy(() => import("../pages/CRCorner")),
+    requireAuth: true,
+    title: "CR Corner",
+    category: "education",
+    meta: {
+      description: "Class announcements, polls, and updates from your CR",
+    },
+  },
+  {
+    path: "/teachers-corner",
+    component: lazy(() => import("../pages/TeachersCorner")),
+    requireAuth: true,
+    title: "Teachers' Corner",
+    category: "education",
+    meta: {
+      description: "Resources, schedules, and tools for faculty members",
+    },
+  },
+  {
     path: "/university",
     component: lazy(() => import("../pages/University/University")),
     requireAuth: true,

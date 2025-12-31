@@ -79,7 +79,7 @@ const SidebarRight: React.FC = () => {
             <div
               key={poll.id}
               className="cursor-pointer p-4 transition-colors hover:bg-gray-50"
-              onClick={() => navigate("/university/crcorner")}
+              onClick={() => navigate("/cr-corner")}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -99,7 +99,7 @@ const SidebarRight: React.FC = () => {
         </div>
         <div className="border-t border-gray-100 p-3">
           <button
-            onClick={() => navigate("/university/crcorner")}
+            onClick={() => navigate("/cr-corner")}
             className="text-sm font-medium text-blue-600 hover:text-blue-700"
           >
             View all polls
@@ -122,7 +122,7 @@ const SidebarRight: React.FC = () => {
             <div
               key={announcement.id}
               className="cursor-pointer p-4 transition-colors hover:bg-gray-50"
-              onClick={() => navigate("/university/crcorner")}
+              onClick={() => navigate("/cr-corner")}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -143,7 +143,7 @@ const SidebarRight: React.FC = () => {
         </div>
         <div className="border-t border-gray-100 p-3">
           <button
-            onClick={() => navigate("/university/crcorner")}
+            onClick={() => navigate("/cr-corner")}
             className="text-sm font-medium text-blue-600 hover:text-blue-700"
           >
             View all announcements

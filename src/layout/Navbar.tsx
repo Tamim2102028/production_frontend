@@ -6,21 +6,38 @@ import {
   FaHome,
   FaBullhorn,
   FaGraduationCap,
+  FaChalkboardTeacher,
 } from "react-icons/fa";
+import { useUser } from "../hooks/useAuth";
+import { USER_TYPES } from "../constants";
 
 const Navbar: React.FC = () => {
-  // TODO: Replace with actual auth state from API
-  const isAuthenticated = true;
+  const { user, isAuthenticated } = useUser();
 
   if (!isAuthenticated) {
     return null; // Don't show navbar if not authenticated
   }
 
+  const isTeacher = user?.userType === USER_TYPES.TEACHER;
+
   const navItems = [
     { to: "/", icon: FaHome, label: "Home" },
     { to: "/university", icon: FaUniversity, label: "University" },
     { to: "/department", icon: FaGraduationCap, label: "Department" },
-    { to: "/university/crcorner", icon: FaBullhorn, label: "CR Corner" },
+    // CR Corner - hidden for teachers
+    ...(!isTeacher
+      ? [{ to: "/cr-corner", icon: FaBullhorn, label: "CR Corner" }]
+      : []),
+    // Teachers Corner - visible only for teachers
+    ...(isTeacher
+      ? [
+          {
+            to: "/teachers-corner",
+            icon: FaChalkboardTeacher,
+            label: "Teachers Corner",
+          },
+        ]
+      : []),
     { to: "/messages", icon: FaEnvelope, label: "Messages", badge: 2 },
   ];
 

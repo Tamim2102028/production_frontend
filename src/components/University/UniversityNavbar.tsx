@@ -36,12 +36,6 @@ const navItems = [
     path: "/university/academictimeline",
   },
   {
-    id: "teacherscorner",
-    label: "Teachers' Corner",
-    icon: FaFolder,
-    path: "/university/teacherscorner",
-  },
-  {
     id: "marketplace",
     label: "Marketplace",
     icon: FaTag,
