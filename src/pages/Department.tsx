@@ -104,9 +104,9 @@ const Department: React.FC = () => {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen overflow-x-hidden bg-gray-100">
       {/* Cover Photo Section */}
-      <div className="relative">
+      <div className="relative w-full overflow-hidden">
         <div className="h-48 w-full overflow-hidden sm:h-64 md:h-80">
           <img
             src={departmentInfo.coverImage}
