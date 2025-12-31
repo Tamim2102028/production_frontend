@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCamera, FaUser, FaGraduationCap, FaArrowLeft } from "react-icons/fa";
 
-import PageLoader from "./Fallbacks/PageLoader";
-import { useUser } from "../hooks/useAuth";
-import { PhotosTab, GeneralTab, AcademicTab } from "../components/ProfileEdit";
+import PageLoader from "../Fallbacks/PageLoader";
+import { useUser } from "../../hooks/useAuth";
+import {
+  PhotosTab,
+  GeneralTab,
+  AcademicTab,
+} from "../../components/ProfileEdit";
 
 // ====================================
 // TAB TYPES

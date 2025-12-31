@@ -198,7 +198,7 @@ export const routes: RouteConfig[] = [
   // Profile routes
   {
     path: "/profile",
-    component: lazy(() => import("../pages/Profile")),
+    component: lazy(() => import("../pages/Profile/Profile")),
     requireAuth: true,
     title: "Profile",
     category: "profile",
@@ -206,7 +206,7 @@ export const routes: RouteConfig[] = [
   },
   {
     path: "/profile/:username",
-    component: lazy(() => import("../pages/Profile")),
+    component: lazy(() => import("../pages/Profile/Profile")),
     requireAuth: true,
     title: "User Profile",
     category: "profile",
@@ -214,7 +214,7 @@ export const routes: RouteConfig[] = [
   },
   {
     path: "/profile/edit",
-    component: lazy(() => import("../pages/ProfileEdit")),
+    component: lazy(() => import("../pages/Profile/ProfileEdit")),
     requireAuth: true,
     title: "Edit Profile",
     category: "profile",
@@ -230,7 +230,7 @@ export const routes: RouteConfig[] = [
   },
   {
     path: "/profile/details",
-    component: lazy(() => import("../pages/ProfileDetails")),
+    component: lazy(() => import("../pages/Profile/ProfileDetails")),
     requireAuth: true,
     title: "Profile Details",
     category: "profile",
@@ -238,7 +238,7 @@ export const routes: RouteConfig[] = [
   },
   {
     path: "/profile/:username/details",
-    component: lazy(() => import("../pages/ProfileDetails")),
+    component: lazy(() => import("../pages/Profile/ProfileDetails")),
     requireAuth: true,
     title: "User Profile Details",
     category: "profile",

@@ -5,8 +5,8 @@ import {
   FaFileAlt,
   FaUsers,
   FaUniversity,
-  FaBuilding,
   FaComments,
+  FaGraduationCap,
 } from "react-icons/fa";
 
 interface SearchFiltersProps {
@@ -42,7 +42,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
     {
       id: "departments",
       name: "Departments",
-      icon: FaBuilding,
+      icon: FaGraduationCap,
       count: resultCounts.departments,
     },
     {

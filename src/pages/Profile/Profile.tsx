@@ -8,12 +8,12 @@ import {
   CreateProfilePost,
   ProfileNotFound,
   ProfileBlocked,
-} from "../components/Profile";
-import { useUser } from "../hooks/useAuth";
-import { useProfileHeader } from "../hooks/useProfile";
-import { useUnblockUser } from "../hooks/useFriendship";
-import ProfileHeaderSkeleton from "../components/shared/skeletons/ProfileHeaderSkeleton";
-import confirm from "../utils/sweetAlert";
+} from "../../components/Profile";
+import { useUser } from "../../hooks/useAuth";
+import { useProfileHeader } from "../../hooks/useProfile";
+import { useUnblockUser } from "../../hooks/useFriendship";
+import ProfileHeaderSkeleton from "../../components/shared/skeletons/ProfileHeaderSkeleton";
+import confirm from "../../utils/sweetAlert";
 
 const Profile: React.FC = () => {
   const { username } = useParams<{ username: string }>();

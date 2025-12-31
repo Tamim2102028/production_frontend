@@ -18,7 +18,7 @@ const pathToImporter: Record<string, Importer> = {
   "/saved": () => import("../pages/Saved"),
   "/friends": () => import("../pages/Friends"),
   "/videos": () => import("../pages/Videos"),
-  "/profile": () => import("../pages/Profile"),
+  "/profile": () => import("../pages/Profile/Profile"),
   "/settings": () => import("../pages/Settings"),
 };
 

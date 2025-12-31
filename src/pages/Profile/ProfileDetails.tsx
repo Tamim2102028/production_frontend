@@ -16,11 +16,11 @@ import {
   FaVenusMars,
   FaPray,
 } from "react-icons/fa";
-import { useUser } from "../hooks/useAuth";
-import { useProfileDetails } from "../hooks/useProfile";
-import PageLoader from "./Fallbacks/PageLoader";
-import { USER_TYPES } from "../constants";
-import type { Institution, Department } from "../types";
+import { useUser } from "../../hooks/useAuth";
+import { useProfileDetails } from "../../hooks/useProfile";
+import PageLoader from "../Fallbacks/PageLoader";
+import { USER_TYPES } from "../../constants";
+import type { Institution, Department } from "../../types";
 
 const ProfileDetails: React.FC = () => {
   const { username } = useParams<{ username: string }>();
