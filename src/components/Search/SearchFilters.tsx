@@ -54,11 +54,12 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   ];
 
   return (
-    <div className="flex items-center space-x-2 overflow-x-auto pb-2">
+    <div className="flex items-center justify-between space-x-2 overflow-x-auto pb-2">
       {filters.map((filter) => {
         const IconComponent = filter.icon;
-        const hasCount = typeof filter.count === "number";
-        const showBadge = hasCount && filter.count > 0;
+        const countValue = filter.count;
+        const hasCount = typeof countValue === "number";
+        const showBadge = hasCount && countValue > 0;
 
         return (
           <button

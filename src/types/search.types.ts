@@ -2,7 +2,15 @@ import { GROUP_MEMBERSHIP_STATUS } from "../constants";
 import type { Pagination } from "./common.types";
 import type { Post } from "./post.types";
 
-export type SearchType = "all" | "users" | "posts" | "groups" | "hashtags"; // 'people' map to 'users'
+export type SearchType =
+  | "all"
+  | "users"
+  | "posts"
+  | "groups"
+  | "hashtags"
+  | "institutions"
+  | "departments"
+  | "comments";
 
 // Search Result Items
 

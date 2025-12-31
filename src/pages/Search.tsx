@@ -12,7 +12,7 @@ import DepartmentsResults from "../components/Search/DepartmentsResults";
 import CommentsResults from "../components/Search/CommentsResults";
 
 const Search: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState<string>("users");
 
   // useSearch hook returns 'results' which corresponds to GlobalSearchResponse
   const {
