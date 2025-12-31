@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import SearchHeader from "../components/Search/SearchHeader";
 import SearchBar from "../components/Search/SearchBar";
 import SearchFilters from "../components/Search/SearchFilters";
@@ -12,28 +13,50 @@ import DepartmentsResults from "../components/Search/DepartmentsResults";
 import CommentsResults from "../components/Search/CommentsResults";
 
 const Search: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlQuery = searchParams.get("q") || "";
+  const urlType = searchParams.get("type") || "all";
+
+  const [activeFilter, setActiveFilter] = useState<string>(urlType);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // useSearch hook returns 'results' which corresponds to GlobalSearchResponse
   const {
     query: searchQuery,
     setQuery: setSearchQuery,
-    results, // Direct use
+    results,
     loading,
     search,
   } = useSearch();
+
+  // Initialize query from URL on mount
+  useEffect(() => {
+    if (urlQuery && urlQuery !== searchQuery) {
+      setSearchQuery(urlQuery);
+    }
+    if (urlType && urlType !== activeFilter) {
+      setActiveFilter(urlType);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount
+
+  // Sync URL when state changes
+  useEffect(() => {
+    const params: { q?: string; type?: string } = {};
+    if (searchQuery) params.q = searchQuery;
+    if (activeFilter !== "all") params.type = activeFilter;
+
+    setSearchParams(params, { replace: true });
+  }, [searchQuery, activeFilter, setSearchParams]);
 
   // Reset pagination when query or filter changes (except for append/load more)
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, activeFilter]);
 
-  // Initial search trigger
+  // Initial search trigger & trigger when URL params change
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (searchQuery.trim()) {
-        // Filter IDs in SearchFilters.tsx match backend 'type' strings
         search(searchQuery, activeFilter, 1);
       }
     }, 500);
