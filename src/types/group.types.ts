@@ -65,6 +65,7 @@ export type GroupMeta = {
   isOwner: boolean;
   isModerator: boolean;
   isMember: boolean;
+  isBanned: boolean;
   isRestricted: boolean;
 };
 

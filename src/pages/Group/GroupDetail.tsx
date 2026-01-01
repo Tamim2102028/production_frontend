@@ -4,6 +4,7 @@ import GroupMediaTab from "../../components/Groups/group-tabs-inside/GroupMediaT
 import GroupAboutTab from "../../components/Groups/group-tabs-inside/GroupAboutTab";
 import { useGroupDetails } from "../../hooks/useGroup";
 import GroupAccessDenied from "../../components/Groups/utils/GroupAccessDenied";
+import GroupBanned from "../../components/Groups/utils/GroupBanned";
 import GroupHeader from "../../components/Groups/GroupHeader";
 import GroupNavBar from "../../components/Groups/GroupNavBar";
 import CreateGroupPost from "../../components/Groups/CreateGroupPost";
@@ -13,7 +14,9 @@ import GroupMembersTab from "../../components/Groups/group-tabs-inside/GroupMemb
 import GroupNotFound from "../../components/Groups/utils/GroupNotFound";
 import GroupLoading from "../../components/Groups/utils/GroupLoading";
 
-const Marketplace = lazy(() => import("../../components/Groups/group-tabs-inside/Marketplace"));
+const Marketplace = lazy(
+  () => import("../../components/Groups/group-tabs-inside/Marketplace")
+);
 
 const GroupDetail: React.FC = () => {
   const { data: response, isLoading, error } = useGroupDetails();
@@ -32,6 +35,10 @@ const GroupDetail: React.FC = () => {
   }
 
   // Access Control Check
+  if (meta.isBanned) {
+    return <GroupBanned group={group} />;
+  }
+
   if (meta.isRestricted) {
     return <GroupAccessDenied group={group} />;
   }
@@ -56,15 +63,7 @@ const GroupDetail: React.FC = () => {
                 }
               />
               <Route path="pinned" element={<GroupPinnedPosts />} />
-              <Route
-                path="members"
-                element={
-                  <GroupMembersTab
-                    isOwner={meta.isOwner}
-                    isAdmin={meta.isAdmin}
-                  />
-                }
-              />
+              <Route path="members" element={<GroupMembersTab />} />
               <Route path="media" element={<GroupMediaTab />} />
               <Route
                 path="marketplace"
