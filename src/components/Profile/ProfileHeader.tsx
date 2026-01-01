@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaEdit,
@@ -37,6 +37,18 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
   const { isOwnProfile } = meta;
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const institutionName = userData.institution?.name;
   const departmentName = userData.academicInfo?.department?.name;
@@ -260,7 +272,7 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
         />
 
         {/* 3-Dot Menu - positioned over cover */}
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4" ref={menuRef}>
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="rounded-full bg-white/90 p-2 text-gray-700 shadow-md backdrop-blur-sm transition-all hover:bg-white focus:outline-none"
@@ -269,37 +281,28 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
           </button>
 
           {showMenu && (
-            <>
-              {/* Backdrop to close menu */}
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setShowMenu(false)}
-              ></div>
-
-              {/* Dropdown content */}
-              <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
-                <div className="py-1">
-                  <button
-                    onClick={handleCopyLink}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                  >
-                    <FaLink className="h-4 w-4 flex-shrink-0 text-gray-400" />
-                    <span className="font-medium">Copy profile link</span>
-                  </button>
-                  {!isOwnProfile &&
-                    !meta.isBlockedByMe &&
-                    !meta.isBlockedByTarget && (
-                      <button
-                        onClick={handleBlock}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
-                      >
-                        <FaBan className="h-4 w-4 flex-shrink-0" />
-                        <span className="font-medium">Block user</span>
-                      </button>
-                    )}
-                </div>
+            <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
+              <div className="py-1">
+                <button
+                  onClick={handleCopyLink}
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  <FaLink className="h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <span className="font-medium">Copy profile link</span>
+                </button>
+                {!isOwnProfile &&
+                  !meta.isBlockedByMe &&
+                  !meta.isBlockedByTarget && (
+                    <button
+                      onClick={handleBlock}
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-gray-50"
+                    >
+                      <FaBan className="h-4 w-4 flex-shrink-0" />
+                      <span className="font-medium">Block user</span>
+                    </button>
+                  )}
               </div>
-            </>
+            </div>
           )}
         </div>
 
