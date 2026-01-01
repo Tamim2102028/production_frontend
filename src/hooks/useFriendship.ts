@@ -1,154 +1,52 @@
-import {
-  useMutation,
-  useQueryClient,
-  useInfiniteQuery,
-} from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { friendService } from "../services/friendship.service";
-import { toast } from "sonner";
-import type { AxiosError } from "axios";
-import type { ApiError } from "../types";
+import {
+  useSendRequest,
+  useAcceptRequest,
+  useRejectRequest,
+  useCancelRequest,
+  useUnfriend,
+  useBlock,
+  useUnblock,
+} from "./common/useFriendship";
 
 // ====================================
-// Friendship Actions Hooks
+// Friendship Actions Hooks (using common hooks)
 // ====================================
 
 // 1. Send Friend Request
 export const useSendFriendRequest = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ userId }: { userId: string }) =>
-      friendService.sendRequest(userId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
-  });
+  return useSendRequest();
 };
 
 // 2. Accept Friend Request
 export const useAcceptFriendRequest = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ requesterId }: { requesterId: string }) =>
-      friendService.acceptRequest(requesterId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
-  });
+  return useAcceptRequest();
 };
 
 // 3. Reject Friend Request
 export const useRejectFriendRequest = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ requesterId }: { requesterId: string }) =>
-      friendService.rejectRequest(requesterId),
-    onSuccess: (response) => {
-      toast.info(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
-      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
-  });
+  return useRejectRequest();
 };
 
 // 4. Cancel Sent Request
 export const useCancelFriendRequest = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ recipientId }: { recipientId: string }) =>
-      friendService.cancelRequest(recipientId),
-    onSuccess: (response) => {
-      toast.info(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
-  });
+  return useCancelRequest();
 };
 
 // 5. Unfriend User
 export const useUnfriendUser = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ friendId }: { friendId: string }) =>
-      friendService.unfriend(friendId),
-    onSuccess: (response) => {
-      toast.info(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
-  });
+  return useUnfriend();
 };
 
 // 6. Block User
 export const useBlockUser = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ userId }: { userId: string }) => friendService.block(userId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
-      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["sentRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
-  });
+  return useBlock();
 };
 
 // 7. Unblock User
 export const useUnblockUser = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ userId }: { userId: string }) =>
-      friendService.unblock(userId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ["profileHeader"] });
-      queryClient.invalidateQueries({ queryKey: ["friendSuggestions"] });
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
-    },
-  });
+  return useUnblock();
 };
 
 // ====================================

@@ -8,7 +8,6 @@ import {
   FaCrown,
   FaBan,
 } from "react-icons/fa";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   MessageButton,
   UnfriendButton,
@@ -36,6 +35,7 @@ import {
   useDemoteToMember,
   useTransferOwnership,
   useBanMember,
+  useRemoveGroupMember,
 } from "../../hooks/useGroup";
 
 interface MemberCardProps {
@@ -45,7 +45,6 @@ interface MemberCardProps {
 
 const MemberCard: React.FC<MemberCardProps> = ({ member, currentUserRole }) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { slug } = useParams<{ slug: string }>();
   const { user, meta } = member;
 
@@ -65,13 +64,6 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, currentUserRole }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Helper to invalidate group members after friendship action
-  const invalidateGroupMembers = () => {
-    if (slug) {
-      queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
-    }
-  };
-
   // Friendship mutations
   const { mutate: acceptRequest } = useAcceptFriendRequest();
   const { mutate: rejectRequest } = useRejectFriendRequest();
@@ -87,6 +79,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, currentUserRole }) => {
   const { mutate: demoteToMember } = useDemoteToMember();
   const { mutate: transferOwnership } = useTransferOwnership();
   const { mutate: banMember } = useBanMember();
+  const { mutate: removeMember } = useRemoveGroupMember();
 
   // Role hierarchy for permission checks
   const roleHierarchy = {
@@ -111,28 +104,19 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, currentUserRole }) => {
   };
 
   const handleAccept = () => {
-    acceptRequest(
-      { requesterId: user._id },
-      { onSuccess: invalidateGroupMembers }
-    );
+    acceptRequest({ requesterId: user._id });
   };
 
   const handleDecline = () => {
-    rejectRequest(
-      { requesterId: user._id },
-      { onSuccess: invalidateGroupMembers }
-    );
+    rejectRequest({ requesterId: user._id });
   };
 
   const handleAddFriend = () => {
-    sendRequest({ userId: user._id }, { onSuccess: invalidateGroupMembers });
+    sendRequest({ userId: user._id });
   };
 
   const handleCancelRequest = () => {
-    cancelRequest(
-      { recipientId: user._id },
-      { onSuccess: invalidateGroupMembers }
-    );
+    cancelRequest({ recipientId: user._id });
   };
 
   const handleUnfriend = async () => {
@@ -143,12 +127,12 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, currentUserRole }) => {
       icon: "warning",
     });
     if (ok) {
-      unfriend({ friendId: user._id }, { onSuccess: invalidateGroupMembers });
+      unfriend({ friendId: user._id });
     }
   };
 
   const handleUnblock = () => {
-    unblock({ userId: user._id }, { onSuccess: invalidateGroupMembers });
+    unblock({ userId: user._id });
   };
 
   // Role management handlers
@@ -195,6 +179,19 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, currentUserRole }) => {
     });
     if (ok && slug) {
       banMember({ slug, userId: user._id });
+    }
+  };
+
+  const handleRemove = async () => {
+    setShowMenu(false);
+    const ok = await confirm({
+      title: "Remove Member?",
+      text: `${user.fullName} will be removed from this group.`,
+      confirmButtonText: "Yes, remove",
+      icon: "warning",
+    });
+    if (ok && slug) {
+      removeMember({ slug, userId: user._id });
     }
   };
 
@@ -381,6 +378,15 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, currentUserRole }) => {
                       )}
                     </>
                   )}
+
+                  {/* Remove action - available to Owner, Admin, Moderator for lower roles */}
+                  <button
+                    onClick={handleRemove}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-orange-600 transition-colors hover:bg-gray-50"
+                  >
+                    <FaUserMinus className="h-4 w-4 flex-shrink-0" />
+                    <span className="font-medium">Remove from Group</span>
+                  </button>
 
                   {/* Ban action - available to Owner, Admin, Moderator for lower roles */}
                   <button

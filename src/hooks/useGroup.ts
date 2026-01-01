@@ -155,7 +155,7 @@ export const useGroupMembers = () => {
       return page < totalPages ? page + 1 : undefined;
     },
     enabled: !!slug,
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
   });
 };
 
