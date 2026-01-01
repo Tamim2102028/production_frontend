@@ -39,7 +39,6 @@ const University: React.FC = () => {
       <div>
         <Routes>
           <Route index element={<UniversityDashboard />} />
-          <Route path="dashboard" element={<UniversityDashboard />} />
           <Route path="noticeboard" element={<UniversityNoticeBoard />} />
           <Route path="academictimeline" element={<AcademicTimeline />} />
           <Route path="crcorner" element={<CRCorner />} />
