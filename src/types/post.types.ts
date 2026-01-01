@@ -58,6 +58,7 @@ export interface PostMeta {
   isOwner?: boolean;
   isAdmin?: boolean;
   isModerator?: boolean;
+  canDelete?: boolean;
 }
 
 export interface PostResponseItem {

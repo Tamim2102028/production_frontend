@@ -321,7 +321,11 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
                           {post.isPinned ? "Unpin post" : "Pin post"}
                         </span>
                       </button>
+                    </>
+                  )}
 
+                  {(meta.canDelete || meta.isMine) && (
+                    <>
                       {/* delete button */}
                       <button
                         onClick={handleDelete}
