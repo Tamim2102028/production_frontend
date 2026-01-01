@@ -3,9 +3,9 @@ import { NavLink, useParams } from "react-router-dom";
 import {
   FaUsers,
   FaImage,
-  FaInfoCircle,
   FaThumbtack,
   FaStore,
+  FaInfoCircle,
 } from "react-icons/fa";
 import { BsPostcard } from "react-icons/bs";
 

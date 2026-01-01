@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import GroupMediaTab from "../../components/Groups/group-tabs-inside/GroupMediaTab";
-import GroupAboutTab from "../../components/Groups/group-tabs-inside/GroupAboutTab";
+import GroupAboutTab from "../../components/Groups/GroupAboutTab";
 import { useGroupDetails } from "../../hooks/useGroup";
 import GroupAccessDenied from "../../components/Groups/utils/GroupAccessDenied";
 import GroupBanned from "../../components/Groups/utils/GroupBanned";
