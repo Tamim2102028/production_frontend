@@ -13,7 +13,7 @@ import GroupMembersTab from "../../components/Groups/group-tabs-inside/GroupMemb
 import GroupNotFound from "../../components/Groups/utils/GroupNotFound";
 import GroupLoading from "../../components/Groups/utils/GroupLoading";
 
-const Marketplace = lazy(() => import("../University/Marketplace"));
+const Marketplace = lazy(() => import("../../components/Groups/group-tabs-inside/Marketplace"));
 
 const GroupDetail: React.FC = () => {
   const { data: response, isLoading, error } = useGroupDetails();

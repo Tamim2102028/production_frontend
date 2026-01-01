@@ -241,9 +241,7 @@ const UniversityMarketplace: React.FC = () => {
                 {item.title}
               </h3>
 
-              <p className="mb-2 text-xs text-gray-500">
-                {item.category}
-              </p>
+              <p className="mb-2 text-xs text-gray-500">{item.category}</p>
 
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <span className="font-medium">{item.seller}</span>

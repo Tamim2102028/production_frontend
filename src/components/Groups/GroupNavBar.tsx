@@ -25,7 +25,7 @@ const GroupNavBar: React.FC = () => {
     { path: `${baseUrl}/media`, label: "Media", icon: FaImage, end: true },
     {
       path: `${baseUrl}/marketplace`,
-      label: "Marketplace",
+      label: "Buy & Sell",
       icon: FaStore,
       end: true,
     },
