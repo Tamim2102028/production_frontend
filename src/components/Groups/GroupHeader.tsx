@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FaEllipsisH,
   FaCog,
@@ -27,6 +27,18 @@ interface GroupHeaderProps {
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const { mutate: joinGroup, isPending: isJoining } = useJoinGroup();
   const { mutate: leaveGroup, isPending: isLeaving } = useLeaveGroup();
@@ -137,13 +149,13 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                   </div>
 
                   {/* 3-dot menu */}
-                  <div className="relative">
+                  <div className="relative" ref={menuRef}>
                     <button
                       onClick={() => setShowMenu(!showMenu)}
                       className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-200"
                       title="More actions"
                     >
-                      <FaEllipsisH className="h-4 w-4" />
+                      <FaEllipsisH className="h-5 w-5" />
                     </button>
 
                     {showMenu && (

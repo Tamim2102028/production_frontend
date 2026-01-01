@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import {
   FaHeart,
@@ -51,7 +51,27 @@ interface ProfilePostCardProps {
 const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
   const [commentText, setCommentText] = useState("");
+
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Edit Mode States
   const [isEditing, setIsEditing] = useState(false);
@@ -217,9 +237,17 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
             </span>
           </button>
 
-          <div className="relative">
+          <div className="relative" ref={menuRef}>
             <button
-              onClick={() => setShowMenu(!showMenu)}
+              ref={buttonRef}
+              onClick={() => {
+                if (!showMenu && buttonRef.current) {
+                  const rect = buttonRef.current.getBoundingClientRect();
+                  const spaceBelow = window.innerHeight - rect.bottom;
+                  setOpenUpward(spaceBelow < 300);
+                }
+                setShowMenu(!showMenu);
+              }}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-200"
               title="More actions"
             >
@@ -227,7 +255,11 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
             </button>
 
             {showMenu && (
-              <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
+              <div
+                className={`absolute right-0 z-50 w-56 rounded-lg border border-gray-200 bg-white shadow-lg ${
+                  openUpward ? "bottom-full mb-1" : "top-full mt-1"
+                }`}
+              >
                 <div className="py-1">
                   <button
                     onClick={handleToggleBookmark}

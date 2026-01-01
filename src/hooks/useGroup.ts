@@ -436,6 +436,126 @@ export const useRevokeGroupAdmin = () => {
   });
 };
 
+export const usePromoteToModerator = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.promoteToModerator(slug, userId),
+    onSuccess: (response, variables) => {
+      toast.success(response.message);
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message;
+      toast.error(message);
+    },
+  });
+};
+
+export const usePromoteToAdmin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.promoteToAdmin(slug, userId),
+    onSuccess: (response, variables) => {
+      toast.success(response.message);
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message;
+      toast.error(message);
+    },
+  });
+};
+
+export const useDemoteToModerator = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.demoteToModerator(slug, userId),
+    onSuccess: (response, variables) => {
+      toast.success(response.message);
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message;
+      toast.error(message);
+    },
+  });
+};
+
+export const useDemoteToMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.demoteToMember(slug, userId),
+    onSuccess: (response, variables) => {
+      toast.success(response.message);
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message;
+      toast.error(message);
+    },
+  });
+};
+
+export const useTransferOwnership = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.transferOwnership(slug, userId),
+    onSuccess: (response, variables) => {
+      toast.success(response.message);
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["groupDetails", variables.slug],
+      });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message;
+      toast.error(message);
+    },
+  });
+};
+
+export const useBanMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ slug, userId }: { slug: string; userId: string }) =>
+      groupService.banMember(slug, userId),
+    onSuccess: (response, variables) => {
+      toast.success(response.message);
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", variables.slug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["groupDetails", variables.slug],
+      });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error?.response?.data?.message;
+      toast.error(message);
+    },
+  });
+};
+
 // ====================================
 // Group Comment Hooks
 // ====================================

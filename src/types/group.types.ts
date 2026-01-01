@@ -88,15 +88,50 @@ export type GroupDetailsResponse = ApiResponse<{
   meta: GroupMeta;
 }>;
 
+// Member User Type (for member list)
+export type MemberUser = {
+  _id: string;
+  userName: string;
+  fullName: string;
+  avatar: string;
+  userType: string;
+  institution: {
+    _id: string;
+    name: string;
+  } | null;
+  department: {
+    _id: string;
+    name: string;
+  } | null;
+};
+
+// Member Meta Type (friendship + role info)
+export type MemberMeta = {
+  // Group role info
+  role: (typeof GROUP_ROLES)[keyof typeof GROUP_ROLES];
+  memberId: string;
+  joinedAt: string;
+  // Friendship info
+  friendshipId: string | null;
+  isFriend: boolean;
+  isSentRequest: boolean;
+  hasPendingRequest: boolean;
+  isBlockedByMe: boolean;
+  isBlockedByThem: boolean;
+  isSelf: boolean;
+};
+
+// Single Member in list
+export type GroupMemberItem = {
+  user: MemberUser;
+  meta: MemberMeta;
+};
+
 export type GroupMembersResponse = ApiResponse<{
-  members: {
-    member: GroupMember;
-    meta: {
-      isFriend: boolean;
-      hasPendingRequest: boolean;
-      isSentRequest: boolean;
-    };
-  }[];
+  members: GroupMemberItem[];
+  meta: {
+    currentUserRole: (typeof GROUP_ROLES)[keyof typeof GROUP_ROLES] | null;
+  };
   pagination: Pagination;
 }>;
 

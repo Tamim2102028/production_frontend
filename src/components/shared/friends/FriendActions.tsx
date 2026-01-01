@@ -76,6 +76,16 @@ export const CancelRequestButton: React.FC<BtnProps> = ({
   </button>
 );
 
+export const UnblockButton: React.FC<BtnProps> = ({ onClick, className }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`flex items-center rounded-lg bg-gray-100 px-3 py-2 text-gray-600 hover:bg-gray-200 ${className || ""}`}
+  >
+    Unblock
+  </button>
+);
+
 export default {
   MessageButton,
   UnfriendButton,
@@ -83,4 +93,5 @@ export default {
   RejectButton,
   AddFriendButton,
   CancelRequestButton,
+  UnblockButton,
 };

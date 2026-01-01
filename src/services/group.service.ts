@@ -155,6 +155,52 @@ export const groupService = {
     return response.data;
   },
 
+  // Promote to Moderator
+  promoteToModerator: async (slug: string, userId: string) => {
+    const response = await api.patch(
+      `/groups/${slug}/members/${userId}/promote-moderator`
+    );
+    return response.data;
+  },
+
+  // Promote to Admin
+  promoteToAdmin: async (slug: string, userId: string) => {
+    const response = await api.patch(
+      `/groups/${slug}/members/${userId}/promote-admin`
+    );
+    return response.data;
+  },
+
+  // Demote to Moderator
+  demoteToModerator: async (slug: string, userId: string) => {
+    const response = await api.patch(
+      `/groups/${slug}/members/${userId}/demote-moderator`
+    );
+    return response.data;
+  },
+
+  // Demote to Member
+  demoteToMember: async (slug: string, userId: string) => {
+    const response = await api.patch(
+      `/groups/${slug}/members/${userId}/demote-member`
+    );
+    return response.data;
+  },
+
+  // Transfer Ownership
+  transferOwnership: async (slug: string, userId: string) => {
+    const response = await api.patch(
+      `/groups/${slug}/members/${userId}/transfer-ownership`
+    );
+    return response.data;
+  },
+
+  // Ban Member
+  banMember: async (slug: string, userId: string) => {
+    const response = await api.patch(`/groups/${slug}/members/${userId}/ban`);
+    return response.data;
+  },
+
   // Get Group Members
   getGroupMembers: async (
     slug: string,
