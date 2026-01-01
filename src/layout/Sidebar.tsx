@@ -44,10 +44,22 @@ const Sidebar: React.FC = () => {
       active: location.pathname === "/gaming",
     },
     {
+      icon: FaSchool,
+      label: "ClassRoom",
+      path: "/classroom",
+      active: location.pathname === "/classroom",
+    },
+    {
       icon: FaLayerGroup,
       label: "Groups",
       path: "/groups",
       active: location.pathname === "/groups",
+    },
+    {
+      icon: FaFolder,
+      label: "Files & Archive",
+      path: "/files",
+      active: location.pathname === "/files",
     },
     {
       icon: FaUserFriends,
@@ -56,23 +68,11 @@ const Sidebar: React.FC = () => {
       active: location.pathname === "/friends",
     },
     {
-      icon: FaSchool,
-      label: "ClassRoom",
-      path: "/classroom",
-      active: location.pathname === "/classroom",
-    },
-    {
       icon: FaBell,
       label: "Notifications",
       path: "/notifications",
       active: location.pathname === "/notifications",
       badge: 5,
-    },
-    {
-      icon: FaFolder,
-      label: "Files & Archive",
-      path: "/files",
-      active: location.pathname === "/files",
     },
     {
       icon: BsStars,
