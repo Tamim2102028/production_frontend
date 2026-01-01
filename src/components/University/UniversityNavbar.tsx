@@ -1,72 +1,39 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import {
-  FaBuilding,
-  FaCalendarAlt,
-  FaClipboardList,
-  FaClock,
-  FaFolder,
-  FaTag,
-  FaEllipsisH,
-} from "react-icons/fa";
 
 const navItems = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: FaBuilding,
-    path: "/university/dashboard",
-  },
-  {
-    id: "events",
-    label: "Events",
-    icon: FaCalendarAlt,
-    path: "/university/events",
-  },
-  {
-    id: "noticeboard",
-    label: "Notice Board",
-    icon: FaClipboardList,
-    path: "/university/noticeboard",
-  },
+  { id: "dashboard", label: "Dashboard", path: "/university/dashboard" },
+  { id: "events", label: "Events", path: "/university/events" },
+  { id: "noticeboard", label: "Notice Board", path: "/university/noticeboard" },
   {
     id: "academictimeline",
     label: "Academic Timeline",
-    icon: FaClock,
     path: "/university/academictimeline",
   },
-  {
-    id: "marketplace",
-    label: "Marketplace",
-    icon: FaTag,
-    path: "/university/marketplace",
-  },
-  { id: "more", label: "More", icon: FaEllipsisH, path: "/university/more" },
+  { id: "marketplace", label: "Marketplace", path: "/university/marketplace" },
+  { id: "more", label: "More", path: "/university/more" },
 ];
 
 const UniversityNavbar: React.FC = () => {
   return (
-    <div className="grid grid-cols-4 gap-2 rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        return (
+    <div className="border-b border-gray-200 bg-white">
+      <nav className="flex overflow-x-auto px-4">
+        {navItems.map((item) => (
           <NavLink
             key={item.id}
             to={item.path}
             className={({ isActive }) =>
-              `flex flex-col items-center rounded-lg p-3 transition-all ` +
-              (isActive
-                ? "bg-blue-50 text-blue-700"
-                : "text-gray-600 hover:bg-blue-50")
+              `border-b-2 py-3 text-sm font-medium whitespace-nowrap transition ${
+                isActive
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+              }`
             }
           >
-            <Icon className="mb-1 h-5 w-5" />
-            <span className="text-center text-xs font-medium">
-              {item.label}
-            </span>
+            {item.label}
           </NavLink>
-        );
-      })}
+        ))}
+      </nav>
     </div>
   );
 };
