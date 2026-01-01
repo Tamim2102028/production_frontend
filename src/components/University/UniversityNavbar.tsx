@@ -16,7 +16,7 @@ const navItems = [
 const UniversityNavbar: React.FC = () => {
   return (
     <div className="border-b border-gray-200 bg-white">
-      <nav className="flex justify-between overflow-x-auto px-5">
+      <nav className="flex justify-between overflow-x-auto px-7">
         {navItems.map((item) => (
           <NavLink
             key={item.id}

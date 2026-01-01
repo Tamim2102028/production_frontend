@@ -33,8 +33,8 @@ const GroupNavBar: React.FC = () => {
   ] as const;
 
   return (
-    <div className="border-b border-gray-200 bg-white">
-      <div className="flex justify-between gap-1 px-3">
+    <div className="scrollbar-hide overflow-x-auto border-b border-gray-200 bg-white">
+      <div className="flex min-w-max gap-1 px-3">
         {tabs.map((tab) => (
           <NavLink
             key={tab.path}
