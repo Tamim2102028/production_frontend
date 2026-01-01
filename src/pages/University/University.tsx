@@ -6,7 +6,6 @@ import AcademicTimeline from "./AcademicTimeline";
 import CRCorner from "./CRCorner";
 import UniversityDashboard from "./Dashboard";
 import UniversityEvents from "./Events";
-import UniversityMarketplace from "./Marketplace";
 import UniversityMore from "./More";
 import UniversityNoticeBoard from "./NoticeBoard";
 import TeachersCorner from "./TeachersCorner";
@@ -45,7 +44,6 @@ const University: React.FC = () => {
           <Route path="academictimeline" element={<AcademicTimeline />} />
           <Route path="crcorner" element={<CRCorner />} />
           <Route path="events" element={<UniversityEvents />} />
-          <Route path="marketplace" element={<UniversityMarketplace />} />
           <Route path="teacherscorner" element={<TeachersCorner />} />
           <Route path="more" element={<UniversityMore />} />
           {/* More section routes */}

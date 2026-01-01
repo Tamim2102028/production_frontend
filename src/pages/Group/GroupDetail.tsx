@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import GroupMediaTab from "../../components/Groups/group-tabs-inside/GroupMediaTab";
 import GroupAboutTab from "../../components/Groups/group-tabs-inside/GroupAboutTab";
@@ -12,6 +12,8 @@ import GroupPinnedPosts from "../../components/Groups/group-tabs-inside/GroupPin
 import GroupMembersTab from "../../components/Groups/group-tabs-inside/GroupMembersTab";
 import GroupNotFound from "../../components/Groups/utils/GroupNotFound";
 import GroupLoading from "../../components/Groups/utils/GroupLoading";
+
+const Marketplace = lazy(() => import("../University/Marketplace"));
 
 const GroupDetail: React.FC = () => {
   const { data: response, isLoading, error } = useGroupDetails();
@@ -64,6 +66,14 @@ const GroupDetail: React.FC = () => {
                 }
               />
               <Route path="media" element={<GroupMediaTab />} />
+              <Route
+                path="marketplace"
+                element={
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <Marketplace />
+                  </Suspense>
+                }
+              />
               <Route path="about" element={<GroupAboutTab group={group} />} />
             </Routes>
           </div>

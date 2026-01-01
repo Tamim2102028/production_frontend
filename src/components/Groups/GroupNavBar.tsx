@@ -1,6 +1,12 @@
 import React from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { FaUsers, FaImage, FaInfoCircle, FaThumbtack } from "react-icons/fa";
+import {
+  FaUsers,
+  FaImage,
+  FaInfoCircle,
+  FaThumbtack,
+  FaStore,
+} from "react-icons/fa";
 import { BsPostcard } from "react-icons/bs";
 
 const GroupNavBar: React.FC = () => {
@@ -17,6 +23,12 @@ const GroupNavBar: React.FC = () => {
     },
     { path: `${baseUrl}/members`, label: "Members", icon: FaUsers, end: true },
     { path: `${baseUrl}/media`, label: "Media", icon: FaImage, end: true },
+    {
+      path: `${baseUrl}/marketplace`,
+      label: "Marketplace",
+      icon: FaStore,
+      end: true,
+    },
     { path: `${baseUrl}/about`, label: "About", icon: FaInfoCircle, end: true },
   ] as const;
 

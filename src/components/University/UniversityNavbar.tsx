@@ -10,14 +10,13 @@ const navItems = [
     label: "Academic Timeline",
     path: "/university/academictimeline",
   },
-  { id: "marketplace", label: "Marketplace", path: "/university/marketplace" },
   { id: "more", label: "More", path: "/university/more" },
 ];
 
 const UniversityNavbar: React.FC = () => {
   return (
     <div className="border-b border-gray-200 bg-white">
-      <nav className="flex overflow-x-auto px-4">
+      <nav className="flex justify-between overflow-x-auto px-5">
         {navItems.map((item) => (
           <NavLink
             key={item.id}
