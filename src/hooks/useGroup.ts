@@ -281,7 +281,9 @@ export const useToggleReadStatusGroupPost = () => {
   return useToggleReadStatus({
     queryKey: ["groupPosts", slug],
     invalidateKey: [
-      ["groupUnreadCounts", slug], // Only invalidate unread counts
+      ["groupPinnedPosts", slug],
+      ["groupMarketplacePosts", slug],
+      ["groupUnreadCounts", slug],
     ],
   });
 };
