@@ -237,15 +237,6 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
           </span>
         )}
 
-        {/* View Details button for all */}
-        <Link
-          to={`/profile/${userData.userName}/details`}
-          className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
-        >
-          <FaInfoCircle className="h-4 w-4" />
-          Details
-        </Link>
-
         {/* Follow/Unfollow Button */}
         <button
           onClick={() => handleToggleFollow(userData._id)}
@@ -257,6 +248,15 @@ const ProfileHeader: React.FC<{ data: ProfileHeaderData }> = ({ data }) => {
         >
           {isFollowing ? "Unfollow" : "Follow"}
         </button>
+
+        {/* View Details button - at far right */}
+        <Link
+          to={`/profile/${userData.userName}/details`}
+          className="flex items-center gap-2 rounded-md bg-gray-600 px-6 py-2 text-white transition-colors hover:bg-gray-700"
+        >
+          <FaInfoCircle className="h-4 w-4" />
+          Details
+        </Link>
       </div>
     );
   };
