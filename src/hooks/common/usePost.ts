@@ -11,10 +11,10 @@ import type {
 } from "../../types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-// ইন্টারফেস ডিফাইন করা হলো
+
 interface UsePostMutationProps {
-  queryKey?: (string | undefined)[]; // যে লিস্ট আপডেট হবে (e.g. ["groupPosts", groupId])
-  invalidateKey?: (string | undefined)[] | (string | undefined)[][]; // Single key or Array of keys
+  queryKey?: (string | undefined)[];
+  invalidateKey?: (string | undefined)[] | (string | undefined)[][];
 }
 
 export const useCreatePost = ({
