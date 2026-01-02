@@ -65,8 +65,7 @@ export const useAddComment = ({
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(error?.response?.data?.message);
     },
   });
 };
@@ -98,8 +97,7 @@ export const useDeleteComment = ({
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(error?.response?.data?.message);
     },
   });
 };
@@ -120,8 +118,7 @@ export const useUpdateComment = ({ postId }: { postId: string }) => {
       toast.success(response.message);
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(error?.response?.data?.message);
     },
   });
 };
@@ -187,8 +184,7 @@ export const useToggleLikeComment = ({ postId }: { postId: string }) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-      const message = error?.response?.data?.message;
-      toast.error(message);
+      toast.error(error?.response?.data?.message);
     },
   });
 };
