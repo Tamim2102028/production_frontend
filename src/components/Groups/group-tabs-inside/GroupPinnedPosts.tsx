@@ -1,10 +1,18 @@
+import React from "react";
 import GroupPostCard from "./../GroupPostCard";
 import { useGroupPinnedPosts } from "../../../hooks/useGroup";
 import PostSkeleton from "../../shared/skeletons/PostSkeleton";
 
 const GroupPinnedPosts = () => {
-  const { data: pinnedData, isLoading } = useGroupPinnedPosts();
-  const posts = pinnedData?.data.posts || [];
+  const {
+    data: pinnedData,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGroupPinnedPosts();
+
+  const posts = pinnedData?.pages.flatMap((page) => page.data.posts) || [];
 
   if (isLoading) {
     return (
@@ -27,6 +35,16 @@ const GroupPinnedPosts = () => {
       {posts.map((item) => (
         <GroupPostCard key={item.post._id} post={item.post} meta={item.meta} />
       ))}
+
+      {hasNextPage && (
+        <button
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+          className="w-full rounded-lg border border-blue-600 p-3 text-center font-medium text-blue-600 transition-colors hover:bg-blue-600 hover:text-white disabled:opacity-50"
+        >
+          {isFetchingNextPage ? "Loading..." : "Load More"}
+        </button>
+      )}
     </div>
   );
 };

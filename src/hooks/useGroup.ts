@@ -187,9 +187,15 @@ export const useGroupPosts = () => {
 
 export const useGroupPinnedPosts = () => {
   const { slug } = useParams();
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["groupPinnedPosts", slug],
-    queryFn: () => groupService.getGroupPinnedPosts(slug as string),
+    queryFn: ({ pageParam }) =>
+      groupService.getGroupPinnedPosts(slug as string, pageParam as number),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
     enabled: !!slug,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -275,16 +281,16 @@ export const useUpdateGroupPost = () => {
   });
 };
 
-// Group Post Read Status Toggle - Using Common Hook with multiple invalidateKeys
+// Group Post Read Status Toggle - Using Common Hook with multiple queryKeys
 export const useToggleReadStatusGroupPost = () => {
   const { slug } = useParams();
   return useToggleReadStatus({
-    queryKey: ["groupPosts", slug],
-    invalidateKey: [
+    queryKey: [
+      ["groupPosts", slug],
       ["groupPinnedPosts", slug],
       ["groupMarketplacePosts", slug],
-      ["groupUnreadCounts", slug],
     ],
+    invalidateKey: [["groupUnreadCounts", slug]],
   });
 };
 

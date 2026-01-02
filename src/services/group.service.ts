@@ -45,8 +45,14 @@ export const groupService = {
   },
 
   // Get Group Pinned Posts
-  getGroupPinnedPosts: async (slug: string): Promise<FeedResponse> => {
-    const response = await api.get<FeedResponse>(`/groups/${slug}/pinned`);
+  getGroupPinnedPosts: async (
+    slug: string,
+    page = 1
+  ): Promise<FeedResponse> => {
+    const limit = POST_LIMIT;
+    const response = await api.get<FeedResponse>(`/groups/${slug}/pinned`, {
+      params: { page, limit },
+    });
     return response.data;
   },
 

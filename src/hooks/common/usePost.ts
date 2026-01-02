@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 
 interface UsePostMutationProps {
-  queryKey?: (string | undefined)[];
+  queryKey?: (string | undefined)[] | (string | undefined)[][]; // Single key or Array of keys
   invalidateKey?: (string | undefined)[] | (string | undefined)[][];
 }
 
@@ -165,46 +165,65 @@ export const useToggleReadStatus = ({
   invalidateKey,
 }: UsePostMutationProps) => {
   const queryClient = useQueryClient();
+
+  // Helper to check if queryKey is array of arrays
+  const isMultipleKeys = queryKey && Array.isArray(queryKey[0]);
+
   return useMutation({
     mutationFn: ({ postId }: { postId: string }) =>
       postService.togglePostRead(postId),
 
     // Optimistic Update
     onMutate: async ({ postId }: { postId: string }) => {
-      await queryClient.cancelQueries({ queryKey: queryKey });
+      const keys = isMultipleKeys
+        ? (queryKey as (string | undefined)[][])
+        : [queryKey as (string | undefined)[]];
 
-      const previousPosts = queryClient.getQueriesData({
-        queryKey: queryKey,
-      });
-
-      queryClient.setQueriesData(
-        { queryKey: queryKey },
-        (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              data: {
-                ...page.data,
-                posts: page.data.posts.map((item) => {
-                  if (item.post._id === postId) {
-                    return {
-                      ...item,
-                      meta: {
-                        ...item.meta,
-                        isRead: !item.meta.isRead,
-                      },
-                    };
-                  }
-                  return item;
-                }),
-              },
-            })),
-          };
-        }
+      // Cancel all queries
+      await Promise.all(
+        keys.map((key) => queryClient.cancelQueries({ queryKey: key }))
       );
+
+      // Get previous data from all queries
+      const previousPosts = keys.flatMap((key) =>
+        queryClient.getQueriesData({ queryKey: key })
+      );
+
+      // Update all queries optimistically
+      keys.forEach((key) => {
+        queryClient.setQueriesData(
+          { queryKey: key },
+          (oldData: InfiniteData<ProfilePostsResponse> | undefined) => {
+            if (!oldData || !oldData.pages) return oldData;
+
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) => {
+                if (!page?.data?.posts) return page;
+
+                return {
+                  ...page,
+                  data: {
+                    ...page.data,
+                    posts: page.data.posts.map((item) => {
+                      if (item.post._id === postId) {
+                        return {
+                          ...item,
+                          meta: {
+                            ...item.meta,
+                            isRead: !item.meta.isRead,
+                          },
+                        };
+                      }
+                      return item;
+                    }),
+                  },
+                };
+              }),
+            };
+          }
+        );
+      });
 
       return { previousPosts };
     },
