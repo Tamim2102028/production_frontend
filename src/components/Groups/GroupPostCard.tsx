@@ -33,12 +33,14 @@ import {
   useToggleReadStatusGroupPost,
   useToggleBookmarkGroupPost,
   useTogglePinGroupPost,
-  useGroupPostComments,
   useAddGroupComment,
   useDeleteGroupComment,
-  useUpdateGroupComment,
-  useToggleLikeGroupComment,
 } from "../../hooks/useGroup";
+import {
+  usePostComments,
+  useUpdateComment,
+  useToggleLikeComment,
+} from "../../hooks/common/useComment";
 import { ATTACHMENT_TYPES } from "../../constants";
 import confirm from "../../utils/sweetAlert";
 
@@ -95,7 +97,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useGroupPostComments({
+  } = usePostComments({
     postId: post._id,
     enabled: showCommentBox,
   });
@@ -108,10 +110,10 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
   const { mutate: deleteComment } = useDeleteGroupComment({
     postId: post._id,
   });
-  const { mutate: toggleLikeComment } = useToggleLikeGroupComment({
+  const { mutate: toggleLikeComment } = useToggleLikeComment({
     postId: post._id,
   });
-  const { mutate: updateComment } = useUpdateGroupComment({
+  const { mutate: updateComment } = useUpdateComment({
     postId: post._id,
   });
 

@@ -19,13 +19,7 @@ import {
   useTogglePin,
 } from "./common/usePost";
 
-import {
-  usePostComments,
-  useAddComment,
-  useDeleteComment,
-  useUpdateComment,
-  useToggleLikeComment,
-} from "./common/useComment";
+import { useAddComment, useDeleteComment } from "./common/useComment";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
@@ -612,19 +606,6 @@ export const useBanMember = () => {
 // Group Comment Hooks
 // ====================================
 
-export const useGroupPostComments = ({
-  postId,
-  enabled,
-}: {
-  postId: string;
-  enabled?: boolean;
-}) => {
-  return usePostComments({
-    postId,
-    enabled,
-  });
-};
-
 export const useAddGroupComment = ({ postId }: { postId: string }) => {
   const { slug } = useParams();
   return useAddComment({
@@ -646,17 +627,5 @@ export const useDeleteGroupComment = ({ postId }: { postId: string }) => {
       ["groupPinnedPosts", slug],
       ["groupMarketplacePosts", slug],
     ],
-  });
-};
-
-export const useUpdateGroupComment = ({ postId }: { postId: string }) => {
-  return useUpdateComment({
-    postId,
-  });
-};
-
-export const useToggleLikeGroupComment = ({ postId }: { postId: string }) => {
-  return useToggleLikeComment({
-    postId,
   });
 };

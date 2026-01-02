@@ -36,12 +36,14 @@ import {
   useToggleReadStatusProfilePost,
   useTogglePinProfilePost,
   useUpdateProfilePost,
-  useProfilePostComments,
   useAddProfileComment,
   useDeleteProfileComment,
-  useUpdateProfileComment,
-  useToggleLikeProfileComment,
 } from "../../hooks/useProfile";
+import {
+  usePostComments,
+  useUpdateComment,
+  useToggleLikeComment,
+} from "../../hooks/common/useComment";
 
 interface ProfilePostCardProps {
   post: Post;
@@ -97,7 +99,7 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useProfilePostComments({
+  } = usePostComments({
     postId: post._id,
     enabled: showCommentBox,
   });
@@ -109,10 +111,10 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const { mutate: deleteComment } = useDeleteProfileComment({
     postId: post._id,
   });
-  const { mutate: toggleLikeComment } = useToggleLikeProfileComment({
+  const { mutate: toggleLikeComment } = useToggleLikeComment({
     postId: post._id,
   });
-  const { mutate: updateComment } = useUpdateProfileComment({
+  const { mutate: updateComment } = useUpdateComment({
     postId: post._id,
   });
 

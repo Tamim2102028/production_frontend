@@ -25,11 +25,8 @@ import {
 } from "./common/usePost";
 
 import {
-  usePostComments,
   useAddComment,
   useDeleteComment,
-  useUpdateComment,
-  useToggleLikeComment,
 } from "./common/useComment";
 import { useToggleFollow } from "./common/useFollow";
 import { useParams } from "react-router-dom";
@@ -221,19 +218,6 @@ export const useTogglePinProfilePost = () => {
 };
 
 // Comment hooks
-export const useProfilePostComments = ({
-  postId,
-  enabled,
-}: {
-  postId: string;
-  enabled?: boolean;
-}) => {
-  return usePostComments({
-    postId,
-    enabled,
-  });
-};
-
 export const useAddProfileComment = ({ postId }: { postId: string }) => {
   return useAddComment({
     postId,
@@ -245,18 +229,6 @@ export const useDeleteProfileComment = ({ postId }: { postId: string }) => {
   return useDeleteComment({
     postId,
     invalidateKey: ["profilePosts"],
-  });
-};
-
-export const useUpdateProfileComment = ({ postId }: { postId: string }) => {
-  return useUpdateComment({
-    postId,
-  });
-};
-
-export const useToggleLikeProfileComment = ({ postId }: { postId: string }) => {
-  return useToggleLikeComment({
-    postId,
   });
 };
 
