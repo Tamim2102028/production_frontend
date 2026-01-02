@@ -20,8 +20,6 @@ const createGroupSchema = z.object({
   name: z.string().min(3, "Group name must be at least 3 characters"),
   description: z.string().optional(),
   type: z.enum(["GENERAL", "JOBS_CAREERS", "OFFICIAL_INSTITUTION"]),
-  avatar: z.any().optional(),
-  coverImage: z.any().optional(),
   privacy: z.enum(["PUBLIC", "PRIVATE", "CLOSED"]),
   settings: z.object({
     allowMemberPosting: z.boolean(),
@@ -46,8 +44,6 @@ const CreateGroupPage: React.FC = () => {
       name: "",
       description: "",
       type: "GENERAL",
-      avatar: "",
-      coverImage: "",
       privacy: "PUBLIC",
       settings: {
         allowMemberPosting: true,
@@ -68,15 +64,8 @@ const CreateGroupPage: React.FC = () => {
     if (data.description) formData.append("description", data.description);
     formData.append("privacy", data.privacy);
 
-    // Append settings as individual fields or JSON string based on backend expectation
+    // Append settings
     formData.append("settings", JSON.stringify(data.settings));
-
-    if (data.coverImage && data.coverImage[0]) {
-      formData.append("coverImage", data.coverImage[0]);
-    }
-    if (data.avatar && data.avatar[0]) {
-      formData.append("avatar", data.avatar[0]);
-    }
 
     createGroup({ formData });
   };
@@ -253,40 +242,6 @@ const CreateGroupPage: React.FC = () => {
                   </p>
                 </label>
               ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {/* Avatar */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Group Avatar
-              </label>
-              <input
-                {...register("avatar")}
-                type="file"
-                accept="image/*"
-                className="block w-full text-sm font-medium text-gray-500 transition-colors file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
-              />
-              <p className="mt-1.5 text-xs font-medium text-gray-500">
-                Recommended: Square image, max 2MB
-              </p>
-            </div>
-
-            {/* Cover Image */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Cover Image
-              </label>
-              <input
-                {...register("coverImage")}
-                type="file"
-                accept="image/*"
-                className="block w-full text-sm font-medium text-gray-500 transition-colors file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
-              />
-              <p className="mt-1.5 text-xs font-medium text-gray-500">
-                Recommended: 1200x400px, max 5MB
-              </p>
             </div>
           </div>
         </div>
