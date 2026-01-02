@@ -24,10 +24,7 @@ import {
   useTogglePin,
 } from "./common/usePost";
 
-import {
-  useAddComment,
-  useDeleteComment,
-} from "./common/useComment";
+import { useAddComment, useDeleteComment } from "./common/useComment";
 import { useToggleFollow } from "./common/useFollow";
 import { useParams } from "react-router-dom";
 import { AUTH_KEYS } from "./useAuth";

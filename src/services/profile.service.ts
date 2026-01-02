@@ -23,8 +23,10 @@ export const profileService = {
   },
 
   // Get Profile Details by Username
-  getProfileDetails: async (username: string): Promise<ApiResponse<User>> => {
-    const response = await api.get<ApiResponse<User>>(
+  getProfileDetails: async (
+    username: string
+  ): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.get<ApiResponse<{ user: User }>>(
       `/profile/details/${username}`
     );
     return response.data;
