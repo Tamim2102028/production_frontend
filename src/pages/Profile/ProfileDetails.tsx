@@ -368,7 +368,7 @@ const ProfileDetails: React.FC = () => {
                   </span>
                 )}
               </div>
-              <div className="flex justify-between border-b border-gray-100 py-1">
+              <div className="flex justify-between py-1">
                 <span className="font-medium text-gray-600">Section</span>
                 {user.academicInfo?.section ? (
                   <span className="font-semibold text-gray-900">
@@ -379,12 +379,6 @@ const ProfileDetails: React.FC = () => {
                     Not added
                   </span>
                 )}
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="font-medium text-gray-600">Is CR</span>
-                <span className="font-semibold text-gray-900">
-                  {user.academicInfo?.isCr ? "Yes" : "No"}
-                </span>
               </div>
             </div>
           </div>

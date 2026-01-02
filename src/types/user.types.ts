@@ -63,7 +63,6 @@ export interface StudentAcademicInfo extends BaseAcademicInfo {
   session?: string;
   currentSemester?: number;
   section?: string;
-  isCr?: boolean;
 }
 
 // Teacher-specific fields
