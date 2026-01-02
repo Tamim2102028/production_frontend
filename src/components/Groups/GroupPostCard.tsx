@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import {
   FaHeart,
@@ -209,15 +210,20 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
       {/* Post Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-3">
-          <img
-            src={post.author.avatar || DEFAULT_AVATAR_MD}
-            alt={post.author.fullName}
-            className="h-10 w-10 rounded-full bg-gray-300 object-cover"
-          />
+          <Link to={`/profile/${post.author.userName}`}>
+            <img
+              src={post.author.avatar || DEFAULT_AVATAR_MD}
+              alt={post.author.fullName}
+              className="h-10 w-10 rounded-full bg-gray-300 object-cover"
+            />
+          </Link>
           <div>
-            <h3 className="font-semibold text-gray-900">
+            <Link
+              to={`/profile/${post.author.userName}`}
+              className="font-semibold text-gray-900 hover:underline"
+            >
               {post.author.fullName}
-            </h3>
+            </Link>
             <p className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               <span>{formatPostDate(post.createdAt)}</span>
               <SeparatorDot ariaHidden />
