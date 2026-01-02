@@ -315,6 +315,7 @@ export const useJoinGroup = () => {
       toast.success(response.message);
       const { slug } = variables;
       queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
+      queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
       queryClient.invalidateQueries({ queryKey: ["sentGroupRequests"] });
       queryClient.invalidateQueries({ queryKey: ["universityGroups"] });
       queryClient.invalidateQueries({ queryKey: ["careerGroups"] });
@@ -340,6 +341,7 @@ export const useLeaveGroup = () => {
       const { slug } = variables;
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
       queryClient.invalidateQueries({ queryKey: ["groupDetails", slug] });
+      queryClient.invalidateQueries({ queryKey: ["groupMembers", slug] });
       queryClient.invalidateQueries({ queryKey: ["suggestedGroups"] });
     },
 
