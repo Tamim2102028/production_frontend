@@ -15,6 +15,7 @@ export const groupService = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      timeout: 60000, // 60 seconds specifically for group creation with images
     });
     return response.data;
   },
