@@ -131,15 +131,15 @@ export const useToggleLikeComment = ({ postId }: { postId: string }) => {
       commentService.toggleLikeComment(commentId),
 
     onMutate: async (commentId) => {
-      // Cancel queries
+      // Cancel background refetch to prevent overwriting optimistic update
       await queryClient.cancelQueries({ queryKey: ["comments", postId] });
 
-      // Snapshot previous data
+      // Snapshot previous data for rollback on error
       const previousComments = queryClient.getQueriesData({
         queryKey: ["comments", postId],
       });
 
-      // Optimistic Update
+      // Optimistic Update - instant UI change
       queryClient.setQueriesData(
         { queryKey: ["comments", postId] },
         (oldData: InfiniteData<CommentsResponse> | undefined) => {
@@ -179,6 +179,7 @@ export const useToggleLikeComment = ({ postId }: { postId: string }) => {
     },
 
     onError: (error: AxiosError<ApiError>, _commentId, context) => {
+      // Rollback to previous state on error
       if (context?.previousComments) {
         context.previousComments.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
