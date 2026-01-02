@@ -39,6 +39,21 @@ export const groupService = {
     return response.data;
   },
 
+  // Get Group Marketplace Posts (BUY_SELL type)
+  getGroupMarketplacePosts: async (
+    slug: string,
+    page = 1
+  ): Promise<FeedResponse> => {
+    const limit = 2;
+    const response = await api.get<FeedResponse>(
+      `/groups/${slug}/marketplace`,
+      {
+        params: { page, limit },
+      }
+    );
+    return response.data;
+  },
+
   // Get My Groups
   getMyGroups: async (page = 1): Promise<MyGroupsResponse> => {
     const limit = GROUP_LIMIT;

@@ -189,12 +189,41 @@ export const useGroupPinnedPosts = () => {
   });
 };
 
+export const useGroupMarketplacePosts = () => {
+  const { slug } = useParams();
+  return useInfiniteQuery({
+    queryKey: ["groupMarketplacePosts", slug],
+    queryFn: ({ pageParam }) =>
+      groupService.getGroupMarketplacePosts(
+        slug as string,
+        pageParam as number
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 1, // 1 minute
+  });
+};
+
 export const useCreateGroupPost = () => {
   const { slug } = useParams();
   return useCreatePost({
     invalidateKey: [
       ["groupPosts", slug],
       ["groupPinnedPosts", slug],
+      ["groupDetails", slug],
+    ],
+  });
+};
+
+export const useCreateMarketplacePost = () => {
+  const { slug } = useParams();
+  return useCreatePost({
+    invalidateKey: [
+      ["groupMarketplacePosts", slug],
       ["groupDetails", slug],
     ],
   });
@@ -214,7 +243,11 @@ export const useDeleteGroupPost = () => {
   const { slug } = useParams();
   return useDeletePost({
     queryKey: ["groupPosts", slug],
-    invalidateKey: ["groupDetails", slug], // Post count sync করার জন্য
+    invalidateKey: [
+      ["groupDetails", slug],
+      ["groupMarketplacePosts", slug],
+      ["groupPinnedPosts", slug],
+    ],
   });
 };
 
@@ -223,7 +256,10 @@ export const useUpdateGroupPost = () => {
   const { slug } = useParams();
   return useUpdatePost({
     queryKey: ["groupPosts", slug],
-    invalidateKey: ["groupPinnedPosts", slug],
+    invalidateKey: [
+      ["groupPinnedPosts", slug],
+      ["groupMarketplacePosts", slug],
+    ],
   });
 };
 
