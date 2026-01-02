@@ -206,7 +206,13 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
   );
 
   return (
-    <div className="rounded border border-gray-400 bg-white shadow">
+    <div
+      className={`rounded border shadow ${
+        post.isPinned
+          ? "border-blue-300 bg-blue-200/30"
+          : "border-gray-400 bg-white"
+      }`}
+    >
       {/* Post Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-3">
