@@ -16,10 +16,10 @@ interface CommentMutationProps {
 
 export const usePostComments = ({
   postId,
-  enabled = true,
+  enabled,
 }: {
   postId: string;
-  enabled?: boolean;
+  enabled: boolean;
 }) => {
   return useInfiniteQuery({
     queryKey: ["comments", postId],
