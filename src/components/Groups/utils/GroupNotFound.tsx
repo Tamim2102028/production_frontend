@@ -25,10 +25,9 @@ function GroupNotFound({ error }: GroupNotFoundProps) {
     <div className="flex w-full flex-col items-center justify-center">
       <div className="w-full rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
         {/* টেক্সট কন্টেন্ট */}
-        <h2 className="mb-3 text-2xl font-bold text-gray-800">
-          Group Not Found
+        <h2 className="mb-8 text-2xl font-bold text-gray-800">
+          {errorMessage}
         </h2>
-        <p className="mb-8 leading-relaxed text-gray-500">{errorMessage}</p>
 
         {/* অ্যাকশন বাটনসমূহ */}
         <div className="flex gap-10">

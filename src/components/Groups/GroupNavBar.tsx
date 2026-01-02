@@ -4,7 +4,7 @@ import {
   FaUsers,
   FaImage,
   FaThumbtack,
-  FaStore,
+  FaHandshake,
   FaInfoCircle,
 } from "react-icons/fa";
 import { BsPostcard } from "react-icons/bs";
@@ -21,14 +21,14 @@ const GroupNavBar: React.FC = () => {
       icon: FaThumbtack,
       end: true,
     },
-    { path: `${baseUrl}/members`, label: "Members", icon: FaUsers, end: true },
-    { path: `${baseUrl}/media`, label: "Media", icon: FaImage, end: true },
     {
       path: `${baseUrl}/marketplace`,
       label: "Buy & Sell",
-      icon: FaStore,
+      icon: FaHandshake,
       end: true,
     },
+    { path: `${baseUrl}/members`, label: "Members", icon: FaUsers, end: true },
+    { path: `${baseUrl}/media`, label: "Media", icon: FaImage, end: true },
     { path: `${baseUrl}/about`, label: "About", icon: FaInfoCircle, end: true },
   ] as const;
 
