@@ -20,14 +20,15 @@ import {
 } from "./common/usePost";
 
 import { useAddComment, useDeleteComment } from "./common/useComment";
+import type { CreateGroupData } from "../types/group.types";
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: ({ formData }: { formData: FormData }) =>
-      groupService.createGroup(formData),
+    mutationFn: (groupData: CreateGroupData) =>
+      groupService.createGroup(groupData),
     onSuccess: (data) => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });

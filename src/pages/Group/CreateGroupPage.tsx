@@ -56,18 +56,7 @@ const CreateGroupPage: React.FC = () => {
   const typeValue = watch("type");
 
   const onSubmit = (data: CreateGroupFormInputs) => {
-    const formData = new FormData();
-
-    formData.append("name", data.name);
-    formData.append("type", data.type);
-
-    if (data.description) formData.append("description", data.description);
-    formData.append("privacy", data.privacy);
-
-    // Append settings
-    formData.append("settings", JSON.stringify(data.settings));
-
-    createGroup({ formData });
+    createGroup(data);
   };
 
   const groupTypes = [

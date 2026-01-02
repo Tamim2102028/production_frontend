@@ -38,27 +38,23 @@ const defaultProfileQueryOptions = {
   retry: 1,
 };
 
-export const useProfileHeader = (username?: string) =>
+export const useProfileHeader = (username: string) =>
   useQuery({
     queryKey: ["profileHeader", username],
     queryFn: async () => {
-      if (!username) throw new Error("Username is required");
       const response = await profileService.getProfileHeader(username);
       return response.data;
     },
-    enabled: Boolean(username),
     ...defaultProfileQueryOptions,
   });
 
-export const useProfileDetails = (username?: string) =>
+export const useProfileDetails = (username: string) =>
   useQuery({
     queryKey: ["profileDetails", username],
     queryFn: async () => {
-      if (!username) throw new Error("Username is required");
       const response = await profileService.getProfileDetails(username);
       return response.data;
     },
-    enabled: Boolean(username),
     ...defaultProfileQueryOptions,
   });
 

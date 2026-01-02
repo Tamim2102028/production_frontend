@@ -8,15 +8,12 @@ import type {
   GroupUnreadCountsResponse,
 } from "../types";
 
+import type { CreateGroupData } from "../types/group.types";
+
 export const groupService = {
   // Create Group
-  createGroup: async (data: FormData) => {
-    const response = await api.post("/groups", data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      timeout: 60000, // 60 seconds specifically for group creation with images
-    });
+  createGroup: async (groupData: CreateGroupData) => {
+    const response = await api.post("/groups", groupData);
     return response.data;
   },
 

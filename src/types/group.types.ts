@@ -155,3 +155,14 @@ export type GroupCardResponse = {
       | null;
   };
 };
+
+export type CreateGroupData = {
+  name: string;
+  description?: string;
+  type: (typeof GROUP_TYPES)[keyof typeof GROUP_TYPES];
+  privacy: (typeof GROUP_PRIVACY)[keyof typeof GROUP_PRIVACY];
+  settings: {
+    allowMemberPosting: boolean;
+    requirePostApproval: boolean;
+  };
+};
