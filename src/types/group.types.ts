@@ -89,6 +89,17 @@ export type GroupDetailsResponse = ApiResponse<{
   meta: GroupMeta;
 }>;
 
+// Unread counts response type
+export type GroupUnreadCountsMeta = {
+  unreadPinnedCount: number;
+  unreadMarketplaceCount: number;
+};
+
+export type GroupUnreadCountsResponse = ApiResponse<{
+  group: { _id: string };
+  meta: GroupUnreadCountsMeta;
+}>;
+
 // Member User Type (for member list)
 export type MemberUser = {
   _id: string;

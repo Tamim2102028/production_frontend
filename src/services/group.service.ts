@@ -5,6 +5,7 @@ import type {
   GroupMembersResponse,
   FeedResponse,
   GroupDetailsResponse,
+  GroupUnreadCountsResponse,
 } from "../types";
 
 export const groupService = {
@@ -21,6 +22,16 @@ export const groupService = {
   // Get Group Details
   getGroupDetails: async (slug: string): Promise<GroupDetailsResponse> => {
     const response = await api.get<GroupDetailsResponse>(`/groups/${slug}`);
+    return response.data;
+  },
+
+  // Get Group Unread Counts (lightweight API for navbar badges)
+  getGroupUnreadCounts: async (
+    slug: string
+  ): Promise<GroupUnreadCountsResponse> => {
+    const response = await api.get<GroupUnreadCountsResponse>(
+      `/groups/${slug}/unread-counts`
+    );
     return response.data;
   },
 

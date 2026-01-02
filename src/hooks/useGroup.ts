@@ -137,6 +137,18 @@ export const useGroupDetails = () => {
   });
 };
 
+// Lightweight hook for navbar unread counts
+export const useGroupUnreadCounts = () => {
+  const { slug } = useParams();
+  return useQuery({
+    queryKey: ["groupUnreadCounts", slug],
+    queryFn: async () =>
+      await groupService.getGroupUnreadCounts(slug as string),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    enabled: !!slug,
+  });
+};
+
 export const useGroupMembers = () => {
   const { slug } = useParams();
   return useInfiniteQuery({
@@ -272,6 +284,7 @@ export const useToggleReadStatusGroupPost = () => {
       ["groupPosts", slug],
       ["groupPinnedPosts", slug],
       ["groupMarketplacePosts", slug],
+      ["groupUnreadCounts", slug], // Invalidate unread counts on read/unread toggle
     ],
   });
 };
