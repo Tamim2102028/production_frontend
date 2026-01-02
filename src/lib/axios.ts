@@ -27,7 +27,7 @@ const api = axios.create({
   },
 
   // timeout to prevent hanging requests
-  timeout: 30000, // 30 seconds
+  timeout: 15000, // 15 seconds
   // কিছু request এ timeout বেশি লাগতে পারে, ওগুলোতে আলাদা করে set করা যাবে
 });
 
