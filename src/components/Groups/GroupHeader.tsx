@@ -6,7 +6,6 @@ import {
   FaUserSlash,
   FaCheck,
   FaBell,
-  FaShareAlt,
   FaTrash,
 } from "react-icons/fa";
 import { toast } from "sonner";
@@ -242,11 +241,6 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                   <button className="flex cursor-pointer items-center gap-2 rounded-lg bg-blue-200 px-6 py-2.5 font-semibold text-gray-700 hover:bg-blue-300">
                     <FaBell className="h-4 w-4" />
                     Notifications
-                  </button>
-
-                  <button className="flex cursor-pointer items-center gap-2 rounded-lg bg-blue-200 px-6 py-2.5 font-semibold text-gray-700 hover:bg-blue-300">
-                    <FaShareAlt className="h-4 w-4" />
-                    Share
                   </button>
                 </div>
               </div>
