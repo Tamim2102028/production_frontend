@@ -82,12 +82,14 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
   const { user: currentUser } = useUser();
 
   // Post hooks
-  const { mutate: likeMutate } = useToggleLikeGroupPost();
+  const { mutate: likeMutate, isPending: isLiking } = useToggleLikeGroupPost();
   const { mutate: deletePost, isPending: isDeleting } = useDeleteGroupPost();
   const { mutate: updatePost, isPending: isUpdating } = useUpdateGroupPost();
-  const { mutate: toggleReadStatus } = useToggleReadStatusGroupPost();
-  const { mutate: toggleBookmark } = useToggleBookmarkGroupPost();
-  const { mutate: togglePin } = useTogglePinGroupPost();
+  const { mutate: toggleReadStatus, isPending: isTogglingRead } =
+    useToggleReadStatusGroupPost();
+  const { mutate: toggleBookmark, isPending: isBookmarking } =
+    useToggleBookmarkGroupPost();
+  const { mutate: togglePin, isPending: isPinning } = useTogglePinGroupPost();
 
   // Comment hooks
 
@@ -227,7 +229,8 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => toggleReadStatus({ postId: post._id })}
-            className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
+            disabled={isTogglingRead}
+            className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 disabled:opacity-50 ${
               meta.isRead ? "text-blue-600" : "text-gray-500"
             }`}
             title={meta.isRead ? "Mark as unread" : "Mark as read"}
@@ -265,7 +268,8 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
                   {/* save/unsave button */}
                   <button
                     onClick={handleToggleBookmark}
-                    className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                    disabled={isBookmarking}
+                    className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 disabled:opacity-50 ${
                       meta.isSaved ? "text-blue-600" : "text-gray-700"
                     }`}
                   >
@@ -314,7 +318,8 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
                           togglePin({ postId: post._id });
                           setShowMenu(false);
                         }}
-                        className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                        disabled={isPinning}
+                        className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 disabled:opacity-50 ${
                           post.isPinned ? "text-yellow-600" : "text-gray-700"
                         }`}
                       >
@@ -458,7 +463,8 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({ post, meta }) => {
           {/* like button */}
           <button
             onClick={handleLike}
-            className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
+            disabled={isLiking}
+            className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors disabled:opacity-50 ${
               meta.isLiked
                 ? "bg-red-50 text-red-600 hover:bg-red-100"
                 : "text-gray-600 hover:bg-gray-100"

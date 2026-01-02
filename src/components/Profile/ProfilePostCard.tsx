@@ -85,12 +85,15 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
   const isOwnPost = meta.isMine;
 
   // Post hooks
-  const { mutate: likeMutate } = useToggleLikeProfilePost();
+  const { mutate: likeMutate, isPending: isLiking } =
+    useToggleLikeProfilePost();
   const { mutate: deletePost, isPending: isDeleting } = useDeleteProfilePost();
   const { mutate: updatePost, isPending: isUpdating } = useUpdateProfilePost();
-  const { mutate: toggleReadStatus } = useToggleReadStatusProfilePost();
-  const { mutate: toggleBookmark } = useToggleBookmarkProfilePost();
-  const { mutate: togglePin } = useTogglePinProfilePost();
+  const { mutate: toggleReadStatus, isPending: isTogglingRead } =
+    useToggleReadStatusProfilePost();
+  const { mutate: toggleBookmark, isPending: isBookmarking } =
+    useToggleBookmarkProfilePost();
+  const { mutate: togglePin, isPending: isPinning } = useTogglePinProfilePost();
 
   // Comment hooks
   const {
@@ -228,7 +231,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => toggleReadStatus({ postId: post._id })}
-            className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 ${
+            disabled={isTogglingRead}
+            className={`flex h-9 items-center gap-2 rounded-lg px-3 transition-colors hover:bg-gray-200 disabled:opacity-50 ${
               meta.isRead ? "text-blue-600" : "text-gray-500"
             }`}
             title={meta.isRead ? "Mark as unread" : "Mark as read"}
@@ -265,7 +269,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
                 <div className="py-1">
                   <button
                     onClick={handleToggleBookmark}
-                    className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                    disabled={isBookmarking}
+                    className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 disabled:opacity-50 ${
                       meta.isSaved ? "text-blue-600" : "text-gray-700"
                     }`}
                   >
@@ -309,7 +314,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
                           togglePin({ postId: post._id });
                           setShowMenu(false);
                         }}
-                        className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                        disabled={isPinning}
+                        className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 disabled:opacity-50 ${
                           post.isPinned ? "text-yellow-600" : "text-gray-700"
                         }`}
                       >
@@ -449,7 +455,8 @@ const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ post, meta }) => {
           {/* like button */}
           <button
             onClick={handleLike}
-            className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
+            disabled={isLiking}
+            className={`flex items-center justify-center space-x-2 rounded-lg px-3 py-2 transition-colors disabled:opacity-50 ${
               meta.isLiked
                 ? "bg-red-50 text-red-600 hover:bg-red-100"
                 : "text-gray-600 hover:bg-gray-100"
