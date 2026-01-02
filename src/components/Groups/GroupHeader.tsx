@@ -99,7 +99,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
   const { isAdmin, isOwner, status } = meta;
 
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden">
       {group.coverImage ? (
         <img
           src={group.coverImage}
