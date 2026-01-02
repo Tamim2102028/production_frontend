@@ -229,65 +229,81 @@ export const useCreateMarketplacePost = () => {
   });
 };
 
-// [REFACTORED] Using Generic Hook
+// Group Post Like Toggle - Using Common Hook with multiple invalidateKeys
 export const useToggleLikeGroupPost = () => {
   const { slug } = useParams();
   return useToggleLikePost({
     queryKey: ["groupPosts", slug],
-    invalidateKey: ["groupPinnedPosts", slug], // Pinned post sync করার জন্য
+    invalidateKey: [
+      ["groupPosts", slug],
+      ["groupPinnedPosts", slug],
+      ["groupMarketplacePosts", slug],
+    ],
   });
 };
 
-// [REFACTORED] Using Generic Hook
+// Group Post Delete - Using Common Hook with multiple invalidateKeys
 export const useDeleteGroupPost = () => {
   const { slug } = useParams();
   return useDeletePost({
     queryKey: ["groupPosts", slug],
     invalidateKey: [
-      ["groupDetails", slug],
-      ["groupMarketplacePosts", slug],
+      ["groupPosts", slug],
       ["groupPinnedPosts", slug],
+      ["groupMarketplacePosts", slug],
+      ["groupDetails", slug],
     ],
   });
 };
 
-// [REFACTORED] Using Generic Hook
+// Group Post Update - Using Common Hook with multiple invalidateKeys
 export const useUpdateGroupPost = () => {
   const { slug } = useParams();
   return useUpdatePost({
     queryKey: ["groupPosts", slug],
     invalidateKey: [
+      ["groupPosts", slug],
       ["groupPinnedPosts", slug],
       ["groupMarketplacePosts", slug],
     ],
   });
 };
 
-// [REFACTORED] Using Generic Hook
+// Group Post Read Status Toggle - Using Common Hook with multiple invalidateKeys
 export const useToggleReadStatusGroupPost = () => {
   const { slug } = useParams();
   return useToggleReadStatus({
     queryKey: ["groupPosts", slug],
-    invalidateKey: ["groupPinnedPosts", slug],
+    invalidateKey: [
+      ["groupPosts", slug],
+      ["groupPinnedPosts", slug],
+      ["groupMarketplacePosts", slug],
+    ],
   });
 };
 
-// [REFACTORED] Using Generic Hook
+// Group Post Bookmark Toggle - Using Common Hook with multiple invalidateKeys
 export const useToggleBookmarkGroupPost = () => {
   const { slug } = useParams();
   return useToggleBookmark({
     queryKey: ["groupPosts", slug],
+    invalidateKey: [
+      ["groupPosts", slug],
+      ["groupPinnedPosts", slug],
+      ["groupMarketplacePosts", slug],
+    ],
   });
 };
 
-// [REFACTORED] Using Generic Hook
+// Group Post Pin Toggle - Using Common Hook with multiple invalidateKeys
 export const useTogglePinGroupPost = () => {
   const { slug } = useParams();
   return useTogglePin({
     queryKey: ["groupPosts", slug],
     invalidateKey: [
+      ["groupPosts", slug],
       ["groupPinnedPosts", slug],
-      ["groupDetails", slug],
+      ["groupMarketplacePosts", slug],
     ],
   });
 };
@@ -613,7 +629,11 @@ export const useAddGroupComment = ({ postId }: { postId: string }) => {
   const { slug } = useParams();
   return useAddComment({
     postId,
-    invalidateKey: ["groupPosts", slug],
+    invalidateKey: [
+      ["groupPosts", slug],
+      ["groupPinnedPosts", slug],
+      ["groupMarketplacePosts", slug],
+    ],
   });
 };
 
@@ -621,7 +641,11 @@ export const useDeleteGroupComment = ({ postId }: { postId: string }) => {
   const { slug } = useParams();
   return useDeleteComment({
     postId,
-    invalidateKey: ["groupPosts", slug],
+    invalidateKey: [
+      ["groupPosts", slug],
+      ["groupPinnedPosts", slug],
+      ["groupMarketplacePosts", slug],
+    ],
   });
 };
 

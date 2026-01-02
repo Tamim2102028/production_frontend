@@ -146,7 +146,15 @@ export const useToggleLikePost = ({
     },
     onSettled: () => {
       if (invalidateKey) {
-        queryClient.invalidateQueries({ queryKey: invalidateKey });
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey as (string | undefined)[],
+          });
+        }
       }
     },
   });
@@ -215,13 +223,24 @@ export const useToggleReadStatus = ({
 
     onSettled: () => {
       if (invalidateKey) {
-        queryClient.invalidateQueries({ queryKey: invalidateKey });
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey as (string | undefined)[],
+          });
+        }
       }
     },
   });
 };
 
-export const useToggleBookmark = ({ queryKey }: UsePostMutationProps) => {
+export const useToggleBookmark = ({
+  queryKey,
+  invalidateKey,
+}: UsePostMutationProps) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ postId }: { postId: string }) =>
@@ -265,6 +284,21 @@ export const useToggleBookmark = ({ queryKey }: UsePostMutationProps) => {
       );
 
       return { previousPosts };
+    },
+
+    onSuccess: () => {
+      // Invalidate related queries
+      if (invalidateKey) {
+        if (Array.isArray(invalidateKey[0])) {
+          invalidateKey.forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key as string[] });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey as string[],
+          });
+        }
+      }
     },
 
     onError: (error: AxiosError<ApiError>, variables, context) => {
@@ -320,7 +354,15 @@ export const useUpdatePost = ({
 
       // Invalidate additional queries if specified (e.g., pinned posts)
       if (invalidateKey) {
-        queryClient.invalidateQueries({ queryKey: invalidateKey });
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey as (string | undefined)[],
+          });
+        }
       }
 
       toast.success(data.message || data.data?.message);
@@ -369,7 +411,15 @@ export const useDeletePost = ({
 
       // 2. Dynamic Header Invalidate করা (যদি Key থাকে)
       if (invalidateKey) {
-        queryClient.invalidateQueries({ queryKey: invalidateKey });
+        if (Array.isArray(invalidateKey[0])) {
+          (invalidateKey as (string | undefined)[][]).forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: key });
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: invalidateKey as (string | undefined)[],
+          });
+        }
       }
 
       toast.success(response.message);
