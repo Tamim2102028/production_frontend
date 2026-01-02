@@ -6,7 +6,7 @@ import {
   FaUserFriends,
   FaLock,
   FaVideo,
-  FaShoppingCart,
+  FaTag,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 import { useForm } from "react-hook-form";
@@ -150,8 +150,8 @@ const CreateMarketplacePost: React.FC<{ groupId: string }> = ({ groupId }) => {
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Header with icon */}
-          <div className="mb-3 flex items-center gap-2 text-green-600">
-            <FaShoppingCart className="h-5 w-5" />
+          <div className="mb-3 flex items-center gap-2 text-orange-600">
+            <FaTag className="h-5 w-5" />
             <span className="font-semibold">Sell Something</span>
           </div>
 
@@ -168,7 +168,7 @@ const CreateMarketplacePost: React.FC<{ groupId: string }> = ({ groupId }) => {
                   {...register("content")}
                   onFocus={() => setIsExpanded(true)}
                   placeholder="What are you selling? Include price, condition, etc."
-                  className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  className="w-full resize-none rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   rows={isExpanded ? 4 : 1}
                   maxLength={5000}
                 />
@@ -178,7 +178,7 @@ const CreateMarketplacePost: React.FC<{ groupId: string }> = ({ groupId }) => {
                   type="text"
                   {...register("tags")}
                   placeholder="Add tags (e.g., books, electronics, price)"
-                  className="mt-2 w-full rounded-lg border border-gray-300 p-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  className="mt-2 w-full rounded-lg border border-gray-300 p-2 text-sm font-medium focus:border-transparent focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
               )}
             </div>
@@ -222,7 +222,7 @@ const CreateMarketplacePost: React.FC<{ groupId: string }> = ({ groupId }) => {
                         aria-pressed={privacy === opt.value}
                         className={`flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
                           privacy === opt.value
-                            ? "bg-green-50 text-green-600"
+                            ? "bg-orange-50 text-orange-600"
                             : "text-gray-600 hover:bg-gray-100"
                         }`}
                       >
@@ -253,7 +253,7 @@ const CreateMarketplacePost: React.FC<{ groupId: string }> = ({ groupId }) => {
                   <button
                     type="submit"
                     disabled={!isValid || isPending}
-                    className="flex items-center space-x-2 rounded-lg bg-green-600 px-6 py-2 text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex items-center space-x-2 rounded-lg bg-orange-600 px-6 py-2 text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <span>{isPending ? "Posting..." : "Post for Sale"}</span>
                   </button>
@@ -268,7 +268,7 @@ const CreateMarketplacePost: React.FC<{ groupId: string }> = ({ groupId }) => {
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex items-center space-x-2 rounded-lg bg-green-600 px-6 py-2 text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+                className="flex items-center space-x-2 rounded-lg bg-orange-600 px-6 py-2 text-white transition-colors hover:bg-orange-700 disabled:opacity-50"
               >
                 <FaPaperPlane className="h-4 w-4" />
                 <span>{isPending ? "Posting..." : "Post"}</span>

@@ -36,7 +36,7 @@ const GroupNavBar: React.FC = () => {
       icon: FaHandshake,
       end: true,
       badge: unreadMarketplaceCount,
-      badgeColor: "bg-green-500",
+      badgeColor: "bg-orange-500",
     },
     {
       path: `${baseUrl}/members`,
