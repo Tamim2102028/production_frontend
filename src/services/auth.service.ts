@@ -2,21 +2,21 @@
 import api from "../lib/axios";
 
 // Types
-import type { LoginCredentials, User, ApiResponse } from "../types";
+import type {
+  LoginCredentials,
+  User,
+  ApiResponse,
+  RegisterData,
+} from "../types";
 
 export const authService = {
   // Register new user
   register: async (
-    formData: FormData
+    userData: RegisterData
   ): Promise<ApiResponse<{ user: User }>> => {
     const response = await api.post<ApiResponse<{ user: User }>>(
       "/users/register",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      userData
     );
     return response.data;
   },

@@ -66,15 +66,8 @@ const Register = () => {
 
   // ✅ Form submit handler - much cleaner now!
   const onSubmit = (data: RegisterFormData) => {
-    // Backend এ FormData হিসেবে পাঠাতে হবে
-    const formData = new FormData();
-    formData.append("fullName", data.fullName);
-    formData.append("email", data.email);
-    formData.append("userName", data.userName);
-    formData.append("password", data.password);
-    formData.append("userType", data.userType);
-
-    register({ formData });
+    // 📝 Real World Safety: Backend এও এখন agreeToTerms পাঠানো হচ্ছে
+    register({ userData: data });
   };
 
   return (

@@ -186,3 +186,13 @@ export interface LoginCredentials {
   userName?: string;
   password: string;
 }
+
+// Register Types
+export interface RegisterData {
+  fullName: string;
+  email: string;
+  userName: string;
+  password: string;
+  userType: UserType;
+  agreeToTerms: boolean;
+}

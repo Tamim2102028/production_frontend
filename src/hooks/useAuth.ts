@@ -2,7 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import authService from "../services/auth.service";
-import type { LoginCredentials, AuthState, ApiError } from "../types";
+import type {
+  LoginCredentials,
+  AuthState,
+  ApiError,
+  RegisterData,
+} from "../types";
 import type { AxiosError } from "axios";
 
 // Query Keys
@@ -47,8 +52,9 @@ export const useRegister = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ formData }: { formData: FormData }) =>
-      authService.register(formData),
+    mutationFn: ({ userData }: { userData: RegisterData }) =>
+      authService.register(userData),
+
     onSuccess: (response) => {
       queryClient.setQueryData(AUTH_KEYS.currentUser, response.data.user);
       toast.success(response.message);
