@@ -245,4 +245,33 @@ export const groupService = {
     );
     return response.data;
   },
+
+  // Update Group Details
+  updateGroupDetails: async (
+    slug: string,
+    updateData: Partial<CreateGroupData>
+  ) => {
+    const response = await api.patch(`/groups/${slug}/details`, updateData);
+    return response.data;
+  },
+
+  // Update Group Avatar
+  updateGroupAvatar: async (slug: string, avatar: File) => {
+    const formData = new FormData();
+    formData.append("avatar", avatar);
+    const response = await api.patch(`/groups/${slug}/avatar`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
+
+  // Update Group Cover Image
+  updateGroupCoverImage: async (slug: string, coverImage: File) => {
+    const formData = new FormData();
+    formData.append("coverImage", coverImage);
+    const response = await api.patch(`/groups/${slug}/cover-image`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
 };

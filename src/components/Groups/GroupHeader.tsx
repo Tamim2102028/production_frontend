@@ -9,6 +9,7 @@ import {
   FaTrash,
   FaEdit,
 } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { confirm } from "../../utils/sweetAlert";
 import type { Group, GroupMeta } from "../../types";
@@ -162,12 +163,15 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                       <div className="absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
                         <div className="py-1">
                           {isAdmin && isOwner && (
-                            <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50">
+                            <Link
+                              to={`/groups/${group.slug}/edit`}
+                              className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                            >
                               <FaCog className="h-4 w-4 flex-shrink-0" />
                               <span className="font-medium">
                                 Group Settings
                               </span>
-                            </button>
+                            </Link>
                           )}
                           <button
                             onClick={handleCopyLink}
@@ -245,10 +249,13 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                   </button>
 
                   {(isOwner || isAdmin) && (
-                    <button className="flex cursor-pointer items-center gap-2 rounded-lg bg-gray-100 px-6 py-2.5 font-semibold text-gray-700 transition hover:bg-gray-200">
+                    <Link
+                      to={`/groups/${group.slug}/edit`}
+                      className="flex cursor-pointer items-center gap-2 rounded-lg bg-gray-100 px-6 py-2.5 font-semibold text-gray-700 transition hover:bg-gray-200"
+                    >
                       <FaEdit className="h-4 w-4" />
                       Edit Group
-                    </button>
+                    </Link>
                   )}
                 </div>
               </div>

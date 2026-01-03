@@ -161,6 +161,14 @@ export const routes: RouteConfig[] = [
     meta: { description: "Join and manage groups" },
   },
   {
+    path: "/groups/:slug/edit",
+    component: lazy(() => import("../pages/Group/EditGroupPage")),
+    requireAuth: true,
+    title: "Manage Group",
+    category: "social",
+    meta: { description: "Edit group information and settings" },
+  },
+  {
     path: "/notifications",
     component: lazy(() => import("../pages/Notifications")),
     requireAuth: true,

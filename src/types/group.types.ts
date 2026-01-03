@@ -21,6 +21,8 @@ export type Group = {
   settings?: {
     allowComments?: boolean;
     allowPosts?: boolean;
+    allowMemberPosting?: boolean;
+    requirePostApproval?: boolean;
   };
   membersCount?: number;
   postsCount?: number;

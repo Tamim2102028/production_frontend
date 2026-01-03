@@ -651,3 +651,66 @@ export const useDeleteGroupComment = ({ postId }: { postId: string }) => {
     ],
   });
 };
+
+export const useUpdateGroupDetails = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      slug,
+      updateData,
+    }: {
+      slug: string;
+      updateData: Partial<CreateGroupData>;
+    }) => groupService.updateGroupDetails(slug, updateData),
+    onSuccess: (_, variables) => {
+      toast.success("Group details updated successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["groupDetails", variables.slug],
+      });
+      queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to update group details"
+      );
+    },
+  });
+};
+
+export const useUpdateGroupAvatar = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ slug, avatar }: { slug: string; avatar: File }) =>
+      groupService.updateGroupAvatar(slug, avatar),
+    onSuccess: (_, variables) => {
+      toast.success("Avatar updated successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["groupDetails", variables.slug],
+      });
+      queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      toast.error(error?.response?.data?.message || "Failed to update avatar");
+    },
+  });
+};
+
+export const useUpdateGroupCoverImage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ slug, coverImage }: { slug: string; coverImage: File }) =>
+      groupService.updateGroupCoverImage(slug, coverImage),
+    onSuccess: (_, variables) => {
+      toast.success("Cover image updated successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["groupDetails", variables.slug],
+      });
+      queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to update cover image"
+      );
+    },
+  });
+};
