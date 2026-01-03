@@ -35,7 +35,7 @@ const Sidebar: React.FC = () => {
       icon: FaSearch,
       label: "Search",
       path: "/search",
-      active: location.pathname === "/search",
+      active: location.pathname.startsWith("/search"),
     },
     {
       icon: FaTrophy,
@@ -47,80 +47,80 @@ const Sidebar: React.FC = () => {
       icon: FaSchool,
       label: "ClassRoom",
       path: "/classroom",
-      active: location.pathname === "/classroom",
+      active: location.pathname.startsWith("/classroom"),
     },
     {
       icon: FaLayerGroup,
       label: "Groups",
       path: "/groups",
-      active: location.pathname === "/groups",
+      active: location.pathname.startsWith("/groups"),
     },
     {
       icon: FaFolder,
       label: "Files & Archive",
       path: "/files",
-      active: location.pathname === "/files",
+      active: location.pathname.startsWith("/files"),
     },
     {
       icon: FaUserFriends,
       label: "Friends",
       path: "/friends",
-      active: location.pathname === "/friends",
+      active: location.pathname.startsWith("/friends"),
     },
     {
       icon: FaBell,
       label: "Notifications",
       path: "/notifications",
-      active: location.pathname === "/notifications",
+      active: location.pathname.startsWith("/notifications"),
       badge: 5,
     },
     {
       icon: BsStars,
       label: "Study Helper AI",
       path: "/study-helper",
-      active: location.pathname === "/study-helper",
+      active: location.pathname.startsWith("/study-helper"),
     },
     {
       icon: FaBookOpen,
       label: "Open Study",
       path: "/open-study",
-      active: location.pathname === "/open-study",
+      active: location.pathname.startsWith("/open-study"),
     },
     {
       icon: FaBriefcase,
       label: "Career Hub",
       path: "/career-hub",
-      active: location.pathname === "/career-hub",
+      active: location.pathname.startsWith("/career-hub"),
     },
     {
       icon: FaStore,
       label: "Student Store",
       path: "/store",
-      active: location.pathname === "/store",
+      active: location.pathname.startsWith("/store"),
     },
     {
       icon: FaChalkboardTeacher,
       label: "Tuition",
       path: "/tuition",
-      active: location.pathname === "/tuition",
+      active: location.pathname.startsWith("/tuition"),
     },
     {
       icon: FaVideo,
       label: "Videos",
       path: "/videos",
-      active: location.pathname === "/videos",
+      active: location.pathname.startsWith("/videos"),
     },
     {
       icon: FaEllipsisH,
       label: "More",
       path: "/more",
-      active: location.pathname === "/more",
+      active: location.pathname.startsWith("/more"),
     },
     {
       icon: FaCog,
       label: "Settings",
       path: "/settings",
-      active: location.pathname === "/settings",
+      active: location.pathname.startsWith("/settings"),
     },
   ];
 
@@ -150,7 +150,7 @@ const Sidebar: React.FC = () => {
               onMouseEnter={() => prefetchRoute(item.path)}
               className={`flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium transition-all duration-200 ${
                 item.active
-                  ? "text-blue-600"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-blue-100 hover:text-gray-900"
               }`}
             >
