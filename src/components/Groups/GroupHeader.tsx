@@ -7,6 +7,7 @@ import {
   FaCheck,
   FaBell,
   FaTrash,
+  FaEdit,
 } from "react-icons/fa";
 import { toast } from "sonner";
 import { confirm } from "../../utils/sweetAlert";
@@ -242,6 +243,13 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, meta }) => {
                     <FaBell className="h-4 w-4" />
                     Notifications
                   </button>
+
+                  {(isOwner || isAdmin) && (
+                    <button className="flex cursor-pointer items-center gap-2 rounded-lg bg-gray-100 px-6 py-2.5 font-semibold text-gray-700 transition hover:bg-gray-200">
+                      <FaEdit className="h-4 w-4" />
+                      Edit Group
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
