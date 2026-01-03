@@ -74,9 +74,7 @@ export const useLogin = () => {
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(
-        error?.response?.data?.message ?? "Login failed, please try again"
-      );
+      toast.error(error?.response?.data?.message ?? "Internal server error");
     },
   });
 };

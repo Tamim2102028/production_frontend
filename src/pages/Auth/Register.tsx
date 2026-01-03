@@ -4,11 +4,8 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { toast } from "sonner";
 import { useRegister } from "../../hooks/useAuth";
 import { USER_TYPES } from "../../constants";
-import type { AxiosError } from "axios";
-import type { ApiError } from "../../types";
 
 // ✅ Zod Schema - Backend validation এর সাথে match করে
 const registerSchema = z.object({
@@ -49,7 +46,6 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 const Register = () => {
   const { mutate: register, isPending } = useRegister();
   const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
 
   // ✅ React Hook Form with Zod resolver
   const {
@@ -70,8 +66,6 @@ const Register = () => {
 
   // ✅ Form submit handler - much cleaner now!
   const onSubmit = (data: RegisterFormData) => {
-    setServerError(null);
-
     // Backend এ FormData হিসেবে পাঠাতে হবে
     const formData = new FormData();
     formData.append("fullName", data.fullName);
@@ -80,18 +74,7 @@ const Register = () => {
     formData.append("password", data.password);
     formData.append("userType", data.userType);
 
-    register(
-      { formData },
-      {
-        onError: (error: AxiosError<ApiError>) => {
-          const message =
-            error.response?.data?.message ||
-            "Registration failed. Please try again.";
-          setServerError(message);
-          toast.error(message);
-        },
-      }
-    );
+    register({ formData });
   };
 
   return (
@@ -108,13 +91,6 @@ const Register = () => {
       {/* Register Form - Right Side */}
       <div className="max-h-[90vh] w-[550px] overflow-y-auto rounded-lg border bg-white p-5 shadow-lg">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Server Error */}
-          {serverError && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-              {serverError}
-            </div>
-          )}
-
           {/* Scrollable Input Fields */}
           <div className="max-h-[70vh] space-y-3 overflow-y-auto p-2">
             {/* Full Name Field */}

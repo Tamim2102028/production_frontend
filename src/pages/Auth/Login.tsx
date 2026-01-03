@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { toast } from "sonner";
-import type { AxiosError } from "axios";
 import { useLogin } from "../../hooks/useAuth";
-import type { ApiError } from "../../types";
 
 // ✅ Zod Schema for Login
 const loginSchema = z.object({
@@ -22,7 +19,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 const Login = () => {
   const { mutate: login, isPending } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
+  // ✅ Password field focus করার জন্য Ref
+  const passwordRef = useRef<HTMLInputElement | null>(null);
 
   // ✅ React Hook Form with Zod resolver
   const {
@@ -48,13 +46,13 @@ const Login = () => {
         password: "",
         rememberMe: true,
       });
+      // ✅ Email যদি আগে থেকেই থাকে, তাহলে সরাসরি Password field এ focus করব
+      setTimeout(() => passwordRef.current?.focus(), 0);
     }
   }, [reset]);
 
   // ✅ Form submit handler
   const onSubmit = (data: LoginFormData) => {
-    setServerError(null);
-
     // Remember Me: login করার আগেই handle করি
     if (data.rememberMe) {
       localStorage.setItem("rememberedEmail", data.email);
@@ -62,16 +60,7 @@ const Login = () => {
       localStorage.removeItem("rememberedEmail");
     }
 
-    login(
-      { credentials: { email: data.email, password: data.password } },
-      {
-        onError: (error: AxiosError<ApiError>) => {
-          const message = error.response?.data?.message;
-          setServerError(message || "Error from server");
-          toast.error(message || "Error from server");
-        },
-      }
-    );
+    login({ credentials: { email: data.email, password: data.password } });
   };
 
   return (
@@ -88,13 +77,6 @@ const Login = () => {
       {/* Login Form - Right Side */}
       <div className="w-[400px] rounded-lg border bg-white p-8 shadow-lg">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Server Error */}
-          {serverError && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-              {serverError}
-            </div>
-          )}
-
           <div className="space-y-4">
             {/* Email Field */}
             <div>
@@ -107,6 +89,7 @@ const Login = () => {
               <input
                 id="email"
                 type="text"
+                autoFocus // ✅ নতুন উইন্ডো লোড হলে বাই-ডিফল্ট এখানে ফোকাস থাকবে
                 {...register("email")}
                 className={`mt-1 w-full rounded-lg border px-3 py-2 transition-colors focus:ring-2 focus:outline-none ${
                   errors.email
@@ -135,6 +118,11 @@ const Login = () => {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
+                  // ✅ Hook Form এর সাথে Ref কানেক্ট করা
+                  ref={(e) => {
+                    register("password").ref(e);
+                    passwordRef.current = e;
+                  }}
                   className={`w-full rounded-lg border px-3 py-2 pr-10 transition-colors focus:ring-2 focus:outline-none ${
                     errors.password
                       ? "border-red-500 focus:ring-red-500"
