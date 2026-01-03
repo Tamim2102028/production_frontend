@@ -70,7 +70,7 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ avatar, coverImage }) => {
             <button
               onClick={() => avatarInputRef.current?.click()}
               disabled={isUpdatingAvatar}
-              className="absolute -right-2 -bottom-2 flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all group-hover:bg-blue-700 hover:scale-110 active:scale-95 disabled:bg-gray-400"
+              className="absolute -right-2 -bottom-2 flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all group-hover:bg-blue-700 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-50"
             >
               <FaCamera />
             </button>
@@ -118,7 +118,7 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ avatar, coverImage }) => {
             <button
               onClick={() => coverInputRef.current?.click()}
               disabled={isUpdatingCover}
-              className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-900 shadow-xl backdrop-blur-sm transition-all hover:scale-110 active:scale-95 disabled:bg-gray-200"
+              className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-900 shadow-xl backdrop-blur-sm transition-all hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:opacity-50"
             >
               <FaCamera />
             </button>
